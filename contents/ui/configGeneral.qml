@@ -27,7 +27,7 @@ Item {
             columns: 2
             Label{
                 id: label1
-                width: Math.max(0.3 * root.width, 220)
+                width: 0.3 * root.width
                 text: i18n("Poll Interval: ")
                 horizontalAlignment: Text.AlignRight
             }
@@ -41,6 +41,12 @@ Item {
                             return (value === 1 ? qsTr("%1 min")
                                                 : qsTr("%1 mins")).arg(value);
                    }
+            }
+            Kirigami.InlineMessage {
+                width: label1.width * 2
+                text: "Consider switching this to a higher value for better battery performance!"
+                type: Kirigami.MessageType.Warning
+                visible: time.value < 10
             }
 
         }

@@ -8,7 +8,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 
 PlasmoidItem {
   id: main
-  property string subtext: i18n("Packages")
+  property string subtext: i18n("Updates")
   property string title: title
   toolTipSubText: subtext
   Plasmoid.icon: "package-new"
@@ -42,7 +42,7 @@ PlasmoidItem {
 
   Item {
     id: config
-    property int interval: Math.max(900000, plasmoid.configuration.pollinterval * 1000 * 60)
+    property int interval: plasmoid.configuration.pollinterval * 1000 * 60
     property string updateChecker: plasmoid.configuration.updatechecker || "checkupdates"
     property string updateChecker_aur: plasmoid.configuration.updatechecker_aur || "yay -Su"
     property string updateCommand: plasmoid.configuration.installationcommand || "pacman -Syu"
@@ -111,7 +111,7 @@ PlasmoidItem {
     id: timer
     interval: config.interval
     running: true
-    repeat: false
+    repeat: true
     onTriggered: {
       executable.exec(config.updateChecker)
       if (config.updateChecker_aur != null) {
