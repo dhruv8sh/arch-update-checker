@@ -1,11 +1,14 @@
-import QtQuick
-
 import org.kde.plasma.configuration
 
 ConfigModel {
     ConfigCategory {
-         name: i18nc("@title", "Arch update notifier configuration")
-         icon: "preferences-other"
-         source: "config/configInterval.qml"
+        name: i18n("General")
+        icon: "configure"
+        source: "configGeneral.qml"
+    }
+    ConfigCategory {
+        name: i18n("Pacman")
+        icon: "repository"
+        source: "configPacman.qml"
     }
 }

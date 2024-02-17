@@ -1,56 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
-http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
-<kcfgfile name=""/>
-
-<group name="intervalConfigPage">
-
-<entry name="updateInterval" type="Int">
-<default>30</default>
-</entry>
-
-<entry name="debugMode" type="Bool">
-<default>false</default>
-</entry>
-
-<entry name="konsoleIsValid" type="Bool">
-<default>false</default>
-</entry>
-
-<entry name="checkupdateIsValid" type="Bool">
-<default>false</default>
-</entry>
-
-<entry name="notCloseCommand" type="Bool">
-<default>false</default>
-</entry>
-
-<entry name="updateCommand" type="String">
-<default>yay</default>
-</entry>
-
-<entry name="countArchCommand" type="String">
-<default>checkupdates | wc -l</default>
-</entry>
-
-<entry name="countAurCommand" type="String">
-<default>yay -Qua | wc -l</default>
-</entry>
-
-<entry name="dotVisible" type="Bool">
-<default>false</default>
-</entry>
-
-<entry name="dotColor" type="String">
-<default>white</default>
-</entry>
-
-<entry name="dotUseCustomColor" type="Bool">
-<default>false</default>
-</entry>
-
-</group>
-
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="pollinterval" type="Int">
+      <label>Polling Interval</label>
+      <whatsthis>Polling interval (in minutes).</whatsthis>
+      <default>10</default>
+    </entry>
+    <entry name="dotColor" type="String">
+      <label>Dot Color</label>
+      <whatsthis>Color of the badge</whatsthis>
+      <default>White</default>
+    </entry>
+    <entry name="numberAvailable" type="Bool">
+      <label>Show number of updates</label>
+      <whatsthis>Is number available on the badge</whatsthis>
+      <default>True</default>
+    </entry>
+    <entry name="zeroPackageBadge" type="Bool">
+      <label>Show badge even when zero packages available</label>
+      <whatsthis>If enabled, shows badge along with the text even when zero packages are available to updgrade</whatsthis>
+      <default>False</default>
+    </entry>
+  </group>
+  <group name="Pacman">
+    <entry name="updatechecker" type="String">
+      <label>Update Checker Command</label>
+      <whatsthis>Application to check for updates without updating package database.</whatsthis>
+      <default>checkupdates</default>
+    </entry>
+    <entry name="updatechecker_aur" type="String">
+      <label>AUR Update Checker Command</label>
+      <whatsthis>Application to check AUR for updates without installing.</whatsthis>
+      <default>yay -Su | tee /dev/null</default>
+    </entry>
+    <entry name="installationcommand" type="String">
+      <label>Command to Perform Installation</label>
+      <whatsthis>Application to install updates.</whatsthis>
+      <default>yay</default>
+    </entry>
+  </group>
 </kcfg>

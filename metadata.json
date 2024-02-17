@@ -6,18 +6,20 @@
                 "Name": "Dhruvesh Surolia"
             }
         ],
-        "Category": "System Information",
-        "Description": "Show and handle the pending pacman update",
-        "Icon": "update-none-symbolic",
-        "Id": "dhurv8sh.archupdate.plasmoid",
-        "License": "GPL-3.0+",
-        "Name": "Arch Update Detector",
+        "Category": "Utilities",
+        "Dependencies": [
+        ],
+        "Description": "A utility to check for updates without updating the pacman database.",
+        "EnabledByDefault": true,
+        "Id": "org.kde.updatenotifier",
+        "License": "GPL",
+        "Name": "Arch Update Checker",
+        "Icon": "update-none",
         "ServiceTypes": [
             "Plasma/Applet"
         ],
-        "Depends": ["konsole", "pacman-contrib", "yay"]
+        "Version": "0.1",
+        "Website": "https://github.com/dhruv8sh/arch-update-checker"
     },
-    "X-Plasma-NotificationArea": "true",
-    "X-Plasma-NotificationAreaCategory": "SystemServices",
     "X-Plasma-API-Minimum-Version": "6.0"
 }
