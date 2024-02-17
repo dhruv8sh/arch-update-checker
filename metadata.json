@@ -1,0 +1,23 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "dhruv8sh@proton.me",
+                "Name": "Dhruvesh Surolia"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Show and handle the pending pacman update",
+        "Icon": "update-none-symbolic",
+        "Id": "dhurv8sh.archupdate.plasmoid",
+        "License": "GPL-3.0+",
+        "Name": "Arch Update Detector",
+        "ServiceTypes": [
+            "Plasma/Applet"
+        ],
+        "Depends": ["konsole", "pacman-contrib", "yay"]
+    },
+    "X-Plasma-NotificationArea": "true",
+    "X-Plasma-NotificationAreaCategory": "SystemServices",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
