@@ -8,6 +8,8 @@ import org.kde.kirigami as Kirigami
 Item {
 
     focus: true
+    Layout.minimumHeight: 200
+    Layout.minimumWidth: 400
 
     PlasmaExtras.Heading {
         id: heading
@@ -57,6 +59,9 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        Item {
+        id: contentItem
+        anchors.fill: parent
 
         ListView {
             id: packageView;
@@ -67,7 +72,15 @@ Item {
             boundsBehavior: Flickable.StopAtBounds;
             focus: true
             delegate: PackageItem {}
-
+            visible: packageModel.count > 0
+        }
+        Text {
+            text: "You are up to date"
+            y : (scrollView.height - height) / 2 - 10
+            x : (scrollView.width - width) / 2
+            visible: packageModel.count === 0
+            color: Kirigami.Theme.disabledTextColor
+        }
         }
     }
 }
