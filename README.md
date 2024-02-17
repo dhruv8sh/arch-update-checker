@@ -1,11 +1,23 @@
 # Arch Update Notifier
-A silent icon that notifies you of any AUR or Arch Updates available.
-<hr>
+A KDE Plamsa Applet (Plasmoid) to check for Arch and AUR Updates.
+
+## Images
+  
+  ![Screenshot_20240218_013332](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/90a7f66d-f752-4fdc-a95b-8f61c586bcda)<br>
+  Expanded applet
+<br>
+<br>
+  
+  ![Screenshot_20240218_013123](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/81310c19-ede5-4ed7-8ada-e08eb5c2d9bb)<br>
+  Applet in a native Plasma Dock
+
+
 
 ## Installation
-- git clone this repository
-- cd into the root directory of this project
-- run plasmapkg2 -i .
+```
+git clone https://github.com/dhruv8sh/arch-update-checker/
+cd arch-update-checker
+plasmapkg2 -i .
+```
+Or just use the plasma "Download new widget" functionality
 
-
-Warning: the tooltip does not currently show the right data
