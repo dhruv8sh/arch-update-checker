@@ -10,7 +10,12 @@
       <whatsthis>Polling interval (in minutes).</whatsthis>
       <default>30</default>
     </entry>
-    <entry name="dotColor" type="String">
+    <entry name="packageSeparator" type="String">
+      <label>Show badge even when zero packages available</label>
+      <whatsthis>Used to separate version values</whatsthis>
+      <default>to</default>
+    </entry>
+    <entry name="dotColor" type="Color">
       <label>Dot Color</label>
       <whatsthis>Color of the badge</whatsthis>
       <default>White</default>

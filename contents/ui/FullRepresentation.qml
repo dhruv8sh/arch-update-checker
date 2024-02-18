@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.plasmoid as Plasmoid
 import org.kde.plasma.extras as PlasmaExtras
+import org.kde.plasma.core as PlasmaCore //Needed for Busy Spinner Widget
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 
@@ -39,16 +40,21 @@ Item {
         anchors.top: parent.top
         height: Kirigami.Units.iconSizes.medium
         icon.name: "view-refresh"
-        RotationAnimation on rotation {
-            id: rotationAnim
-            from: 0
-            to: 360
-            duration: Kirigami.Units.humanMoment
-            running: false
-        }
         onClicked: {
-            rotationAnim.running = false;
+            uptodateLabel.visible = false
+            busyIndicator.visible = true
             main.action_checkForUpdates()
+            humanMomentTimer.start()
+        }
+    }
+    Timer {
+        id: humanMomentTimer
+        running: false
+        repeat: false
+        interval: 2000//Kirigami.Theme.humanMoment
+        onTriggered: {
+            busyIndicator.visible = false
+            uptodateLabel.visible = packageModel.count == 0
         }
     }
 
@@ -59,10 +65,6 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        Item {
-        id: contentItem
-        anchors.fill: parent
-
         ListView {
             id: packageView;
             anchors.rightMargin: Kirigami.Units.gridUnit
@@ -72,15 +74,18 @@ Item {
             boundsBehavior: Flickable.StopAtBounds;
             focus: true
             delegate: PackageItem {}
-            visible: packageModel.count > 0
         }
-        Text {
-            text: "You are up to date"
-            y : (scrollView.height - height) / 2 - 10
-            x : (scrollView.width - width) / 2
-            visible: packageModel.count === 0
-            color: Kirigami.Theme.disabledTextColor
-        }
-        }
+    }
+    Text {
+        id: uptodateLabel
+        text: i18n("You are up to date.")
+        anchors.centerIn: parent
+        visible: packageModel.count === 0
+        color: Kirigami.Theme.disabledTextColor
+    }
+    PlasmaComponents.BusyIndicator {
+        id: busyIndicator
+        anchors.centerIn: parent
+        visible: false
     }
 }

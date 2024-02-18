@@ -118,7 +118,6 @@ PlasmoidItem {
         executable.exec(config.updateChecker_aur)
       }
     }
-
   }
 
   function action_updateSystem() {

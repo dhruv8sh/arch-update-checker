@@ -40,7 +40,7 @@ Item {
       font.pointSize: Kirigami.Theme.smallFont.pointSize
       opacity: 0.6
       text: FromVersion
-
+      // color: Kirigami.Theme.negativeText
     }
 
     PlasmaComponents.Label {
@@ -54,7 +54,7 @@ Item {
       elide: Text.ElideRight
       font.pointSize: Kirigami.Theme.smallFont.pointSize
       opacity: 0.6
-      text: "->"
+      text: plasmoid.configuration.packageSeparator
     }
     PlasmaComponents.Label {
       id: toVersionLabel
@@ -69,7 +69,7 @@ Item {
       font.pointSize: Kirigami.Theme.smallFont.pointSize
       opacity: 0.6
       text: ToVersion
-
+      // color: Kirigami.Theme.positiveText
     }
   }
   Rectangle{
