@@ -10,9 +10,9 @@ Rectangle {
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     color: plasmoid.configuration.dotColor
-    radius: width / 2
+    radius: height / 2
     height: parent.height/2
-    width: parent.width/2
+    width: Math.max(parent.width/2, implicitWidth)
     Label {
         id: label
         color: Kirigami.Themes.TextColor

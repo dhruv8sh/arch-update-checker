@@ -51,7 +51,7 @@ Item {
         id: humanMomentTimer
         running: false
         repeat: false
-        interval: 2000//Kirigami.Theme.humanMoment
+        interval: Kirigami.Theme.humanMoment
         onTriggered: {
             busyIndicator.visible = false
             uptodateLabel.visible = packageModel.count == 0
@@ -74,13 +74,14 @@ Item {
             boundsBehavior: Flickable.StopAtBounds;
             focus: true
             delegate: PackageItem {}
+            onCountChanged: uptodateLabel.visible = packageModel.count == 0
         }
     }
     Text {
         id: uptodateLabel
         text: i18n("You are up to date.")
         anchors.centerIn: parent
-        visible: packageModel.count === 0
+        visible: packageModel.count == 0
         color: Kirigami.Theme.disabledTextColor
     }
     PlasmaComponents.BusyIndicator {

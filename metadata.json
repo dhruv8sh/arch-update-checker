@@ -14,7 +14,7 @@
         "Id": "org.kde.updatenotifier",
         "License": "GPL",
         "Name": "Arch Update Checker",
-        "Icon": "update-none",
+        "Icon": "update-high-symbolic",
         "ServiceTypes": [
             "Plasma/Applet"
         ],

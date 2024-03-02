@@ -32,10 +32,8 @@ PlasmoidItem {
       disconnectSource(sourceName)
     }
     function exec(cmd) {
-
         console.log("exec " + cmd)
         connectSource(cmd)
-
     }
     signal exited(string sourceName, int exitCode, int exitStatus, string stdout, string stderr )
   }
@@ -103,8 +101,6 @@ PlasmoidItem {
         }
         timer.restart()
       }
-
-
     }
   }
   Timer {
@@ -119,7 +115,6 @@ PlasmoidItem {
       }
     }
   }
-
   function action_updateSystem() {
      timer.stop()
      executable.exec('konsole -e "' + plasmoid.configuration.installationcommand + '"')
@@ -138,10 +133,9 @@ PlasmoidItem {
       PlasmaCore.Action {
           id: action_updateSystem
           text: i18n("Update System")
-          icon.name: "package-install"
+          icon.name: "install-symbolic"
           onTriggered: {
-              executable.exec(plasmoid.configuration.updatechecker);
-              executable.exec(plasmoid.configuration.updatechecker_aur);
+              executable.exec(plasmoid.configuration.installationcommand);
               timer.start();
           }
       }
