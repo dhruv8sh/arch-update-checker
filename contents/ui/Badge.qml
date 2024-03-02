@@ -16,7 +16,7 @@ Rectangle {
     Label {
         id: label
         color: Kirigami.Themes.TextColor
-        font.pixelSize: 12
+        font.pixelSize: Math.min(parent.height / 2, parent.width / 2)
         anchors.fill: parent
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
