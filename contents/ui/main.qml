@@ -42,7 +42,7 @@ PlasmoidItem {
     id: config
     property int interval: plasmoid.configuration.pollinterval * 1000 * 60
     property string updateChecker: plasmoid.configuration.updatechecker || "checkupdates"
-    property string updateChecker_aur: plasmoid.configuration.updatechecker_aur || "yay -Su"
+    property string updateChecker_aur: plasmoid.configuration.updatechecker_aur || "yay -Squa"
     property string updateCommand: plasmoid.configuration.installationcommand || "pacman -Syu"
 
   }
@@ -131,13 +131,14 @@ PlasmoidItem {
   }
   Plasmoid.contextualActions: [
       PlasmaCore.Action {
-          id: action_updateSystem
           text: i18n("Update System")
           icon.name: "install-symbolic"
-          onTriggered: {
-              executable.exec(plasmoid.configuration.installationcommand);
-              timer.start();
-          }
+          onTriggered: action_updateSystem()
+      },
+      PlasmaCore.Action {
+          text: i18n("Check for Updates")
+          icon.name: "view-refresh"
+          onTriggered: action_checkForUpdates()
       }
     ]
 }

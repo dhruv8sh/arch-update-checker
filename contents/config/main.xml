@@ -40,7 +40,7 @@
     <entry name="updatechecker_aur" type="String">
       <label>AUR Update Checker Command</label>
       <whatsthis>Application to check AUR for updates without installing.</whatsthis>
-      <default>yay -Su | tee /dev/null</default>
+      <default>yay -Squa</default>
     </entry>
     <entry name="installationcommand" type="String">
       <label>Command to Perform Installation</label>

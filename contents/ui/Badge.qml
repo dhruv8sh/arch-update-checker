@@ -15,7 +15,7 @@ Rectangle {
     width: Math.max(parent.width/2, implicitWidth)
     Label {
         id: label
-        color: Kirigami.Themes.TextColor
+        color: Kirigami.Themes.textColor
         font.pixelSize: Math.min(parent.height / 2, parent.width / 2)
         anchors.fill: parent
         verticalAlignment: Text.AlignVCenter
