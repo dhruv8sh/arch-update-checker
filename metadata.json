@@ -11,7 +11,7 @@
         ],
         "Description": "A utility to check for updates without updating the pacman database.",
         "EnabledByDefault": true,
-        "Id": "org.kde.updatenotifier",
+        "Id": "org.kde.archupdatechecker",
         "License": "GPL",
         "Name": "Arch Update Checker",
         "Icon": "update-high-symbolic",
