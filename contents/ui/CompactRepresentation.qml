@@ -24,6 +24,8 @@ Item {
               main.action_updateSystem()
           } else {
               main.expanded = !main.expanded
+              if( main.expanded && plasmoid.configuration.updateOnExpand )
+                  main.action_checkForUpdates();
           }
       }
       cursorShape: Qt.PointingHandCursor

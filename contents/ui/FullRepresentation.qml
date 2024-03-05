@@ -40,21 +40,18 @@ Item {
         anchors.top: parent.top
         height: Kirigami.Units.iconSizes.medium
         icon.name: "view-refresh"
-        onClicked: {
+        onClicked: main.action_checkForUpdates()
+    }
+
+    Connections {
+        target: main
+        onUpdatingPackageList: {
             uptodateLabel.visible = false
             busyIndicator.visible = true
-            main.action_checkForUpdates()
-            humanMomentTimer.start()
         }
-    }
-    Timer {
-        id: humanMomentTimer
-        running: false
-        repeat: false
-        interval: Kirigami.Theme.humanMoment
-        onTriggered: {
+        onStoppedUpdating: {
             busyIndicator.visible = false
-            uptodateLabel.visible = packageModel.count == 0
+            // uptodateLabel.visible = packageModel.count == 0
         }
     }
 
@@ -73,15 +70,14 @@ Item {
             currentIndex: -1;
             boundsBehavior: Flickable.StopAtBounds;
             focus: true
-            delegate: PackageItem {}
-            onCountChanged: uptodateLabel.visible = packageModel.count == 0
+            delegate: PackageItem { pos: index }
         }
     }
     Text {
         id: uptodateLabel
         text: i18n("You are up to date.")
         anchors.centerIn: parent
-        visible: packageModel.count == 0
+        visible: !busyIndicator.visible && packageView.count == 0
         color: Kirigami.Theme.disabledTextColor
     }
     PlasmaComponents.BusyIndicator {

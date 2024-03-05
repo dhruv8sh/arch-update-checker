@@ -8,7 +8,8 @@ Item {
   id: packageItem
   enabled: true
   width: parent.width
-  height: 50
+  height: 45
+  property int pos: 0
   Item {
     id: packageItemBase
     height: packagenNameLabel.height + fromVersionLabel.height + Math.round(Kirigami.Units.gridUnit / 2)
@@ -30,8 +31,7 @@ Item {
       id: fromVersionLabel
 
       anchors {
-        left: parent.left
-        leftMargin: Math.round(Kirigami.Units.gridUnit / 2)
+        leftMargin: Kirigami.Units.gridUnit
         top: packagenNameLabel.bottom
       }
 
@@ -39,15 +39,14 @@ Item {
       elide: Text.ElideRight
       font.pointSize: Kirigami.Theme.smallFont.pointSize
       opacity: 0.6
-      text: FromVersion
-      // color: Kirigami.Theme.negativeText
+      text: "    "+FromVersion
+      // color: Kirigami.Theme.negativeTextColor
     }
 
     PlasmaComponents.Label {
       id: arrow
       anchors {
         left: fromVersionLabel.right
-        leftMargin: Math.round(Kirigami.Units.gridUnit / 2)
         top: packagenNameLabel.bottom
       }
       height: paintedHeight
@@ -61,7 +60,6 @@ Item {
 
       anchors {
         left: arrow.right
-        leftMargin: Math.round(Kirigami.Units.gridUnit / 2)
         top: packagenNameLabel.bottom
       }
       height: paintedHeight
@@ -69,14 +67,14 @@ Item {
       font.pointSize: Kirigami.Theme.smallFont.pointSize
       opacity: 0.6
       text: ToVersion
-      // color: Kirigami.Theme.positiveText
+      // color: Kirigami.Theme.positiveTextColor
     }
   }
   Rectangle{
     width: parent.width * 0.98
     height: 1
+    anchors.topMargin: 45
     color: Kirigami.Theme.disabledTextColor
     opacity: 0.3
   }
-
 }

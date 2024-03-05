@@ -10,19 +10,21 @@ PlasmoidItem {
   id: main
   property string subtext: i18n("Updates")
   property string title: title
+  property bool updating: false
   toolTipSubText: subtext
   Plasmoid.icon: "package-new"
   compactRepresentation: CompactRepresentation {}
-  fullRepresentation: FullRepresentation{}
+  fullRepresentation: FullRepresentation{ }
 
   ListModel { id: packageModel }
 
+  signal updatingPackageList()
+  signal stoppedUpdating()
 
   Plasma5Support.DataSource {
     id: "executable"
     engine: "executable"
     connectedSources: []
-    //property string sourceName: ""
     onNewData: {
       var exitCode = data["exit code"]
       var exitStatus = data["exit status"]
@@ -47,60 +49,38 @@ PlasmoidItem {
 
   }
   property string outputText: ''
+  function removeANSIEscapeCodes(str) {
+    return str.replace(/\u001b\[[0-9;]*[m|K]/g, '');
+  }
   Connections {
     target: executable
     onExited: {
-      console.log ("onExited " + executable.sourceName);
+      console.log ("onExited " + sourceName);
       console.log ("onExited " + config.updateChecker);
-      console.log( executable.sourceName === config.updateChecker);
-      console.log("onExited " + executable.sourceName);
+      console.log("onExited " + sourceName);
       console.log("exitCode: " + exitCode);
       console.log("exitStatus: " + exitStatus);
       console.log("stdout: " + stdout);
       console.log("stderr: " + stderr);
-      if ( sourceName === config.updateChecker ) {
-         //console.log ("Updating model")
-
-         var packagelines = stdout.split("\n")
-         if ( packagelines.length > packageModel.count ) {
-           //new Packages
-
-         }
-         packageModel.clear()
-         for ( var i = 0; i < packagelines.length; i++) {
-           var packagedetails = packagelines[i].split(" ")
-           //console.log ("Appending Package: " + packagedetails[0])
-           if ( packagelines[i].trim() != "") {
-             packageModel.append( { PackageName: packagedetails[0],
-                   FromVersion: packagedetails[1],
-                   ToVersion: packagedetails[3],
-                 })
-           }
-         }
-
-      } else if (sourceName === config.updateChecker_aur) {
-        var packagelines = stdout.split("\n")
-        var pregex;
-        if( config.updateChecker_aur.includes('pacaur')  ) {
-           pregex = /^\S+\s+\S+\s+(\S+)\s+(\S+)\s+\S+\s+(\S+)/;
-
-        } else if ( config.updateChecker_aur.includes('yay') ) {
-          pregex = /^\s\S+\s+(\S+):\s+(\S+)\s+==>\s+(\S+)/;
-        }
-        
-        for ( var i = 0; i < packagelines.length; i++) {
-          var packageline = packagelines[i];
-
-
-          var parameters = pregex.exec(packageline);
-          if ( parameters != null) {
-            packageModel.append( { PackageName: parameters[1],
-                  FromVersion: parameters[2],
-                  ToVersion: parameters[3]})
+      main.stoppedUpdating()
+      var packagelines = stdout.split("\n")
+      packagelines.forEach(line => {
+          line = main.removeANSIEscapeCodes(line.trim());
+          if( line.startsWith(":: aur") ){
+            line = line.substring(8);
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+line);
           }
-        }
-        timer.restart()
-      }
+          const packageDetails = line.split(/\s+/);
+          const packageName = packageDetails[0];
+          const fromVersion = packageDetails[1];
+          const toVersion = packageDetails[3];
+          if( packageName.trim() != "" )
+          packageModel.append({
+              PackageName: packageName,
+              FromVersion: fromVersion,
+              ToVersion: toVersion
+          });
+      });
     }
   }
   Timer {
@@ -108,22 +88,19 @@ PlasmoidItem {
     interval: config.interval
     running: true
     repeat: true
-    onTriggered: {
-      executable.exec(config.updateChecker)
-      if (config.updateChecker_aur != null) {
-        executable.exec(config.updateChecker_aur)
-      }
-    }
+    onTriggered: action_checkForUpdates
   }
   function action_updateSystem() {
      timer.stop()
-     executable.exec('konsole -e "' + plasmoid.configuration.installationcommand + '"')
+     executable.exec('konsole -e "' + plasmoid.configuration.updateCommand + '"')
      packageModel.clear()
      timer.start()
   }
   function action_checkForUpdates() {
-    executable.exec(plasmoid.configuration.updatechecker);
-    executable.exec(plasmoid.configuration.updatechecker_aur);    
+    packageModel.clear()
+    main.updatingPackageList()
+    executable.exec("checkupdates");
+    executable.exec(plasmoid.configuration.updateCheckCommand);
   }
 
   function onConfigChanged() {

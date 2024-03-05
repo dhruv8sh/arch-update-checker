@@ -1,102 +1,80 @@
 import QtQuick
-import QtQuick.Layouts as QtLayouts
-import QtQuick.Controls
-import org.kde.plasma.components as PlasmaComponents
-import org.kde.kquickcontrols as KQuickControls
-import org.kde.plasma.plasmoid
+import QtQuick.Controls as QQC2
+import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
-Item{
+QQC2.Pane {
+    id: root
     property alias cfg_pollinterval: time.value
-    property alias cfg_dotColor: dotColor.color
     property alias cfg_numberAvailable: numbersVisible.checked
     property alias cfg_zeroPackageBadge: zeroPackage.checked
     property alias cfg_packageSeparator: packageSeparator.text
-    QtLayouts.ColumnLayout {
-        id: root
-        x: parent.width * 0.05
-        spacing: 12
+    property alias cfg_updateOnExpand: updateOnExpand.checked
+    property alias cfg_updateCommand: aurWrapper.upcmd
+    property alias cfg_updateCheckCommand: aurWrapper.upcheckcmd
 
 
-        Kirigami.InlineMessage {
-            width: parent.width * 2
-            text: "Consider switching this to a higher value for better battery performance!"
-            type: Kirigami.MessageType.Warning
-            visible: time.value < 10
-        }
-        QtLayouts.RowLayout {
-            PlasmaComponents.Label {
-                id: label1
-                horizontalAlignment: Label.AlignRight
-                text: i18n("Poll Interval:")
-                width: Math.max(0.3 * root.width, 100)
+    Kirigami.FormLayout {
+        anchors.fill: parent
+        QQC2.ComboBox {
+            id: aurWrapper
+            property string upcmd
+            property string upcheckcmd
+            Kirigami.FormData.label: i18n("AUR Wrapper:")
+            textRole: "text"
+            model: [
+                {text: "yay", value: "yay"},
+                {text: "paru", value: "paru"},
+                {text: "trizen", value: "trizen"},
+                {text: "pikaur", value: "pikaur"},
+                {text: "pacaur", value: "pacaur"}
+            ];
+            // currentIndex: 0
+            onCurrentIndexChanged: {
+                let curr = model[currentIndex].text;
+                if( curr ) {
+                    upcheckcmd = curr + " -Qua";
+                    upcmd = curr + " -Syu --noconfirm"
+                }
             }
-            PlasmaComponents.SpinBox {
-                id: time
-                from: 1
-                to: 240
-                x: label1.width + 10
-                anchors.left: label1.right + 10
-                textFromValue: function(value, locale) {
+        }
+        Item {
+            Kirigami.FormData.isSection: true
+        }
+        QQC2.CheckBox {
+            id: updateOnExpand
+            Kirigami.FormData.label: i18n("Update list on expand:")
+        }
+        QQC2.SpinBox {
+            id: time
+            Kirigami.FormData.label: i18n("Poll Interval:")
+            from: 1
+            to: 1000
+            textFromValue: function(value, locale) {
                             return (value === 1 ? qsTr("%1 min")
                                                 : qsTr("%1 mins")).arg(value);}
-            }
         }
-        QtLayouts.RowLayout {
-            PlasmaComponents.Label {
-                horizontalAlignment: Label.AlignRight
-                text: i18n("Version Separator:")
-                width: label1.width
-            }
-            PlasmaComponents.TextField {
-                id: packageSeparator
-                x: label1.width + 10
-                placeholderText: i18n("Separator")
-                anchors.left: label1.right
-            }
+        Item {
+            Kirigami.FormData.isSection: true
+        }
+        QQC2.CheckBox {
+            id: numbersVisible
+            Kirigami.FormData.label: i18n("Badge:")
+            text: i18n("Show numbers on badge")
+        }
+        QQC2.CheckBox {
+            id: zeroPackage
+            text: i18n("Show when zero packages to update")
         }
 
-        QtLayouts.ColumnLayout{
-            QtLayouts.GridLayout{
-                rows: 3
-                columns: 3
-                Label{
-                    width: label1.width
-                    text: i18n("Badge:")
-                    horizontalAlignment: Label.AlignRight
-                }
-
-                KQuickControls.ColorButton {
-                    id: dotColor
-                    enabled: true
-                    x: label1.width + 10
-                    anchors.left: label1.right
-                }
-
-                PlasmaComponents.Label {
-                    horizontalAlignment: Label.AlignRight
-                    text: i18n(dotColor.color)
-                    anchors.left: dotColor.right
-                }
-                Label{}
-                PlasmaComponents.CheckBox {
-                    x: label1.width + 10
-                    id: numbersVisible
-                    checked: false
-                    anchors.left: label1.right
-                    text: i18n("Show numbers on badge")
-                }
-                Label{}
-                Label{}
-                PlasmaComponents.CheckBox {
-                    x: label1.width + 10
-                    id: zeroPackage
-                    checked: false
-                    anchors.left: label1.right
-                    text: i18n("Show when zero packages to update")
-                }
-            }
+        Item {
+            Kirigami.FormData.isSection: true
         }
-
+        QQC2.TextField {
+            id: packageSeparator
+            Kirigami.FormData.label: i18n("Package seperator:")
+            placeholderText: i18n("Example: ->, =>, to, etc.")
+            text: plasmoid.configuration.packageSeparator
+        }
     }
 }

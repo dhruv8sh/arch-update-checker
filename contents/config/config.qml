@@ -6,9 +6,4 @@ ConfigModel {
         icon: "configure"
         source: "configGeneral.qml"
     }
-    ConfigCategory {
-        name: i18n("Pacman")
-        icon: "repository"
-        source: "configPacman.qml"
-    }
 }

@@ -13,7 +13,7 @@
     <entry name="packageSeparator" type="String">
       <label>Show badge even when zero packages available</label>
       <whatsthis>Used to separate version values</whatsthis>
-      <default>to</default>
+      <default>===></default>
     </entry>
     <entry name="dotColor" type="Color">
       <label>Dot Color</label>
@@ -25,27 +25,25 @@
       <whatsthis>Is number available on the badge</whatsthis>
       <default>True</default>
     </entry>
+    <entry name="updateOnExpand" type="Bool">
+      <label>Update package update list when expanding the applet</label>
+      <whatsthis>If enabled, checks for updates when expanding</whatsthis>
+      <default>True</default>
+    </entry>
     <entry name="zeroPackageBadge" type="Bool">
       <label>Show badge even when zero packages available</label>
       <whatsthis>If enabled, shows badge along with the text even when zero packages are available to updgrade</whatsthis>
       <default>False</default>
     </entry>
-  </group>
-  <group name="Pacman">
-    <entry name="updatechecker" type="String">
-      <label>Update Checker Command</label>
-      <whatsthis>Application to check for updates without updating package database.</whatsthis>
-      <default>checkupdates</default>
+    <entry name="updateCommand" type="String">
+          <label>AUR Wrapper you want to use</label>
+          <whatsthis>Arch User Repository Wrapper to be used.</whatsthis>
+      <default>yay -Syu --noconfirm</default>
     </entry>
-    <entry name="updatechecker_aur" type="String">
-      <label>AUR Update Checker Command</label>
-      <whatsthis>Application to check AUR for updates without installing.</whatsthis>
-      <default>yay -Squa</default>
-    </entry>
-    <entry name="installationcommand" type="String">
-      <label>Command to Perform Installation</label>
-      <whatsthis>Application to install updates.</whatsthis>
-      <default>yay</default>
+    <entry name="updateCheckCommand" type="String">
+          <label>AUR Wrapper you want to use</label>
+          <whatsthis>Arch User Repository Wrapper to be used.</whatsthis>
+      <default>yay -Qua</default>
     </entry>
   </group>
 </kcfg>
