@@ -13,7 +13,7 @@ Item {
   
     Badge {
         id: packageBadge
-        visible: plasmoid.configuration.zeroPackageBadge || packageModel.count > 0
+        visible: packageModel.count > 0
         text: packageModel.count
     }
 

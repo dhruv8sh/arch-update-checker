@@ -7,7 +7,6 @@ QQC2.Pane {
     id: root
     property alias cfg_pollinterval: time.value
     property alias cfg_numberAvailable: numbersVisible.checked
-    property alias cfg_zeroPackageBadge: zeroPackage.checked
     property alias cfg_packageSeparator: packageSeparator.text
     property alias cfg_updateOnExpand: updateOnExpand.checked
     property alias cfg_updateCommand: aurWrapper.upcmd
@@ -29,7 +28,22 @@ QQC2.Pane {
                 {text: "pikaur", value: "pikaur"},
                 {text: "pacaur", value: "pacaur"}
             ];
-            // currentIndex: 0
+            currentIndex: {
+                switch(plasmoid.configuration.updateCheckCommand) {
+                    case "yay -Qua":
+                        return 0;
+                    case "paru -Qua":
+                        return 1;
+                    case "trizen -Qua":
+                        return 2;
+                    case "pikaur -Qua":
+                        return 3;
+                    case "pacaur -Qua":
+                        return 4;
+                    default:
+                        return 0;
+                }
+            }
             onCurrentIndexChanged: {
                 let curr = model[currentIndex].text;
                 if( curr ) {
@@ -62,10 +76,15 @@ QQC2.Pane {
             Kirigami.FormData.label: i18n("Badge:")
             text: i18n("Show numbers on badge")
         }
-        QQC2.CheckBox {
-            id: zeroPackage
-            text: i18n("Show when zero packages to update")
-        }
+        // QQC2.RadioButton {
+        //     id:
+        // }
+        // QQC2.ColorBox {
+        //     id: badgeColor
+        // }
+        // QQC2.ColorBox {
+        //     id: textColor
+        // }
 
         Item {
             Kirigami.FormData.isSection: true
