@@ -20,13 +20,24 @@ Item {
         anchors.right: updateIcon.left
         level: 3
         opacity: 0.6
-        text: main.subtext
+        text: "Updates " + (pauseUpdateChecks.checked ? "":"(Paused)")
     }
+
+    PlasmaComponents.Switch {
+        id: pauseUpdateChecks
+        anchors.right: parent.right
+        anchors.top: parent.top
+        height: Kirigami.Units.iconSizes.medium
+        icon.name: checked ? "media-playback-start":"media-playback-pause"
+        checked: true
+        onCheckedChanged : main.timer.running = checked
+    }
+    // Component.onCompleted : pauseUpdateChecks.checked = false
 
     PlasmaComponents.ToolButton {
         id: updateIcon
 
-        anchors.right: parent.right
+        anchors.right: pauseUpdateChecks.left
         anchors.top: parent.top
         height: Kirigami.Units.iconSizes.medium
         icon.name: "install"
@@ -43,6 +54,7 @@ Item {
         onClicked: main.action_checkForUpdates()
     }
 
+
     Connections {
         target: main
         onUpdatingPackageList: {
@@ -51,7 +63,7 @@ Item {
         }
         onStoppedUpdating: {
             busyIndicator.visible = false
-            // uptodateLabel.visible = packageModel.count == 0
+            uptodateLabel.visible = packageModel.count == 0
         }
     }
 
