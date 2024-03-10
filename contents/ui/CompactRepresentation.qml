@@ -1,6 +1,7 @@
 import QtQuick
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
+import org.kde.plasma.components as PlasmaComponents
 
 Item {
   id: itemIcon
@@ -10,11 +11,30 @@ Item {
       source: "update-none"
   }
   
-  Badge {
-    id: packageBadge
-    visible: plasmoid.configuration.zeroPackageBadge || packageModel.count > 0
-    text: packageModel.count
+    Badge {
+        id: packageBadge
+        visible: plasmoid.configuration.zeroPackageBadge || packageModel.count > 0
+        text: packageModel.count
+    }
+
+    PlasmaComponents.BusyIndicator {
+        id: busyIndicator2
+        anchors.centerIn: parent
+        visible: false
+        anchors.fill: parent
+    }
+  Connections {
+    target: main
+    onUpdatingPackageList: {
+        packageBadge.visible = false
+        busyIndicator2.visible = true
+    }
+    onStoppedUpdating: {
+        packageBadge.visible = packageModel.count !== 0
+        busyIndicator2.visible = false
+    }
   }
+
 
   MouseArea {
       anchors.fill: parent
