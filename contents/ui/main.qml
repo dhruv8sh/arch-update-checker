@@ -10,7 +10,7 @@ PlasmoidItem {
   id: main
   property string subtext: i18n("Updates")
   property string title: title
-  property bool updating: false
+  property bool stillUpdating: false
   toolTipSubText: subtext
   Plasmoid.icon: "package-new"
   compactRepresentation: CompactRepresentation {}
@@ -44,8 +44,8 @@ PlasmoidItem {
     id: config
     property int interval: plasmoid.configuration.pollinterval * 1000 * 60
     property string updateChecker: plasmoid.configuration.updatechecker || "checkupdates"
-    property string updateChecker_aur: plasmoid.configuration.updatechecker_aur || "yay -Squa"
-    property string updateCommand: plasmoid.configuration.installationcommand || "pacman -Syu"
+    property string updateChecker_aur: plasmoid.configuration.updatechecker_aur || "yay -Qua"
+    property string updateCommand: plasmoid.configuration.installationcommand || "yay -Syu"
 
   }
   property string outputText: ''
@@ -62,14 +62,11 @@ PlasmoidItem {
       console.log("exitStatus: " + exitStatus);
       console.log("stdout: " + stdout);
       console.log("stderr: " + stderr);
-      main.stoppedUpdating()
       var packagelines = stdout.split("\n")
       packagelines.forEach(line => {
           line = main.removeANSIEscapeCodes(line.trim());
-          if( line.startsWith(":: aur") ){
+          if( line.startsWith(":: aur") )
             line = line.substring(8);
-            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>"+line);
-          }
           const packageDetails = line.split(/\s+/);
           const packageName = packageDetails[0];
           const fromVersion = packageDetails[1];
@@ -81,6 +78,9 @@ PlasmoidItem {
               ToVersion: toVersion
           });
       });
+
+      if( stillUpdating ) main.stoppedUpdating()
+      stillUpdating = !stillUpdating
     }
   }
   Timer {
@@ -88,12 +88,13 @@ PlasmoidItem {
     interval: config.interval
     running: true
     repeat: true
-    onTriggered: action_checkForUpdates
+    onTriggered: action_checkForUpdates()
   }
   function action_updateSystem() {
      timer.stop()
      executable.exec('konsole -e "' + plasmoid.configuration.updateCommand + '"')
      packageModel.clear()
+     main.stoppedUpdating()
      timer.start()
   }
   function action_checkForUpdates() {
@@ -102,7 +103,6 @@ PlasmoidItem {
     executable.exec("checkupdates");
     executable.exec(plasmoid.configuration.updateCheckCommand);
   }
-
   function onConfigChanged() {
     config.interval = plasmoid.readConfig("pollinterval");
   }
