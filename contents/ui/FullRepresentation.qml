@@ -7,51 +7,65 @@ import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 
 Item {
-
     focus: true
     Layout.minimumHeight: 200
     Layout.minimumWidth: 400
+    anchors.fill: parent
 
-    PlasmaExtras.Heading {
-        id: heading
-
+    RowLayout {
+        id: header
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.right: updateIcon.left
-        level: 3
-        opacity: 0.6
-        text: "Updates " + (pauseUpdateChecks.checked ? "":"(Paused)")
-    }
-
-    PlasmaComponents.Switch {
-        id: pauseUpdateChecks
         anchors.right: parent.right
-        anchors.top: parent.top
-        height: Kirigami.Units.iconSizes.medium
-        icon.name: checked ? "media-playback-start":"media-playback-pause"
-        checked: true
-        onCheckedChanged : main.timer.running = checked
+        width: parent.width
+
+        RowLayout {
+            spacing: 0
+
+            PlasmaComponents.Switch {
+                id: pauseUpdateChecks
+                height: Kirigami.Units.iconSizes.medium
+                checked: true
+                onCheckedChanged : main.requestPause(checked)
+            }
+            PlasmaExtras.Heading {
+                id: heading
+                level: 2
+                opacity: 0.6
+                text: "Updates" + (pauseUpdateChecks.checked ? "":" Paused")
+            }
+            PlasmaComponents.Label {
+                opacity: 0.6
+                text: (packageModel.count == 0 ? "":" ("+packageModel.count+" pending)")
+            }
+        }
+        RowLayout {
+            Layout.alignment: Qt.AlignRight
+            spacing: 0
+
+            PlasmaComponents.ToolButton {
+                id: updateIcon
+                height: Kirigami.Units.iconSizes.medium
+                icon.name: "install"
+                onClicked: main.action_updateSystem()
+            }
+
+            PlasmaComponents.ToolButton {
+                id: checkUpdatesIcon
+                height: Kirigami.Units.iconSizes.medium
+                icon.name: "view-refresh"
+                onClicked: main.action_checkForUpdates()
+            }
+        }
     }
-    // Component.onCompleted : pauseUpdateChecks.checked = false
-
-    PlasmaComponents.ToolButton {
-        id: updateIcon
-
-        anchors.right: pauseUpdateChecks.left
-        anchors.top: parent.top
-        height: Kirigami.Units.iconSizes.medium
-        icon.name: "install"
-        onClicked: main.action_updateSystem()
-    }
-
-    PlasmaComponents.ToolButton {
-        id: checkUpdatesIcon
-
-        anchors.right: updateIcon.left
-        anchors.top: parent.top
-        height: Kirigami.Units.iconSizes.medium
-        icon.name: "view-refresh"
-        onClicked: main.action_checkForUpdates()
+    Rectangle {
+        anchors.top: header.bottom
+        id: headerSeparator
+        width: parent.width
+        height: 1
+        color: Kirigami.Theme.textColor
+        opacity: 0.25
+        visible: true
     }
 
 
@@ -70,7 +84,7 @@ Item {
     Kirigami.ScrollablePage {
         id: scrollView;
         background: Kirigami.Theme.backgroundColor
-        anchors.top: heading.height > updateIcon.height ? heading.bottom : updateIcon.bottom
+        anchors.top: headerSeparator.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -85,13 +99,15 @@ Item {
             delegate: PackageItem { pos: index }
         }
     }
-    Text {
+    PlasmaExtras.PlaceholderMessage {
         id: uptodateLabel
         text: i18n("You are up to date.")
+        // iconName: "checkmark"
         anchors.centerIn: parent
         visible: !busyIndicator.visible && packageView.count == 0
-        color: Kirigami.Theme.disabledTextColor
+        // color: Kirigami.Theme.disabledTextColor
     }
+
     PlasmaComponents.BusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent

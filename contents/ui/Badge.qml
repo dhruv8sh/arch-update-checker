@@ -9,7 +9,7 @@ Rectangle {
 
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-    color: Kirigami.Theme.backgroundColor
+    color: Kirigami.Theme.textColor
 
     radius: height / 2
     height: parent.height/2

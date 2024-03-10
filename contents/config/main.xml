@@ -13,7 +13,7 @@
     <entry name="packageSeparator" type="String">
       <label>Show badge even when zero packages available</label>
       <whatsthis>Used to separate version values</whatsthis>
-      <default>===></default>
+      <default>→</default>
     </entry>
     <entry name="dotColor" type="Color">
       <label>Dot Color</label>

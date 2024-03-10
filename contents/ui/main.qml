@@ -13,6 +13,7 @@ PlasmoidItem {
   property bool stillUpdating: false
   toolTipSubText: subtext
   Plasmoid.icon: "package-new"
+  preferredRepresentation: compactRepresentation
   compactRepresentation: CompactRepresentation {}
   fullRepresentation: FullRepresentation{ }
 
@@ -20,6 +21,7 @@ PlasmoidItem {
 
   signal updatingPackageList()
   signal stoppedUpdating()
+  signal requestPause(bool pause)
 
   Plasma5Support.DataSource {
     id: "executable"
@@ -75,13 +77,18 @@ PlasmoidItem {
           packageModel.append({
               PackageName: packageName,
               FromVersion: fromVersion,
-              ToVersion: toVersion
+              ToVersion: toVersion,
+              IsAUR: sourceName !== "checkupdates"
           });
       });
 
       if( stillUpdating ) main.stoppedUpdating()
       stillUpdating = !stillUpdating
     }
+  }
+  Connections {
+    target: main
+    onRequestPause: timer.running = pause
   }
   Timer {
     id: timer

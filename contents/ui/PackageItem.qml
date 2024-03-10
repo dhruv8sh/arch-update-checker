@@ -9,8 +9,12 @@ Item {
   id: packageItem
   enabled: true
   width: parent.width
-  height: 45
+  height: packageItemBase.height
   property int pos: 0
+
+  MouseArea {
+    anchors.fill: parent
+  }
 
   KSvg.SvgItem {
       id: separatorLine
@@ -28,26 +32,15 @@ Item {
     id: packageItemBase
     height: packagenNameLabel.height + fromVersionLabel.height + Math.round(Kirigami.Units.gridUnit / 2)
     anchors.top: separatorLine.bottom
-    // For next release
-    // PlasmaComponents.Label {
-    //   id: aurLabel
-    //   anchors.left: parent.left
-    //   anchors.bottom: packagenNameLabel.verticalCenter
-    //   height: packagenNameLabel / 2
-    //   elide: Text.ElideRight
-    //   textFormat: Text.PlainText
-    //   text: "AUR"
-    // }
     PlasmaComponents.Label {
       id: packagenNameLabel
       height: paintedHeight
       elide: Text.ElideRight
-      text: PackageName
-      textFormat: Text.PlainText
-
+      textFormat: Text.RichText
+      text: ( IsAUR ? "<sup><b>AUR</b></sup>   ":"" ) + PackageName
       anchors {
         bottom: parent.verticalCenter
-        left: aurLabel.right
+        left: parent.left
         leftMargin: Math.round(Kirigami.Units.gridUnit / 2)
       }
     }
@@ -91,14 +84,6 @@ Item {
       font.pointSize: Kirigami.Theme.smallFont.pointSize
       opacity: 0.6
       text: ToVersion
-      // color: Kirigami.Theme.positiveTextColor
     }
   }
-  // Rectangle{
-  //   width: parent.width * 0.98
-  //   height: 1
-  //   anchors.topMargin: 45
-  //   color: Kirigami.Theme.disabledTextColor
-  //   opacity: 0.3
-  // }
 }
