@@ -6,25 +6,6 @@ Rectangle {
     id: badge
     smooth: true
     property alias text: label.text
-    Connections {
-        target: main
-        onUpdatingPackageList: {
-            busyIndicator.visible = true
-            label.visible = false
-            badge.color = "transparent"
-        }
-        onStoppedUpdating: {
-            busyIndicator.visible = false
-            label.visible = true
-            badge.color = Kirigami.Theme.backgroundColor
-        }
-    }
-    PlasmaComponents.BusyIndicator {
-        id: busyIndicator
-        anchors.centerIn: parent
-        visible: false
-        anchors.fill: parent
-    }
 
     anchors.right: parent.right
     anchors.bottom: parent.bottom
@@ -35,8 +16,8 @@ Rectangle {
     width: Math.max(parent.width/2, implicitWidth)
     Label {
         id: label
-        color: Kirigami.Theme.textColor
-        font.pixelSize: Math.min(parent.height / 2, parent.width / 2)
+        color: plasmoid.configuration.customBadgeColor ? Kirigami.Theme.backgroundColor : plasmoid.configuration.textColor;
+        font.pixelSize: Math.max(Math.min(parent.height / 2, parent.width / 2),8)
         anchors.fill: parent
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter
