@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.plasmoid as Plasmoid
 import org.kde.plasma.extras as PlasmaExtras
-import org.kde.plasma.core as PlasmaCore //Needed for Busy Spinner Widget
+import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 
@@ -26,7 +26,7 @@ Item {
                 id: pauseUpdateChecks
                 height: Kirigami.Units.iconSizes.medium
                 checked: true
-                onCheckedChanged : main.requestPause(checked)
+                onCheckedChanged : main.requestPause(!checked)
             }
             PlasmaExtras.Heading {
                 id: heading
@@ -48,8 +48,8 @@ Item {
                 height: Kirigami.Units.iconSizes.medium
                 icon.name: "install"
                 onClicked: main.action_updateSystem()
+                visible: packageModel.count != 0
             }
-
             PlasmaComponents.ToolButton {
                 id: checkUpdatesIcon
                 height: Kirigami.Units.iconSizes.medium
@@ -67,23 +67,23 @@ Item {
         opacity: 0.25
         visible: true
     }
-
-
     Connections {
         target: main
-        onUpdatingPackageList: {
+        function onUpdatingPackageList() {
             uptodateLabel.visible = false
             busyIndicator.visible = true
         }
-        onStoppedUpdating: {
+        function onStoppedUpdating() {
             busyIndicator.visible = false
             uptodateLabel.visible = packageModel.count == 0
         }
     }
-
     Kirigami.ScrollablePage {
         id: scrollView;
-        background: Kirigami.Theme.backgroundColor
+        background: Rectangle{
+            anchors.fill: parent
+            color: "transparent"
+        }
         anchors.top: headerSeparator.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -97,17 +97,16 @@ Item {
             boundsBehavior: Flickable.StopAtBounds;
             focus: true
             delegate: PackageItem { pos: index }
+            onCountChanged: uptodateLabel.visible = !busyIndicator.visible && count == 0;
         }
     }
     PlasmaExtras.PlaceholderMessage {
         id: uptodateLabel
         text: i18n("You are up to date.")
-        // iconName: "checkmark"
+        iconName: "preferences-system-linux"
         anchors.centerIn: parent
         visible: !busyIndicator.visible && packageView.count == 0
-        // color: Kirigami.Theme.disabledTextColor
     }
-
     PlasmaComponents.BusyIndicator {
         id: busyIndicator
         anchors.centerIn: parent

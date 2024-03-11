@@ -25,17 +25,15 @@ Item {
     }
   Connections {
     target: main
-    onUpdatingPackageList: {
+    function onUpdatingPackageList() {
         packageBadge.visible = false
         busyIndicator2.visible = true
     }
-    onStoppedUpdating: {
+    function onStoppedUpdating() {
         packageBadge.visible = packageModel.count !== 0
         busyIndicator2.visible = false
     }
   }
-
-
   MouseArea {
       anchors.fill: parent
       acceptedButtons: Qt.LeftButton | Qt.MiddleButton
@@ -50,5 +48,4 @@ Item {
       }
       cursorShape: Qt.PointingHandCursor
   }
-
 }

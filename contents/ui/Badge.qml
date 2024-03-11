@@ -16,7 +16,7 @@ Rectangle {
     width: Math.max(parent.width/2, implicitWidth)
     Label {
         id: label
-        color: plasmoid.configuration.customBadgeColor ? Kirigami.Theme.backgroundColor : plasmoid.configuration.textColor;
+        color: Kirigami.Theme.backgroundColor;
         font.pixelSize: Math.max(Math.min(parent.height / 2, parent.width / 2),8)
         anchors.fill: parent
         verticalAlignment: Text.AlignVCenter

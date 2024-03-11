@@ -5,33 +5,34 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
 
-Item {
+PlasmaExtras.ExpandableListItem {
   id: packageItem
   enabled: true
-  width: parent.width
+  width: scrollView.width
   height: packageItemBase.height
   property int pos: 0
 
-  MouseArea {
-    anchors.fill: parent
-  }
-
-  KSvg.SvgItem {
-      id: separatorLine
-      anchors {
-          horizontalCenter: parent.horizontalCenter
-          top: parent.top
-          topMargin: Kirigami.Units.smallSpacing
-      }
-      imagePath: "widgets/line"
-      elementId: "horizontal-line"
-      width: parent.width - Kirigami.Units.gridUnit
-      visible: pos != 0
-  }
+  // showDefaultActionButtonWhenBusy: true
+  // defaultActionButtonAction: Action {
+  //     id: stateChangeButton
+  //     icon.name: "showinfo"
+  //     text: i18n("Info")
+  // }
+  // MouseArea {
+  //   hoverEnabled: true
+  //   anchors.fill: parent
+  //   id: mousearea
+  // }
+  // PlasmaExtras.Highlight {
+  //   id: highlight
+  //     anchors.fill: parent
+  //     hovered: mousearea.containsMouse
+  //     visible: mousearea.containsMouse
+  //}
   Item {
     id: packageItemBase
     height: packagenNameLabel.height + fromVersionLabel.height + Math.round(Kirigami.Units.gridUnit / 2)
-    anchors.top: separatorLine.bottom
+    anchors.top: parent.top
     PlasmaComponents.Label {
       id: packagenNameLabel
       height: paintedHeight
@@ -56,34 +57,8 @@ Item {
       elide: Text.ElideRight
       font.pointSize: Kirigami.Theme.smallFont.pointSize
       opacity: 0.6
-      text: "    "+FromVersion
+      text: "    "+FromVersion + plasmoid.configuration.packageSeparator + ToVersion
       // color: Kirigami.Theme.negativeTextColor
-    }
-
-    PlasmaComponents.Label {
-      id: arrow
-      anchors {
-        left: fromVersionLabel.right
-        top: packagenNameLabel.bottom
-      }
-      height: paintedHeight
-      elide: Text.ElideRight
-      font.pointSize: Kirigami.Theme.smallFont.pointSize
-      opacity: 0.6
-      text: plasmoid.configuration.packageSeparator
-    }
-    PlasmaComponents.Label {
-      id: toVersionLabel
-
-      anchors {
-        left: arrow.right
-        top: packagenNameLabel.bottom
-      }
-      height: paintedHeight
-      elide: Text.ElideRight
-      font.pointSize: Kirigami.Theme.smallFont.pointSize
-      opacity: 0.6
-      text: ToVersion
     }
   }
 }

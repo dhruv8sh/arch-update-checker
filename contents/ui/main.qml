@@ -22,12 +22,13 @@ PlasmoidItem {
   signal updatingPackageList()
   signal stoppedUpdating()
   signal requestPause(bool pause)
+  property bool isUpdating: false
 
   Plasma5Support.DataSource {
     id: "executable"
     engine: "executable"
     connectedSources: []
-    onNewData: {
+    onNewData:function(sourceName, data){
       var exitCode = data["exit code"]
       var exitStatus = data["exit status"]
       var stdout = data["stdout"]
@@ -36,8 +37,9 @@ PlasmoidItem {
       disconnectSource(sourceName)
     }
     function exec(cmd) {
-        console.log("exec " + cmd)
-        connectSource(cmd)
+        // console.log("exec " + cmd)
+        if( !isUpdating )
+          connectSource(cmd)
     }
     signal exited(string sourceName, int exitCode, int exitStatus, string stdout, string stderr )
   }
@@ -56,14 +58,14 @@ PlasmoidItem {
   }
   Connections {
     target: executable
-    onExited: {
-      console.log ("onExited " + sourceName);
-      console.log ("onExited " + config.updateChecker);
-      console.log("onExited " + sourceName);
-      console.log("exitCode: " + exitCode);
-      console.log("exitStatus: " + exitStatus);
-      console.log("stdout: " + stdout);
-      console.log("stderr: " + stderr);
+    function onExited(sourceName, exitCode, exitStatus, stdout, stderr){
+      // console.log ("onExited " + sourceName);
+      // console.log ("onExited " + config.updateChecker);
+      // console.log("onExited " + sourceName);
+      // console.log("exitCode: " + exitCode);
+      // console.log("exitStatus: " + exitStatus);
+      // console.log("stdout: " + stdout);
+      // console.log("stderr: " + stderr);
       var packagelines = stdout.split("\n")
       packagelines.forEach(line => {
           line = main.removeANSIEscapeCodes(line.trim());
@@ -88,7 +90,10 @@ PlasmoidItem {
   }
   Connections {
     target: main
-    onRequestPause: timer.running = pause
+    function onRequestPause(pause){
+      timer.running = !pause
+    }
+    function onStoppedUpdating(){ isUpdating = false; }
   }
   Timer {
     id: timer
@@ -113,6 +118,7 @@ PlasmoidItem {
   function onConfigChanged() {
     config.interval = plasmoid.readConfig("pollinterval");
   }
+  Component.onCompleted : action_checkForUpdates()
   Plasmoid.contextualActions: [
       PlasmaCore.Action {
           text: i18n("Update System")
