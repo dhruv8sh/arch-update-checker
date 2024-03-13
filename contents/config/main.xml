@@ -30,6 +30,11 @@
       <whatsthis>If enabled, checks for updates when expanding</whatsthis>
       <default>True</default>
     </entry>
+    <entry name="noConfirmEnabled" type="Bool">
+      <label>Update packages using the noconfirm command</label>
+      <whatsthis>If enabled, uses no confirm tag</whatsthis>
+      <default>True</default>
+    </entry>
     <entry name="zeroPackageBadge" type="Bool">
       <label>Show badge even when zero packages available</label>
       <whatsthis>If enabled, shows badge along with the text even when zero packages are available to updgrade</whatsthis>

@@ -11,6 +11,7 @@ QQC2.Pane {
     property alias cfg_updateOnExpand: updateOnExpand.checked
     property alias cfg_updateCommand: aurWrapper.upcmd
     property alias cfg_updateCheckCommand: aurWrapper.upcheckcmd
+    property alias cfg_noConfirmEnabled: noConfirmEnabled.checked
 
 
     Kirigami.FormLayout {
@@ -44,13 +45,20 @@ QQC2.Pane {
                         return 0;
                 }
             }
-            onCurrentIndexChanged: {
+            onCurrentIndexChanged: update()
+            function update() {
                 let curr = model[currentIndex].text;
                 if( curr ) {
                     upcheckcmd = curr + " -Qua";
-                    upcmd = curr + " -Syu --noconfirm"
+                    upcmd = curr + " -Syu" + ( plasmoid.configuration.noConfirmEnabled ? " --noconfirm":"")
                 }
             }
+        }
+        QQC2.CheckBox {
+            id: noConfirmEnabled
+            Kirigami.FormData.label: i18n("Use --noconfirm")
+            checked: plasmoid.configuration.noConfirmEnabled
+            onCheckedChanged: aurWrapper.update()
         }
         Item {
             Kirigami.FormData.isSection: true
@@ -76,16 +84,6 @@ QQC2.Pane {
             Kirigami.FormData.label: i18n("Badge:")
             text: i18n("Show numbers on badge")
         }
-        // QQC2.RadioButton {
-        //     id:
-        // }
-        // QQC2.ColorBox {
-        //     id: badgeColor
-        // }
-        // QQC2.ColorBox {
-        //     id: textColor
-        // }
-
         Item {
             Kirigami.FormData.isSection: true
         }
