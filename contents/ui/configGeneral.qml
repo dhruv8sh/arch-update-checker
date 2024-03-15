@@ -2,70 +2,91 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
+import org.kde.kquickcontrols as KQuickControls
 
-QQC2.Pane {
+Kirigami.ScrollablePage {
     id: root
     property alias cfg_pollinterval: time.value
     property alias cfg_numberAvailable: numbersVisible.checked
     property alias cfg_packageSeparator: packageSeparator.text
     property alias cfg_updateOnExpand: updateOnExpand.checked
-    property alias cfg_updateCommand: aurWrapper.upcmd
-    property alias cfg_updateCheckCommand: aurWrapper.upcheckcmd
-    property alias cfg_noConfirmEnabled: noConfirmEnabled.checked
+    //commands
+    property alias cfg_updateCommand: aurWrapper.text
+    property alias cfg_flatpakUpdateCommand: flatpakEnabled.upcmd
+    //flags
+    property alias cfg_aurFlags: aurFlags.text
+    property alias cfg_flatpakFlags: flatpakFlags.text
+    //flatpak enabled
+    property alias cfg_flatpakEnabled: flatpakEnabled.checked
 
+    property alias cfg_customColorsEnabled: customColorsEnabled.checked
+    property alias cfg_dotColor: dotColor.color
+    property alias cfg_textColor: textColor.color
+    property alias cfg_position: position.currentIndex
 
     Kirigami.FormLayout {
         anchors.fill: parent
         QQC2.ComboBox {
             id: aurWrapper
-            property string upcmd
-            property string upcheckcmd
+            property string text: model[currentIndex].text
             Kirigami.FormData.label: i18n("AUR Wrapper:")
             textRole: "text"
             model: [
-                {text: "yay", value: "yay"},
-                {text: "paru", value: "paru"},
-                {text: "trizen", value: "trizen"},
-                {text: "pikaur", value: "pikaur"},
-                {text: "pacaur", value: "pacaur"}
+                {text: "yay"},
+                {text: "paru"},
+                {text: "trizen"},
+                {text: "pikaur"},
+                {text: "pacaur"}
             ];
             currentIndex: {
                 switch(plasmoid.configuration.updateCheckCommand) {
-                    case "yay -Qua":
-                        return 0;
-                    case "paru -Qua":
-                        return 1;
-                    case "trizen -Qua":
-                        return 2;
-                    case "pikaur -Qua":
-                        return 3;
-                    case "pacaur -Qua":
-                        return 4;
-                    default:
-                        return 0;
-                }
-            }
-            onCurrentIndexChanged: update()
-            function update() {
-                let curr = model[currentIndex].text;
-                if( curr ) {
-                    upcheckcmd = curr + " -Qua";
-                    upcmd = curr + " -Syu" + ( plasmoid.configuration.noConfirmEnabled ? " --noconfirm":"")
+                    case "yay"   : return 0;
+                    case "paru"  : return 1;
+                    case "trizen": return 2;
+                    case "pikaur": return 3;
+                    case "pacaur": return 4;
+                    default      : return 0;
                 }
             }
         }
+        QQC2.TextField {
+            id: aurFlags
+            Kirigami.FormData.label: i18n("AUR Flags:")
+        }
         QQC2.CheckBox {
-            id: noConfirmEnabled
-            Kirigami.FormData.label: i18n("Use --noconfirm")
-            checked: plasmoid.configuration.noConfirmEnabled
-            onCheckedChanged: aurWrapper.update()
+            id: flatpakEnabled
+            property string upcmd
+            Kirigami.FormData.label: i18n("Flatpak:")
+            enabled: true
+            onCheckedChanged: update()
+            function update() {
+                if( checked ) upcmd = "flatpak update "+flatpakFlags.text
+                else upcmd = ""
+            }
+        }
+        QQC2.TextField {
+            id: flatpakFlags
+            Kirigami.FormData.label: i18n("Flatpak flags:")
+            onTextChanged: flatpakEnabled.update()
         }
         Item {
             Kirigami.FormData.isSection: true
         }
         QQC2.CheckBox {
             id: updateOnExpand
-            Kirigami.FormData.label: i18n("Update list on expand:")
+            Kirigami.FormData.label: i18n("Search on expand:")
+        }
+        QQC2.TextField {
+            id: packageSeparator
+            Kirigami.FormData.label: i18n("Package seperator:")
+            placeholderText: i18n("Example: ->, =>, to, etc.")
+            text: plasmoid.configuration.packageSeparator
+        }
+        Kirigami.InlineMessage {
+            Layout.fillWidth: true
+            text: "Higher value recommended for better battery life!"
+            type: Kirigami.MessageType.Warning
+            visible: time.value < 11
         }
         QQC2.SpinBox {
             id: time
@@ -84,14 +105,35 @@ QQC2.Pane {
             Kirigami.FormData.label: i18n("Badge:")
             text: i18n("Show numbers on badge")
         }
-        Item {
-            Kirigami.FormData.isSection: true
+        QQC2.ComboBox {
+            id: position
+            textRole: "text"
+            model: [
+                {text:"Top-Left"},
+                {text:"Top-Right"},
+                {text:"Bottom-Left"},
+                {text:"Bottom-Right"}
+            ]
+            currentIndex : plasmoid.configuration.position
+            onCurrentIndexChanged: cfg_position = currentIndex
         }
-        QQC2.TextField {
-            id: packageSeparator
-            Kirigami.FormData.label: i18n("Package seperator:")
-            placeholderText: i18n("Example: ->, =>, to, etc.")
-            text: plasmoid.configuration.packageSeparator
+        Item { Kirigami.FormData.isSection: true }
+        QQC2.CheckBox {
+            id: customColorsEnabled
+            Kirigami.FormData.label: i18n("Colors:")
+            checked: true
+            text: i18n("Use custom colors")
         }
+        KQuickControls.ColorButton {
+            id: dotColor
+            Kirigami.FormData.label: i18n("Dot Color:")
+            visible: customColorsEnabled.checked
+        }
+        KQuickControls.ColorButton {
+            id: textColor
+            Kirigami.FormData.label: i18n("Text Color:")
+            visible: customColorsEnabled.checked
+        }
+        Item { Kirigami.FormData.isSection: true }
     }
 }
