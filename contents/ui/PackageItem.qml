@@ -1,64 +1,52 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
 
 PlasmaExtras.ExpandableListItem {
-  id: packageItem
-  enabled: true
-  width: scrollView.width
-  height: packageItemBase.height
-  property int pos: 0
+    id: packageItem
+    property bool showSeparator
 
-  // showDefaultActionButtonWhenBusy: true
-  // defaultActionButtonAction: Action {
-  //     id: stateChangeButton
-  //     icon.name: "showinfo"
-  //     text: i18n("Info")
-  // }
-  // MouseArea {
-  //   hoverEnabled: true
-  //   anchors.fill: parent
-  //   id: mousearea
-  // }
-  // PlasmaExtras.Highlight {
-  //   id: highlight
-  //     anchors.fill: parent
-  //     hovered: mousearea.containsMouse
-  //     visible: mousearea.containsMouse
-  //}
-  Item {
-    id: packageItemBase
-    height: packagenNameLabel.height + fromVersionLabel.height + Math.round(Kirigami.Units.gridUnit / 2)
-    anchors.top: parent.top
-    PlasmaComponents.Label {
-      id: packagenNameLabel
-      height: paintedHeight
-      elide: Text.ElideRight
-      textFormat: Text.RichText
-      text: ( IsAUR ? "<sup><b>AUR</b></sup>   ":"" ) + PackageName
-      anchors {
-        bottom: parent.verticalCenter
-        left: parent.left
-        leftMargin: Math.round(Kirigami.Units.gridUnit / 2)
-      }
+    icon: {
+    if( Source == "FLATPAK" ) return "flatpak-discover";
+    else if( Source == "SNAP" ) return "folder-snap-symbolic";
+    else if( Source == "AUR" ) return "package-symbolic";
+    else return "";
     }
-    PlasmaComponents.Label {
-      id: fromVersionLabel
-
-      anchors {
-        leftMargin: Kirigami.Units.gridUnit
-        top: packagenNameLabel.bottom
-      }
-
-      height: paintedHeight
-      elide: Text.ElideRight
-      font.pointSize: Kirigami.Theme.smallFont.pointSize
-      opacity: 0.6
-      text: "    "+FromVersion + plasmoid.configuration.packageSeparator + ToVersion
-      // color: Kirigami.Theme.negativeTextColor
+    title: PackageName
+    subtitle: FromVersion + plasmoid.configuration.packageSeparator + ToVersion
+    defaultActionButtonAction: Action {
+        id: singleInstallButton
+        icon.name: "run-install"
+        text: i18n("Install")
+        // onTriggered: changeState()
     }
-  }
+    contextualActions: [
+        Action {
+            text: i18n("Show more information")
+            icon.name: "showinfo"
+            onTriggered: packageManager.showInfo(PackageName,Source)
+            enabled: Source !== "FLATPAK"
+        },
+        Action {
+            text: i18n("Uninstall")
+            icon.name: "uninstall"
+            onTriggered: packageManager.uninstall(PackageName,Source)
+        }
+    ]
+
+    KSvg.SvgItem {
+        id: separatorLine
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+        }
+        imagePath: "widgets/line"
+        elementId: "horizontal-line"
+        width: parent.width - Kirigami.Units.gridUnit
+        visible: showSeparator
+    }
 }
