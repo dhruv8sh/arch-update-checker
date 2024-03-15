@@ -4,13 +4,12 @@ import org.kde.plasma.plasmoid
 import org.kde.plasma.components as PlasmaComponents
 
 Item {
-  id: itemIcon
-  Kirigami.Icon {
-      id: itemIconImage
-      anchors.fill: parent
-      source: "update-none"
-  }
-  
+    id: itemIcon
+    Kirigami.Icon {
+        id: itemIconImage
+        anchors.fill: parent
+        source: "update-none"
+    }
     Badge {
         id: packageBadge
         visible: packageModel.count > 0
@@ -20,32 +19,22 @@ Item {
     PlasmaComponents.BusyIndicator {
         id: busyIndicator2
         anchors.centerIn: parent
-        visible: false
+        visible: main.isUpdating
         anchors.fill: parent
     }
-  Connections {
-    target: main
-    function onUpdatingPackageList() {
-        packageBadge.visible = false
-        busyIndicator2.visible = true
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+        onClicked:  (mouse) => {
+            if (mouse.button === Qt.MiddleButton) {
+                packageManager.action_updateSystem()
+            } else {
+                main.expanded = !main.expanded
+                if( main.expanded && plasmoid.configuration.updateOnExpand && main.hasUserSeen )
+                    packageManager.action_checkForUpdates();
+                main.hasUserSeen = true
+            }
+        }
+        cursorShape: Qt.PointingHandCursor
     }
-    function onStoppedUpdating() {
-        packageBadge.visible = packageModel.count !== 0
-        busyIndicator2.visible = false
-    }
-  }
-  MouseArea {
-      anchors.fill: parent
-      acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-      onClicked:  (mouse) => {
-          if (mouse.button === Qt.MiddleButton) {
-              main.action_updateSystem()
-          } else {
-              main.expanded = !main.expanded
-              if( main.expanded && plasmoid.configuration.updateOnExpand )
-                  main.action_checkForUpdates();
-          }
-      }
-      cursorShape: Qt.PointingHandCursor
-  }
 }
