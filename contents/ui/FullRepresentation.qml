@@ -1,115 +1,106 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Controls as QQC2
 import org.kde.plasma.plasmoid as Plasmoid
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
+import org.kde.kitemmodels as KItemModels
 
-Item {
-    focus: true
-    Layout.minimumHeight: 200
-    Layout.minimumWidth: 400
-    anchors.fill: parent
-
-    RowLayout {
-        id: header
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        width: parent.width
-
-        RowLayout {
-            spacing: 0
-
-            PlasmaComponents.Switch {
-                id: pauseUpdateChecks
-                height: Kirigami.Units.iconSizes.medium
-                checked: true
-                onCheckedChanged : main.requestPause(!checked)
-            }
-            PlasmaExtras.Heading {
-                id: heading
-                level: 2
-                opacity: 0.6
-                text: "Updates" + (pauseUpdateChecks.checked ? "":" Paused")
-            }
-            PlasmaComponents.Label {
-                opacity: 0.6
-                text: (packageModel.count == 0 ? "":" ("+packageModel.count+" pending)")
-            }
+PlasmaExtras.Representation {
+    id: full
+    collapseMarginsHint: true
+    Layout.minimumHeight: 500
+    Layout.minimumWidth: 500
+    KItemModels.KSortFilterProxyModel {
+        id: filterModel
+        sourceModel: packageModel
+        filterRoleName: "PackageName"
+        sortRoleName: "PackageName"
+        filterRowCallback: function(sourceRow, sourceParent) {
+            let value = sourceModel.data(sourceModel.index(sourceRow, 0, sourceParent), filterRole);
+            return value.toString().includes(toolbar.searchTextField.text);
         }
-        RowLayout {
-            Layout.alignment: Qt.AlignRight
-            spacing: 0
+    }
+    header: PlasmaExtras.PlasmoidHeading {
+        focus: true
+        contentItem: RowLayout {
+            Layout.fillWidth: true
 
-            PlasmaComponents.ToolButton {
-                id: updateIcon
-                height: Kirigami.Units.iconSizes.medium
-                icon.name: "install"
-                onClicked: main.action_updateSystem()
-                visible: packageModel.count != 0
+            Toolbar {
+                id: toolbar
+                Layout.fillWidth: true
+                visible: stack.depth === 1
             }
-            PlasmaComponents.ToolButton {
-                id: checkUpdatesIcon
-                height: Kirigami.Units.iconSizes.medium
-                icon.name: "view-refresh"
-                onClicked: main.action_checkForUpdates()
+            PlasmaComponents.Button {
+                Layout.fillWidth: true
+                icon.name: mirrored ? "go-next" : "go-previous"
+                text: i18nc("@action:button", "Return to Network Connections")
+                visible: stack.depth > 1
+                onClicked: {
+                    stack.pop()
+                }
+            }
+
+            Loader {
+                sourceComponent: stack.currentItem?.headerItems
+                visible: !!item
             }
         }
     }
-    Rectangle {
-        anchors.top: header.bottom
-        id: headerSeparator
-        width: parent.width
-        height: 1
-        color: Kirigami.Theme.textColor
-        opacity: 0.25
-        visible: true
-    }
-    Connections {
-        target: main
-        function onUpdatingPackageList() {
-            uptodateLabel.visible = false
-            busyIndicator.visible = true
+    QQC2.StackView {
+        id: stack
+        anchors.fill: parent
+        initialItem: ListPage {
+            id: listPage
+            filteredModel: filterModel
         }
-        function onStoppedUpdating() {
-            busyIndicator.visible = false
-            uptodateLabel.visible = packageModel.count == 0
-        }
-    }
-    Kirigami.ScrollablePage {
-        id: scrollView;
-        background: Rectangle{
-            anchors.fill: parent
-            color: "transparent"
-        }
-        anchors.top: headerSeparator.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        ListView {
-            id: packageView;
-            anchors.rightMargin: Kirigami.Units.gridUnit
-            clip: true
-            model: packageModel;
-            currentIndex: -1;
-            boundsBehavior: Flickable.StopAtBounds;
-            focus: true
-            delegate: PackageItem { pos: index }
-            onCountChanged: uptodateLabel.visible = !busyIndicator.visible && count == 0;
-        }
-    }
-    PlasmaExtras.PlaceholderMessage {
-        id: uptodateLabel
-        text: i18n("You are up to date.")
-        iconName: "preferences-system-linux"
-        anchors.centerIn: parent
-        visible: !busyIndicator.visible && packageView.count == 0
-    }
-    PlasmaComponents.BusyIndicator {
-        id: busyIndicator
-        anchors.centerIn: parent
-        visible: false
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
