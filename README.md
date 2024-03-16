@@ -1,16 +1,19 @@
 # Arch Update Notifier
-A KDE Plamsa Applet (Plasmoid) to check for Arch and AUR Updates.
+A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 
-## Images
-  
-  ![Screenshot_20240218_013332](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/90a7f66d-f752-4fdc-a95b-8f61c586bcda)<br>
-  Expanded applet
-<br>
-<br>
-  
-  ![Screenshot_20240218_013123](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/81310c19-ede5-4ed7-8ada-e08eb5c2d9bb)<br>
-  Applet in a native Plasma Dock
+## Screenshots
 
+![Screenshot_20240317_035250](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/7a0fb498-0611-418c-8758-ac16f01ae678)
+
+![Screenshot_20240317_035940](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/f4540d46-a7a6-4ae5-8fa1-d672713691c7)
+
+## Todo
+- [x] Flatpak Support
+- [x] Rewrite to look native
+- [ ] Notification on update
+- [ ] Snap Support
+- [ ] Support for Arch Linux Update News
+- [ ] Support for mirrorlist update
 
 
 ## Installation
