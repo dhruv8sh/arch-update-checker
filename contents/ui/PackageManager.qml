@@ -46,7 +46,9 @@ Item{
             else fetchAURorPACMANInformation(packagelines, sourceName)
             packageManager.stillUpdating --;
             main.isUpdating = packageManager.stillUpdating > 0;
-            // console.log("Exited for " + packageManager.stillUpdating+" started")
+            // if( !main.isUpdating ) {
+            //     notification.sendEvent()
+            // }
         }
     }
     function removeANSIEscapeCodes(str) {
@@ -139,7 +141,6 @@ Item{
         else packageManager.stillUpdating = 2;
         executable.exec(plasmoid.configuration.aurWrapper+" -Qua");
         executable.exec("checkupdates");
-        console.log("now waiting for updates");
     }
     function getDetailsFor(name, source) {
         if( source === "" ) executable.exec("pacman -Qi "+name)

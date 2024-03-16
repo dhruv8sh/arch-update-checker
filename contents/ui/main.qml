@@ -4,17 +4,16 @@ import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponent
 import org.kde.plasma.plasma5support as Plasma5Support
-
+import org.kde.notification
 
 PlasmoidItem {
   id: main
   property string subtext: i18n("Updates")
   property string title: title
   property alias isNotPaused: timer.running
-  toolTipSubText: subtext
   Plasmoid.icon: "package-new"
   preferredRepresentation: compactRepresentation
-  compactRepresentation: CompactRepresentation {}
+  compactRepresentation: CompactRepresentation { }
   fullRepresentation: FullRepresentation{ }
   ListModel { id: packageModel }
   signal updatingPackageList()
@@ -22,12 +21,16 @@ PlasmoidItem {
   signal requestPause(bool pause)
   property bool isUpdating: false
   property bool hasUserSeen: false
-  //HACK: DO NOT MODIFY
   property var details
   property string error: ""
   property bool wasFlatpakDisabled: false
 
   PackageManager{ id: packageManager }
+
+  toolTipMainText: i18n("Arch Update Checker")
+  toolTipSubText: i18n("Updates available: "+packageModel.count)
+  Plasmoid.status: (packageModel > 0 || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
+
   property string outputText: ''
   Item{
     id: config
@@ -43,6 +46,14 @@ PlasmoidItem {
       packageManager.action_checkForUpdates()
     }
   }
+  // Notification {
+  //     id: notification
+  //     componentName: "archupdatechecker"
+  //     eventId: "popup"
+  //     title: "Arch Update Checker"
+  //     text: packageModel.count + "updates available!"
+  //     iconName: "update-high"
+  // }
   Component.onCompleted : {
     hasUserSeen = false;
     packageManager.action_checkForUpdates()

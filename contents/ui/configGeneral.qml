@@ -40,7 +40,7 @@ Kirigami.ScrollablePage {
                 {text: "aura"}
             ];
             currentIndex: {
-                switch(plasmoid.configuration.updateCheckCommand) {
+                switch(plasmoid.configuration.aurWrapper) {
                     case "yay"   : return 0;
                     case "paru"  : return 1;
                     case "trizen": return 2;
@@ -50,6 +50,7 @@ Kirigami.ScrollablePage {
                     default      : return 0;
                 }
             }
+            onCurrentIndexChanged: text = model[currentIndex].text
         }
         QQC2.TextField {
             id: aurFlags

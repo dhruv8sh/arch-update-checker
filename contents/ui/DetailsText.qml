@@ -31,10 +31,10 @@ MouseArea {
         }
 
         PlasmaExtras.MenuItem {
-            text: i18n("Copy \'Name - Version\'")
+            text: i18n("Copy \'Name - New Version\'")
             icon: "edit-copy"
             enabled: contextMenu.text !== ""
-            onClicked: clipboard.content = contextMenu.text
+            onClicked: clipboard.content = PackageName + " - " + ToVersion
         }
     }
     GridLayout {
