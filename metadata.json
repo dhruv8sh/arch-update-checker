@@ -19,7 +19,7 @@
             "Plasma/Applet"
         ],
         "EnabledByDefault": true,
-        "Version": "0.5.6",
+        "Version": "0.7",
         "Website": "https://github.com/dhruv8sh/arch-update-checker"
     },
     "X-Plasma-API-Minimum-Version": "6.0",
