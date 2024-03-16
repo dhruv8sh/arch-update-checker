@@ -26,6 +26,7 @@ Item{
         function onExited(sourceName, exitCode, exitStatus, stdout, stderr){
             var packagelines = stdout.split("\n")
             if( sourceName.startsWith("konsole")) return;
+            else if( sourceName.includes(" -Qi ")) { fetchDetails(packagelines); return; }
             else if( sourceName.startsWith("upd=$(flatpak") ) fetchFlatpakInformation(packagelines)
             else fetchAURorPACMANInformation(packagelines, sourceName)
             main.isUpdating = packageManager.stillUpdating == 0;
@@ -34,6 +35,18 @@ Item{
     }
     function removeANSIEscapeCodes(str) {
         return str.replace(/\u001b\[[0-9;]*[m|K]/g, '');
+    }
+    function fetchDetails(lines) {
+        var details = [];
+        lines.forEach(line => {
+            line = removeANSIEscapeCodes(line.trim());
+            const info = line.split("  : ");
+            if (isNeededInfoField(info[0].trim())) {
+                details.push(info[0].trim());
+                details.push(info[1].trim());
+            }
+        });
+        main.details = details;
     }
     function fetchFlatpakInformation(lines) {
         lines.forEach(line => {
@@ -103,5 +116,26 @@ Item{
         executable.exec(plasmoid.configuration.aurWrapper+" -Qua");
         executable.exec("checkupdates");
         console.log("now waiting for updates");
+    }
+    function getDetailsFor(name, source) {
+        if( source === "" ) executable.exec("pacman -Qi "+name)
+        else if( source === "AUR" ) executable.exec(plasmoid.configuration.aurWrapper+" -Qi "+name)
+        else if( source === "FLATPAK" || source === "SNAP" ) details = ["Not","Supported"]
+    }
+    function isNeededInfoField( key ) {
+        switch( key ) {
+            case "Name":
+            case "Description":
+            case "Installed Size":
+            case "Licences":
+            case "Provides":
+            case "Replaces":
+            case "Build Date":
+            case "Install Reason":
+            case "Conflicts With":
+            case "Groups":
+            case "Optional For": return true;
+            default: return false;
+        }
     }
 }

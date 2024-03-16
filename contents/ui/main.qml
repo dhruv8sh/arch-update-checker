@@ -22,6 +22,8 @@ PlasmoidItem {
   signal requestPause(bool pause)
   property bool isUpdating: false
   property bool hasUserSeen: false
+  //HACK: DO NOT MODIFY
+  property var details
 
   PackageManager{ id: packageManager }
   property string outputText: ''

@@ -36,7 +36,8 @@ Kirigami.ScrollablePage {
                 {text: "paru"},
                 {text: "trizen"},
                 {text: "pikaur"},
-                {text: "pacaur"}
+                {text: "pacaur"},
+                {text: "aura"}
             ];
             currentIndex: {
                 switch(plasmoid.configuration.updateCheckCommand) {
@@ -45,6 +46,7 @@ Kirigami.ScrollablePage {
                     case "trizen": return 2;
                     case "pikaur": return 3;
                     case "pacaur": return 4;
+                    case "aura"  : return 5;
                     default      : return 0;
                 }
             }
@@ -91,11 +93,12 @@ Kirigami.ScrollablePage {
         QQC2.SpinBox {
             id: time
             Kirigami.FormData.label: i18n("Poll Interval:")
-            from: 1
-            to: 1000
+            from: 30
+            to: 100000
+            stepSize: 30
             textFromValue: function(value, locale) {
-                            return (value === 1 ? qsTr("%1 min")
-                                                : qsTr("%1 mins")).arg(value);}
+                            if( value === 1 ) return (qsTr("%1 min")).args(value);
+                            else return (qsTr("%1 mins")).args(value);}
         }
         Item {
             Kirigami.FormData.isSection: true

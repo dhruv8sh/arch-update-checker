@@ -19,10 +19,10 @@ ColumnLayout {
         Layout.preferredHeight: contentItem.implicitHeight + topPadding + bottomPadding
         type: Kirigami.MessageType.Warning
         icon.name: "media-playback-paused-symbolic"
-        text: i18n("Automatic updates are currently paused")
+        text: i18n("Not searching for updates automatically")
         visible: !main.isNotPaused
         actions: Kirigami.Action {
-            text: i18nc("@action:button", "Unpause")
+            text: i18nc("@action:button", "Resume")
             onTriggered: main.isNotPaused = true
         }
     }
@@ -43,9 +43,9 @@ ColumnLayout {
             currentIndex: -1
             boundsBehavior: Flickable.StopAtBounds
             // section.property: true
-            section.delegate: PackageItem {
-                // separator: true
-            }
+            // section.delegate: PackageItem {
+            //     // separator: true
+            // }
             highlight: PlasmaExtras.Highlight { }
             highlightMoveDuration: 0
             highlightResizeDuration: 0

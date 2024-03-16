@@ -9,7 +9,7 @@ import org.kde.ksvg as KSvg
 PlasmaExtras.ExpandableListItem {
     id: packageItem
     property bool showSeparator
-
+    property var localDataCache
     icon: {
     if( Source == "FLATPAK" ) return "flatpak-discover";
     else if( Source == "SNAP" ) return "folder-snap-symbolic";
@@ -22,7 +22,7 @@ PlasmaExtras.ExpandableListItem {
         id: singleInstallButton
         icon.name: "run-install"
         text: i18n("Install")
-        // onTriggered: changeState()
+        onTriggered: packageManager.installOnly(PackageName,Source)
     }
     contextualActions: [
         Action {
@@ -48,5 +48,25 @@ PlasmaExtras.ExpandableListItem {
         elementId: "horizontal-line"
         width: parent.width - Kirigami.Units.gridUnit
         visible: showSeparator
+    }
+    customExpandedViewContent: DetailsText{
+        id: detailsText
+        details: {
+            if( localDataCache ) return localDataCache
+            packageManager.getDetailsFor(PackageName,Source)
+            humanMomentTimer.start()
+            return ["","","","","","","","","","","","","","","","","","","","","",""];
+        }
+    }
+    Timer{
+        id: humanMomentTimer
+        interval: 200
+        running: false
+        repeat: false
+        onTriggered: {
+            localDataCache = main.details
+            detailsText.details = localDataCache;
+            if( localDataCache.length === 0 ) humanMomentTimer.start()
+        }
     }
 }
