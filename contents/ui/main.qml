@@ -24,6 +24,8 @@ PlasmoidItem {
   property bool hasUserSeen: false
   //HACK: DO NOT MODIFY
   property var details
+  property string error: ""
+  property bool wasFlatpakDisabled: false
 
   PackageManager{ id: packageManager }
   property string outputText: ''

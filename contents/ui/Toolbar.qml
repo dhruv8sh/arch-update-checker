@@ -18,7 +18,6 @@ RowLayout {
         visible: true
         PlasmaComponents.Switch {
             id: pauseButton
-            // KeyNavigation.right: wwanSwitchButton.visible ? wwanSwitchButton : wwanSwitchButton.KeyNavigation.right
             icon.name: "media-playback-pause"
             checked: !main.isNotPaused
             onToggled: main.isNotPaused = !checked
@@ -30,8 +29,6 @@ RowLayout {
             id: searchButton
             enabled: true
             icon.name: "view-refresh"
-            // KeyNavigation.left: wifiSwitchButton
-            // KeyNavigation.right: planeModeSwitchButton.visible ? planeModeSwitchButton : planeModeSwitchButton.KeyNavigation.right
             onClicked: {
                 packageManager.action_checkForUpdates()
                 main.hasUserSeen = true
@@ -44,8 +41,6 @@ RowLayout {
             id: installButton
             enabled: true
             icon.name: "install"
-            // KeyNavigation.left: wifiSwitchButton
-            // KeyNavigation.right: planeModeSwitchButton.visible ? planeModeSwitchButton : planeModeSwitchButton.KeyNavigation.right
             onClicked: packageManager.action_updateSystem()
             PlasmaComponents.ToolTip {
                 text: i18n("Update your system")

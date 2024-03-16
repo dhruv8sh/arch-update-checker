@@ -22,6 +22,7 @@ PlasmaExtras.ExpandableListItem {
         id: singleInstallButton
         icon.name: "run-install"
         text: i18n("Install")
+        enabled: Source !== "FLATPAK"
         onTriggered: packageManager.installOnly(PackageName,Source)
     }
     contextualActions: [

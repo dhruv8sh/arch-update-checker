@@ -66,7 +66,7 @@
     <entry name="aurWrapper" type="String">
           <label>AUR Wrapper</label>
           <whatsthis>AUR Wrapper to use</whatsthis>
-      <default>yay</default>
+      <default>paru</default>
     </entry>
 
     <!-- Flags -->

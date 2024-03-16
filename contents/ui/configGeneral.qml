@@ -93,12 +93,14 @@ Kirigami.ScrollablePage {
         QQC2.SpinBox {
             id: time
             Kirigami.FormData.label: i18n("Poll Interval:")
-            from: 30
+            from: 1
             to: 100000
-            stepSize: 30
+            stepSize: 10
+            editable: false
             textFromValue: function(value, locale) {
-                            if( value === 1 ) return (qsTr("%1 min")).args(value);
-                            else return (qsTr("%1 mins")).args(value);}
+                if( value == 1 ) return qsTr("%1 min").arg(value);
+                else return qsTr("%1 mins").arg(value);
+            }
         }
         Item {
             Kirigami.FormData.isSection: true

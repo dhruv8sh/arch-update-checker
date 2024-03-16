@@ -25,12 +25,28 @@ Item{
         target: executable
         function onExited(sourceName, exitCode, exitStatus, stdout, stderr){
             var packagelines = stdout.split("\n")
-            if( sourceName.startsWith("konsole")) return;
+
+            // Error handling
+            if( stderr.includes("flatpak: command not found") ) {
+                plasmoid.configuration.flatpakEnabled = false;
+                main.wasFlatpakDisabled = true;
+                packageManager.stillUpdating --;
+                return;
+            }
+            else if( stderr.trim() !== "" ) {
+                console.log(exitStatus)
+                main.error = "Error code: "+exitCode+"\nError:"+stderr;
+                if( main.isUpdating && stillUpdating > 0 ) packageManager.stillUpdating --;
+                return;
+            }
+            //Error handling ends
+            else if( sourceName.startsWith("konsole")) return;
             else if( sourceName.includes(" -Qi ")) { fetchDetails(packagelines); return; }
             else if( sourceName.startsWith("upd=$(flatpak") ) fetchFlatpakInformation(packagelines)
             else fetchAURorPACMANInformation(packagelines, sourceName)
-            main.isUpdating = packageManager.stillUpdating == 0;
             packageManager.stillUpdating --;
+            main.isUpdating = packageManager.stillUpdating > 0;
+            // console.log("Exited for " + packageManager.stillUpdating+" started")
         }
     }
     function removeANSIEscapeCodes(str) {
@@ -77,6 +93,7 @@ Item{
     function action_updateSystem() {
         timer.stop()
         packageModel.clear()
+        main.wasFlatpakDisabled = false;
         isUpdating = false
         stillUpdating = 0
         var command = "konsole -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags;
@@ -90,6 +107,12 @@ Item{
         else if( source == "SNAP" ) console.log("SNAP support coming soon!");
         else executable.exec("konsole -e sudo pacman -R "+name);
     }
+    function installOnly(name, source) {
+        if( source === "FLATPAK" ) executable.exec("konsole --hold -e flatpak update "+name);
+        else if( source === "SNAP" ) console.log("SNAP support coming soon!");
+        else if( source === "AUR" ) executable.exec("konsole -e yay -S "+name)
+        else executable.exec("konsole --hold -e sudo pacman -S "+name);
+    }
     function showInfo(name, source) {
         if( source == "FLATPAK" ) console.log("THIS IS NOT YET IMPLEMENTED!");
         else if( source == "SNAP" )  console.log("SNAP support coming soon!");
@@ -99,6 +122,7 @@ Item{
     function action_checkForUpdates() {
         if( main.isUpdating || packageManager.stillUpdating > 0 ) return;
         packageModel.clear()
+        main.wasFlatpakDisabled = false;
         main.isUpdating = true
         if( plasmoid.configuration.flatpakEnabled ) {
             packageManager.stillUpdating = 3;
@@ -124,7 +148,7 @@ Item{
     }
     function isNeededInfoField( key ) {
         switch( key ) {
-            case "Name":
+            // case "Name":
             case "Description":
             case "Installed Size":
             case "Licences":

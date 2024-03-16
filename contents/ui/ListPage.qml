@@ -26,11 +26,48 @@ ColumnLayout {
             onTriggered: main.isNotPaused = true
         }
     }
+    Kirigami.InlineMessage {
+        id: errorMessage
+        Layout.fillWidth: true
+        Layout.leftMargin: packageView.leftMargin
+        Layout.rightMargin: packageView.rightMargin
+        Layout.topMargin: Kirigami.Units.smallSpacing * 2
+        Layout.preferredHeight: contentItem.implicitHeight + topPadding + bottomPadding
+        type: Kirigami.MessageType.Error
+        icon.name: "data-error"
+        text: main.error
+        visible: main.error != ""
+        actions: Kirigami.Action {
+            text: i18nc("@action:button", "Clear")
+            onTriggered: main.error = ""
+        }
+    }
+    Kirigami.InlineMessage {
+        id: flatpakNotFoundMessage
+        Layout.fillWidth: true
+        Layout.leftMargin: packageView.leftMargin
+        Layout.rightMargin: packageView.rightMargin
+        Layout.topMargin: Kirigami.Units.smallSpacing * 2
+        Layout.preferredHeight: contentItem.implicitHeight + topPadding + bottomPadding
+        type: Kirigami.MessageType.Information
+        icon.name: "dialog-information"
+        text: i18n("Flatpak was not found! It is now disabled.")
+        onLinkActivated: Qt.openUrlExternally("https://flathub.org/setup")
+        visible: main.wasFlatpakDisabled
+        actions: Kirigami.Action {
+            text: i18nc("@action:button", "Re-enable")
+            onTriggered: {
+                main.wasFlatpakDisabled = false
+                plasmoid.configuration.flatpakEnabled = true
+            }
+        }
+    }
 
     PlasmaComponents.ScrollView {
         id: scrollView
         Layout.fillWidth: true
         Layout.fillHeight: true
+        visible: !main.isUpdating
         contentWidth: availableWidth - contentItem.leftMargin - contentItem.rightMargin
         contentItem: ListView {
             id: packageView
@@ -42,10 +79,6 @@ ColumnLayout {
             model: filteredModel
             currentIndex: -1
             boundsBehavior: Flickable.StopAtBounds
-            // section.property: true
-            // section.delegate: PackageItem {
-            //     // separator: true
-            // }
             highlight: PlasmaExtras.Highlight { }
             highlightMoveDuration: 0
             highlightResizeDuration: 0
@@ -67,6 +100,10 @@ ColumnLayout {
                 }
             }
         }
+    }
+    PlasmaComponents.BusyIndicator {
+        Layout.fillWidth: true
+        visible: main.isUpdating
     }
 
 }
