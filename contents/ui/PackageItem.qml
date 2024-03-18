@@ -28,13 +28,12 @@ PlasmaExtras.ExpandableListItem {
         Action {
             text: i18n("Show more information")
             icon.name: "showinfo"
-            onTriggered: packageManager.showInfo(PackageName,Source)
-            enabled: Source !== "FLATPAK"
+            onTriggered: packageManager.showInfo(Source === "FLATPAK"?ToVersion:PackageName,Source)
         },
         Action {
             text: i18n("Uninstall")
             icon.name: "uninstall"
-            onTriggered: packageManager.uninstall(PackageName,Source)
+            onTriggered: packageManager.uninstall(Source === "FLATPAK"?ToVersion:PackageName,Source)
         }
     ]
 
@@ -53,7 +52,7 @@ PlasmaExtras.ExpandableListItem {
         id: detailsText
         details: {
             if( localDataCache ) return localDataCache
-            packageManager.getDetailsFor(PackageName,Source)
+            packageManager.getDetailsFor(Source === "FLATPAK"?ToVersion:PackageName,Source)
             humanMomentTimer.start()
             return ["","","","","","","","","","","","","","","","","","","","","",""];
         }

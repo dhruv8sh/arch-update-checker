@@ -42,6 +42,7 @@ Item{
             //Error handling ends
             else if( sourceName.startsWith("konsole")) return;
             else if( sourceName.includes(" -Qi ")) { fetchDetails(packagelines); return; }
+            else if( sourceName.startsWith("flatpak info")) { fetchDetailsFlatpak(packagelines); return; }
             else if( sourceName.startsWith("upd=$(flatpak") ) fetchFlatpakInformation(packagelines)
             else fetchAURorPACMANInformation(packagelines, sourceName)
             packageManager.stillUpdating --;
@@ -54,26 +55,48 @@ Item{
     function removeANSIEscapeCodes(str) {
         return str.replace(/\u001b\[[0-9;]*[m|K]/g, '');
     }
+
+    //Gets package details
     function fetchDetails(lines) {
         var details = [];
         lines.forEach(line => {
             line = removeANSIEscapeCodes(line.trim());
             const info = line.split("  : ");
-            if (isNeededInfoField(info[0].trim())) {
+            if (isNeededInfoField(info[0].trim()),source) {
                 details.push(info[0].trim());
                 details.push(info[1].trim());
             }
         });
         main.details = details;
     }
+    function fetchDetailsFlatpak(lines) {
+        var details = [];
+        lines.shift()
+        details.push("Description")
+        details.push(lines[0].substring(lines[0].indexOf(' - ')+3))
+        lines.shift()
+        lines.shift()
+        lines.forEach(line => {
+            line = removeANSIEscapeCodes(line.trim());
+            const info = line.split(": ");
+            if (isNeededInfoFieldFlatpak(info[0].trim())) {
+                details.push(info[0].trim());
+                details.push(info[1].trim());
+            }
+        });
+        main.details = details;
+    }
+
+    //Gets package updates
     function fetchFlatpakInformation(lines) {
         lines.forEach(line => {
             var info = line.split(' ');
-            if( info.length >= 3 )
+            if( info.length > 3 )
+            console.log("Flatpak package:"+info);
             packageModel.append({
                 PackageName: info[0],
-                FromVersion: info[1],
-                ToVersion: info[2],
+                FromVersion: info[3],
+                ToVersion: info[2]+"    "+info[1],
                 Source: "FLATPAK"
             });
         });
@@ -92,6 +115,8 @@ Item{
             });
         });
     }
+
+    //Updates everything
     function action_updateSystem() {
         timer.stop()
         packageModel.clear()
@@ -104,20 +129,26 @@ Item{
         executable.exec(command);
         timer.start()
     }
+
+    //Uninstall
     function uninstall(name, source) {
-        if( source === "FLATPAK" ) executable.exec("konsole --hold -e flatpak uninstall "+name);
+        if( source === "FLATPAK" ) executable.exec("konsole --hold -e flatpak uninstall "+name.split(" ").pop());
         else if( source == "SNAP" ) console.log("SNAP support coming soon!");
-        else executable.exec("konsole -e sudo pacman -R "+name);
+        else executable.exec("konsole --hold -e sudo pacman -R "+name);
     }
+
+    //update One package
     function installOnly(name, source) {
-        if( source === "FLATPAK" ) executable.exec("konsole --hold -e flatpak update "+name);
+        if( source === "FLATPAK" ) executable.exec("konsole --hold -e flatpak update "+name.split(" ").pop());
         else if( source === "SNAP" ) console.log("SNAP support coming soon!");
         else if( source === "AUR" ) executable.exec("konsole -e yay -S "+name)
         else executable.exec("konsole --hold -e sudo pacman -S "+name);
     }
     function showInfo(name, source) {
-        if( source == "FLATPAK" ) console.log("THIS IS NOT YET IMPLEMENTED!");
-        else if( source == "SNAP" )  console.log("SNAP support coming soon!");
+        if( source == "FLATPAK" ) {
+            const id = name.split(" ").pop();
+            executable.exec("konsole --hold -e flatpak info "+id);
+        } else if( source == "SNAP" )  console.log("SNAP support coming soon!");
         else if( source == "AUR" ) executable.exec("konsole --hold -e "+plasmoid.configuration.aurWrapper+" -Qi "+name)
         else executable.exec("konsole --hold -e pacman -Qi "+name)
     }
@@ -128,13 +159,14 @@ Item{
         main.isUpdating = true
         if( plasmoid.configuration.flatpakEnabled ) {
             packageManager.stillUpdating = 3;
-            //copied from exequtic
+            //modified code from exequtic
             executable.exec(`upd=$(flatpak remote-ls --columns=name,application,version --app --updates | \
                             sed 's/ /-/g' | sed 's/\t/ /g')
+                            output=""
                             while IFS= read -r app; do
                                     id=$(echo "$app" | awk '{print $2}')
                                     ver=$(flatpak info "$id" | grep "Version:" | awk '{print $2}')
-                                    output+="$(echo "$app" | sed "s/$id/$ver/" | tr '[:upper:]' '[:lower:]')"$'\n'
+                                    output+="$(echo "$app $ver\n")"
                             done <<< "$upd"
                             echo -en "$output"`);
         }
@@ -144,8 +176,12 @@ Item{
     }
     function getDetailsFor(name, source) {
         if( source === "" ) executable.exec("pacman -Qi "+name)
-        else if( source === "AUR" ) executable.exec(plasmoid.configuration.aurWrapper+" -Qi "+name)
-        else if( source === "FLATPAK" || source === "SNAP" ) details = ["Not","Supported"]
+        else if( source === "AUR" ) executable.exec(plasmoid.configuration.aurWrapper+" -Qi "+name);
+        else if( source === "FLATPAK" ) {
+            const id = name.split(" ").pop();
+            executable.exec("flatpak info "+id);
+        }
+        else if( source === "SNAP" ) details = ["Not Supported","yet"];
     }
     function isNeededInfoField( key ) {
         switch( key ) {
@@ -160,6 +196,21 @@ Item{
             case "Conflicts With":
             case "Groups":
             case "Optional For": return true;
+            default: return false;
+        }
+    }
+    function isNeededInfoFieldFlatpak( key ) {
+        switch( key ) {
+            case "Id":
+            case "Ref":
+            case "Arch":
+            case "Branch":
+            case "Origin":
+            case "Collection":
+            case "Installation":
+            case "System":
+            case "Commit":
+            case "Date": return true;
             default: return false;
         }
     }
