@@ -11,8 +11,7 @@ Kirigami.ScrollablePage {
     property alias cfg_packageSeparator: packageSeparator.text
     property alias cfg_updateOnExpand: updateOnExpand.checked
     //commands
-    property alias cfg_updateCommand: aurWrapper.text
-    property alias cfg_flatpakUpdateCommand: flatpakEnabled.upcmd
+    property alias cfg_aurWrapper: aurWrapper.value
     //flags
     property alias cfg_aurFlags: aurFlags.text
     property alias cfg_flatpakFlags: flatpakFlags.text
@@ -28,7 +27,7 @@ Kirigami.ScrollablePage {
         anchors.fill: parent
         QQC2.ComboBox {
             id: aurWrapper
-            property string text: model[currentIndex].text
+            property string value: model[currentIndex].text
             Kirigami.FormData.label: i18n("AUR Wrapper:")
             textRole: "text"
             model: [
@@ -50,7 +49,7 @@ Kirigami.ScrollablePage {
                     default      : return 0;
                 }
             }
-            onCurrentIndexChanged: text = model[currentIndex].text
+            onCurrentIndexChanged: value = model[currentIndex].text
         }
         QQC2.TextField {
             id: aurFlags
