@@ -10,10 +10,15 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 ## Todo
 - [x] Flatpak Support
 - [x] Rewrite to look native
+  - [x] Details on item expand
+  - [x] Flatpak details on expand
+  - [x] Ask for modifying singular updates
+  - [ ] (7/10) Better error handling
+  - [ ] (1/2) Extensive logging support
 - [ ] Notification on update
-- [ ] Snap Support
 - [ ] Support for Arch Linux Update News
 - [ ] Support for mirrorlist update
+- [ ] Snap support
 
 
 ## Installation
