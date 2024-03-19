@@ -11,7 +11,6 @@ PlasmoidItem {
   property string subtext: i18n("Updates")
   property string title: title
   property alias isNotPaused: timer.running
-  Plasmoid.icon: "package-new"
   preferredRepresentation: compactRepresentation
   compactRepresentation: CompactRepresentation { }
   fullRepresentation: FullRepresentation{ }

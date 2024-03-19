@@ -35,7 +35,7 @@ Item{
                     plasmoid.configuration.flatpakEnabled = false;
                     main.wasFlatpakDisabled = true;
                 } else if( stderr.includes("Temporary failure in name resolution") ) main.error = i18n("Problem connecting to the internet.");
-                else main.error ="Command:"+sourceName+ "\nError code: "+exitCode+ "\n"+stderr.length()>200 ? stderr.substring(0,201)+"..." : stderr ;
+                else main.error ="Command:"+sourceName+ "\nError code: "+exitCode+ "\n"+(stderr.length>200 ? stderr.substring(0,201)+"..." : stderr );
             }
             //Error handling ends
             else if( sourceName.startsWith("konsole")) return;
