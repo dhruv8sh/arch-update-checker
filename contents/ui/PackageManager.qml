@@ -170,12 +170,15 @@ Item{
             executable.exec(`upd=$(flatpak remote-ls --columns=name,application,version --app --updates | \
                             sed 's/ /-/g' | sed 's/\t/ /g')
                             output=""
-                            while IFS= read -r app; do
+                            if [ -n "$upd" ]; then
+                                while IFS= read -r app; do
                                     id=$(echo "$app" | awk '{print $2}')
                                     ver=$(flatpak info "$id" | grep "Version:" | awk '{print $2}')
                                     output+="$(echo "$app $ver\n")"
-                            done <<< "$upd"
-                            echo -en "$output"`);
+                                done <<< "$upd"
+                            fi
+                            echo -en "$output"
+                            `);
         }
         else stillUpdating = 2;
         executable.exec(plasmoid.configuration.aurWrapper+" -Qua");

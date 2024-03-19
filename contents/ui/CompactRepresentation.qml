@@ -29,7 +29,7 @@ Item {
             if (mouse.button === Qt.MiddleButton) {
                 packageManager.action_updateSystem()
             } else {
-                main.expanded = !main.expanded
+                main.expanded = true
                 if( main.expanded && plasmoid.configuration.updateOnExpand && main.hasUserSeen )
                     packageManager.action_checkForUpdates();
                 main.hasUserSeen = true
