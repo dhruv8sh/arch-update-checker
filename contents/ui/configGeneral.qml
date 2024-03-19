@@ -23,6 +23,9 @@ Kirigami.ScrollablePage {
     property alias cfg_textColor: textColor.color
     property alias cfg_position: position.currentIndex
 
+    property alias cfg_holdKonsole: holdKonsole.checked
+    property alias cfg_allowSingularModifications: allowSingularModifications.value
+
     Kirigami.FormLayout {
         anchors.fill: parent
         QQC2.ComboBox {
@@ -77,6 +80,11 @@ Kirigami.ScrollablePage {
         QQC2.CheckBox {
             id: updateOnExpand
             Kirigami.FormData.label: i18n("Search on expand:")
+        }
+        QQC2.CheckBox {
+            id: holdKonsole
+            Kirigami.FormData.label: i18n("Do not close konsole:")
+            text: i18n("After update")
         }
         QQC2.TextField {
             id: packageSeparator
@@ -140,5 +148,13 @@ Kirigami.ScrollablePage {
             visible: customColorsEnabled.checked
         }
         Item { Kirigami.FormData.isSection: true }
+        QQC2.CheckBox {
+            id: allowSingularModifications
+            property int value: 0
+            Kirigami.FormData.label: i18n("USE AT YOUR OWN RISK\n(Risk of system breakage!):")
+            text: i18n("Allow modification of singlular native packages")
+            checked: value == 2
+            onCheckedChanged: value = checked ? 2 : 1
+        }
     }
 }

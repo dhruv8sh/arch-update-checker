@@ -4,6 +4,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 Item{
     id: packageManager
     property int stillUpdating: 0
+    property string konsoleFlags: plasmoid.configuration.holdKonsole
     Plasma5Support.DataSource {
         id: "executable"
         engine: "executable"
@@ -27,17 +28,14 @@ Item{
             var packagelines = stdout.split("\n")
 
             // Error handling
-            if( stderr.includes("flatpak: command not found") ) {
-                plasmoid.configuration.flatpakEnabled = false;
-                main.wasFlatpakDisabled = true;
-                packageManager.stillUpdating --;
-                return;
-            }
-            else if( stderr.trim() !== "" ) {
-                console.log(exitStatus)
-                main.error = "Error code: "+exitCode+"\nError:"+stderr;
-                if( main.isUpdating && stillUpdating > 0 ) packageManager.stillUpdating --;
-                return;
+            if( stderr.trim() !== "" && stdout.trim() === "" ) {
+                if( stderr.includes("flatpak: command not found")   //for bash
+                    || stderr.includes("Command not found: flatpak") //for zsh
+                    || stderr.includes("Unknown command: flatpak") ) {  //for fish
+                    plasmoid.configuration.flatpakEnabled = false;
+                    main.wasFlatpakDisabled = true;
+                } else if( stderr.includes("Temporary failure in name resolution") ) main.error = i18n("Problem connecting to the internet.");
+                else main.error ="Command:"+sourceName+ "\nError code: "+exitCode+ "\n"+stderr.length()>200 ? stderr.substring(0,201)+"..." : stderr ;
             }
             //Error handling ends
             else if( sourceName.startsWith("konsole")) return;
@@ -62,7 +60,7 @@ Item{
         lines.forEach(line => {
             line = removeANSIEscapeCodes(line.trim());
             const info = line.split("  : ");
-            if (isNeededInfoField(info[0].trim()),source) {
+            if (isNeededInfoField(info[0].trim())) {
                 details.push(info[0].trim());
                 details.push(info[1].trim());
             }
@@ -92,7 +90,6 @@ Item{
         lines.forEach(line => {
             var info = line.split(' ');
             if( info.length > 3 )
-            console.log("Flatpak package:"+info);
             packageModel.append({
                 PackageName: info[0],
                 FromVersion: info[3],
@@ -104,9 +101,13 @@ Item{
     function fetchAURorPACMANInformation(lines, source) {
         lines.forEach(line => {
             line = removeANSIEscapeCodes(line.trim());
-            if( line.startsWith(":: aur") ) line = line.substring(8);
+            if( source.startsWith("pikaur -Qua")&& line.startsWith(":: aur") ) line = line.substring(8);
             const info = line.split(/\s+/);
-            if( info[0].trim() != "" )
+            if( source.startsWith("pacaur -Qua") ){
+                info.shift();
+                info.shift();
+            }
+            if( info[0] && info[0].trim() != "" )
             packageModel.append({
                 PackageName: info[0],
                 FromVersion: info[1],
@@ -123,9 +124,9 @@ Item{
         main.wasFlatpakDisabled = false;
         isUpdating = false
         stillUpdating = 0
-        var command = "konsole -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags;
+        var command = "konsole "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags;
         if( plasmoid.configuration.flatpakEnabled )
-            command += " && konsole -e flatpak update "+plasmoid.configuration.flatpakFlags;
+            command += " && konsole "+konsoleFlags+" -e flatpak update "+plasmoid.configuration.flatpakFlags;
         executable.exec(command);
         timer.start()
     }
@@ -139,10 +140,14 @@ Item{
 
     //update One package
     function installOnly(name, source) {
-        if( source === "FLATPAK" ) executable.exec("konsole --hold -e flatpak update "+name.split(" ").pop());
+        if( plasmoid.configuration.allowSingularModifications === 0 ) {
+            main.showAllowSingularModifications = true;
+            return;
+        }
+        if( source === "FLATPAK" ) executable.exec("konsole "+konsoleFlags+" -e flatpak update "+name.split(" ").pop());
         else if( source === "SNAP" ) console.log("SNAP support coming soon!");
-        else if( source === "AUR" ) executable.exec("konsole -e yay -S "+name)
-        else executable.exec("konsole --hold -e sudo pacman -S "+name);
+        else if( source === "AUR" ) executable.exec("konsole "+konsoleFlags+" -e yay -S "+name)
+        else executable.exec("konsole "+konsoleFlags+" -e sudo pacman -S "+name);
     }
     function showInfo(name, source) {
         if( source == "FLATPAK" ) {
@@ -155,10 +160,12 @@ Item{
     function action_checkForUpdates() {
         if( main.isUpdating || packageManager.stillUpdating > 0 ) return;
         packageModel.clear()
+        main.error = "";
         main.wasFlatpakDisabled = false;
-        main.isUpdating = true
+        main.isUpdating = true;
+        main.showAllowSingularModifications = false;
         if( plasmoid.configuration.flatpakEnabled ) {
-            packageManager.stillUpdating = 3;
+            stillUpdating = 3;
             //modified code from exequtic
             executable.exec(`upd=$(flatpak remote-ls --columns=name,application,version --app --updates | \
                             sed 's/ /-/g' | sed 's/\t/ /g')
@@ -170,9 +177,10 @@ Item{
                             done <<< "$upd"
                             echo -en "$output"`);
         }
-        else packageManager.stillUpdating = 2;
+        else stillUpdating = 2;
         executable.exec(plasmoid.configuration.aurWrapper+" -Qua");
-        executable.exec("checkupdates");
+        if(plasmoid.configuration.aurWrapper!== 'pacaur' && plasmoid.configuration.aurWrapper!== 'aura' ) executable.exec("checkupdates");
+        else stillUpdating --;
     }
     function getDetailsFor(name, source) {
         if( source === "" ) executable.exec("pacman -Qi "+name)

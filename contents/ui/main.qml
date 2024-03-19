@@ -24,6 +24,7 @@ PlasmoidItem {
   property var details
   property string error: ""
   property bool wasFlatpakDisabled: false
+  property bool showAllowSingularModifications: false
 
   PackageManager{ id: packageManager }
 

@@ -11,8 +11,8 @@ import org.kde.kitemmodels as KItemModels
 PlasmaExtras.Representation {
     id: full
     collapseMarginsHint: true
-    Layout.minimumHeight: 500
-    Layout.minimumWidth: 500
+    Layout.minimumHeight: 800
+    Layout.minimumWidth: 800
     KItemModels.KSortFilterProxyModel {
         id: filterModel
         sourceModel: packageModel

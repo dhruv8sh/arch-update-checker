@@ -81,5 +81,18 @@
       <whatsthis>These flags will be used while updating AUR packages</whatsthis>
       <default>--noconfirm</default>
     </entry>
+    <entry name="holdKonsole" type="Bool">
+          <label>Do not close konsole</label>
+          <whatsthis>If true, does not close konsole after update</whatsthis>
+      <default>false</default>
+    </entry>
+
+    <!-- System breakage -->
+    <entry name="allowSingularModifications" type="Int">
+          <label>Allow singular modifications</label>
+          <whatsthis>0 is undecided state, 1 is false, 2 is true</whatsthis>
+      <default>false</default>
+    </entry>
+
   </group>
 </kcfg>

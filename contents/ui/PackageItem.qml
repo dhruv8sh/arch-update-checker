@@ -21,7 +21,8 @@ PlasmaExtras.ExpandableListItem {
     defaultActionButtonAction: Action {
         id: singleInstallButton
         icon.name: "run-install"
-        text: i18n("Install")
+        text: i18n("Update")
+        enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingularModifications != 1
         onTriggered: packageManager.installOnly(PackageName,Source)
     }
     contextualActions: [

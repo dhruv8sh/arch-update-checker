@@ -27,6 +27,29 @@ ColumnLayout {
         }
     }
     Kirigami.InlineMessage {
+        id: singleInstallMessage
+        Layout.fillWidth: true
+        Layout.leftMargin: packageView.leftMargin
+        Layout.rightMargin: packageView.rightMargin
+        Layout.topMargin: Kirigami.Units.smallSpacing * 2
+        Layout.preferredHeight: contentItem.implicitHeight + topPadding + bottomPadding
+        type: Kirigami.MessageType.Warning
+        icon.name: "data-warning"
+        text: i18n("Updating single packages is blocked by default due HIGH RISK OF SYSTEM BREAKAGE.\nDo you want to enable this?")
+        visible: main.showAllowSingularModifications
+        showCloseButton: true
+        actions: [
+            Kirigami.Action {
+                text: i18nc("@action:button", "Allow")
+                onTriggered: plasmoid.configuration.allowSingularModifications = 2
+            },
+            Kirigami.Action {
+                text: i18nc("@action:button", "Don' Allow")
+                onTriggered: plasmoid.configuration.allowSingularModifications = 1
+            }
+        ]
+    }
+    Kirigami.InlineMessage {
         id: errorMessage
         Layout.fillWidth: true
         Layout.leftMargin: packageView.leftMargin
@@ -37,13 +60,10 @@ ColumnLayout {
         icon.name: "data-error"
         text: main.error
         visible: main.error != ""
-        actions: Kirigami.Action {
-            text: i18nc("@action:button", "Clear")
-            onTriggered: main.error = ""
-        }
+        showCloseButton: true
     }
     Kirigami.InlineMessage {
-        id: flatpakNotFoundMessage
+        id: managerNotFoundMessage
         Layout.fillWidth: true
         Layout.leftMargin: packageView.leftMargin
         Layout.rightMargin: packageView.rightMargin
@@ -54,6 +74,7 @@ ColumnLayout {
         text: i18n("Flatpak was not found! It is now disabled.")
         onLinkActivated: Qt.openUrlExternally("https://flathub.org/setup")
         visible: main.wasFlatpakDisabled
+        showCloseButton: true
         actions: Kirigami.Action {
             text: i18nc("@action:button", "Re-enable")
             onTriggered: {
