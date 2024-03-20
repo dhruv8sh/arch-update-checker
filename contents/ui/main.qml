@@ -62,12 +62,12 @@ PlasmoidItem {
       PlasmaCore.Action {
           text: i18n("Update System")
           icon.name: "install-symbolic"
-          onTriggered: action_updateSystem()
+          onTriggered: packageManager.action_updateSystem()
       },
       PlasmaCore.Action {
           text: i18n("Check for Updates")
           icon.name: "view-refresh"
-          onTriggered: action_checkForUpdates()
+          onTriggered: packageManager.action_checkForUpdates()
       }
     ]
 }
