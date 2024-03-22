@@ -45,7 +45,6 @@ PlasmaExtras.Representation {
 
             Loader {
                 sourceComponent: stack.currentItem?.headerItems
-                visible: !!item
             }
         }
     }
@@ -58,49 +57,3 @@ PlasmaExtras.Representation {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

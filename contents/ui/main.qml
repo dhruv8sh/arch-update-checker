@@ -29,7 +29,7 @@ PlasmoidItem {
 
   toolTipMainText: i18n("Arch Update Checker")
   toolTipSubText: i18n("Updates available: "+packageModel.count)
-  Plasmoid.status: (packageModel > 0 || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
+  Plasmoid.status: (packageModel.count > 0 || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
 
   property string outputText: ''
   Item{

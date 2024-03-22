@@ -15,7 +15,6 @@ RowLayout {
     RowLayout {
         Layout.leftMargin: Kirigami.Units.smallSpacing
         spacing: parent.spacing
-        visible: true
         PlasmaComponents.Switch {
             id: pauseButton
             icon.name: "media-playback-pause"
@@ -27,7 +26,6 @@ RowLayout {
         }
         PlasmaComponents.ToolButton {
             id: searchButton
-            enabled: true
             icon.name: "view-refresh"
             onClicked: {
                 packageManager.action_checkForUpdates()
@@ -39,7 +37,6 @@ RowLayout {
         }
         PlasmaComponents.ToolButton {
             id: installButton
-            enabled: true
             icon.name: "install"
             onClicked: packageManager.action_updateSystem()
             PlasmaComponents.ToolTip {

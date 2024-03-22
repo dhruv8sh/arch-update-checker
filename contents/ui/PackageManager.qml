@@ -4,7 +4,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 Item{
     id: packageManager
     property int stillUpdating: 0
-    property string konsoleFlags: plasmoid.configuration.holdKonsole
+    property string konsoleFlags: plasmoid.configuration.holdKonsole ? "--hold" : ""
     Plasma5Support.DataSource {
         id: "executable"
         engine: "executable"

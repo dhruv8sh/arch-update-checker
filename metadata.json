@@ -1,26 +1,25 @@
+
 {
     "KPlugin": {
         "Authors": [
             {
-                "Email": "dhruv8sh@proton.me",
-                "Name": "Dhruvesh Surolia"
+                "Name": "Dhruvesh Surolia",
+                "Email": "dhruv8sh@proton.me"
             }
         ],
-        "Category": "Utilities",
-        "Dependencies": [
-        ],
-        "Description": "A utility to check for updates without updating the pacman database.",
-        "EnabledByDefault": true,
+        "Category": "System Information",
+        "Description": "Check for updates on Arch Linux",
+        "Icon": "update-high",
         "Id": "org.kde.archupdatechecker",
-        "License": "GPL",
         "Name": "Arch Update Checker",
-        "Icon": "update-high-symbolic",
         "EnabledByDefault": true,
-        "Version": "0.7.6",
-        "Website": "https://github.com/dhruv8sh/arch-update-checker"
+        "Version": "0.7.7",
+        "License": "GPL",
+        "BugReportUrl": "https://github.com/dhruv8sh/arch-update-checker/issues",
+        "Website": "https://github.com/dhurv8sh/arch-update-checker"
     },
-    "X-Plasma-API-Minimum-Version": "6.0",
-    "X-Plasma-NotificationArea": false,
     "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-NotificationArea": "true",
     "X-Plasma-NotificationAreaCategory": "SystemServices"
 }

@@ -25,7 +25,7 @@ Rectangle {
         id: label
         color              : plasmoid.configuration.customColorsEnabled ? plasmoid.configuration.textColor : Kirigami.Theme.backgroundColor;
         visible            : plasmoid.configuration.numberAvailable
-        font.pixelSize     : Math.max(Math.min(parent.height / 2, parent.width / 2),10)
+        font.pixelSize     : Math.max(Math.min(parent.height / 2, parent.width / 2),8)
         anchors.fill       : parent
         anchors.margins    : parent.anchors.margins
         verticalAlignment  : Text.AlignVCenter
