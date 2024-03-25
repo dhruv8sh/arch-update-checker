@@ -98,16 +98,31 @@ Kirigami.ScrollablePage {
             type: Kirigami.MessageType.Warning
             visible: time.value < 11
         }
-        QQC2.SpinBox {
+        RowLayout{
             id: time
             Kirigami.FormData.label: i18n("Poll Interval:")
-            from: 1
-            to: 100000
-            stepSize: 10
-            editable: false
-            textFromValue: function(value, locale) {
-                if( value == 1 ) return qsTr("%1 min").arg(value);
-                else return qsTr("%1 mins").arg(value);
+            property int value: plasmoid.configuration.pollinterval
+            QQC2.SpinBox {
+                id: hrs
+                from: 0
+                to: 999
+                stepSize: 1
+                value: time.value/60
+                onValueChanged: time.value = mins.value + ( value * 60 )
+            }
+            QQC2.Label{
+                text: i18n("Hours :")
+            }
+            QQC2.SpinBox {
+                id: mins
+                from: 0
+                to: 59
+                stepSize: 5
+                value: time.value % 60
+                onValueChanged: time.value = value + ( hrs.value * 60 )
+            }
+            QQC2.Label{
+                text: i18n("Minutes")
             }
         }
         Item {

@@ -19,7 +19,7 @@
         "Id": "org.kde.archupdatechecker",
         "License": "GPL-2.0+",
         "Name": "Arch Update Checker",
-        "Version": "0.7.8",
+        "Version": "0.7.9",
         "Website": "https://github.com/dhurv8sh/arch-update-checker"
     },
     "X-Plasma-API-Minimum-Version": "6.0",
