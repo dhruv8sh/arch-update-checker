@@ -1,5 +1,6 @@
 
 {
+    "KPackageStructure": "Plasma/Applet",
     "KPlugin": {
         "Authors": [
             {
@@ -7,18 +8,20 @@
                 "Email": "dhruv8sh@proton.me"
             }
         ],
+        "BugReportUrl": "https://github.com/dhruv8sh/arch-update-checker/issues",
         "Category": "System Information",
-        "Description": "Check for updates on Arch Linux",
+        "Description": "Checks for updates on Arch Linux, Flatpak and AUR.",
+        "EnabledByDefault": true,
+        "FormFactors": [
+            "desktop"
+        ],
         "Icon": "update-high",
         "Id": "org.kde.archupdatechecker",
+        "License": "GPL-2.0+",
         "Name": "Arch Update Checker",
-        "EnabledByDefault": true,
-        "Version": "0.7.7",
-        "License": "GPL",
-        "BugReportUrl": "https://github.com/dhruv8sh/arch-update-checker/issues",
+        "Version": "0.7.8",
         "Website": "https://github.com/dhurv8sh/arch-update-checker"
     },
-    "KPackageStructure": "Plasma/Applet",
     "X-Plasma-API-Minimum-Version": "6.0",
     "X-Plasma-NotificationArea": "true",
     "X-Plasma-NotificationAreaCategory": "SystemServices"

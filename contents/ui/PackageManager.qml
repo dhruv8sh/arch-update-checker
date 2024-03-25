@@ -124,9 +124,9 @@ Item{
         main.wasFlatpakDisabled = false;
         isUpdating = false
         stillUpdating = 0
-        var command = "konsole "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags;
+        var command = "konsole "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags+" && echo -en \"Finished updating.\n\"";
         if( plasmoid.configuration.flatpakEnabled )
-            command += " && konsole "+konsoleFlags+" -e flatpak update "+plasmoid.configuration.flatpakFlags;
+            command += " && konsole "+konsoleFlags+" -e flatpak update "+plasmoid.configuration.flatpakFlags+" && echo -en \"Finished updating.\n\"";
         executable.exec(command);
         timer.start()
     }
@@ -144,10 +144,10 @@ Item{
             main.showAllowSingularModifications = true;
             return;
         }
-        if( source === "FLATPAK" ) executable.exec("konsole "+konsoleFlags+" -e flatpak update "+name.split(" ").pop());
+        if( source === "FLATPAK" ) executable.exec("konsole "+konsoleFlags+" -e flatpak update "+name.split(" ").pop()+" && echo -en \"Finished updating.\n\"");
         else if( source === "SNAP" ) console.log("SNAP support coming soon!");
-        else if( source === "AUR" ) executable.exec("konsole "+konsoleFlags+" -e yay -S "+name)
-        else executable.exec("konsole "+konsoleFlags+" -e sudo pacman -S "+name);
+        else if( source === "AUR" ) executable.exec("konsole "+konsoleFlags+" -e yay -S "+name+" && echo -en \"Finished updating.\n\"")
+        else executable.exec("konsole "+konsoleFlags+" -e sudo pacman -S "+name+" && echo -en \"Finished updating.\n\"");
     }
     function showInfo(name, source) {
         if( source == "FLATPAK" ) {

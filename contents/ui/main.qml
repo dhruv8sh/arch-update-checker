@@ -11,27 +11,22 @@ PlasmoidItem {
   property string subtext: i18n("Updates")
   property string title: title
   property alias isNotPaused: timer.running
-  preferredRepresentation: compactRepresentation
   compactRepresentation: CompactRepresentation { }
   fullRepresentation: FullRepresentation{ }
   ListModel { id: packageModel }
-  signal updatingPackageList()
-  signal stoppedUpdating()
-  signal requestPause(bool pause)
   property bool isUpdating: false
   property bool hasUserSeen: false
   property var details
   property string error: ""
   property bool wasFlatpakDisabled: false
   property bool showAllowSingularModifications: false
+  property string outputText: ''
 
   PackageManager{ id: packageManager }
 
   toolTipMainText: i18n("Arch Update Checker")
   toolTipSubText: i18n("Updates available: "+packageModel.count)
   Plasmoid.status: (packageModel.count > 0 || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
-
-  property string outputText: ''
   Item{
     id: config
     property int interval: plasmoid.configuration.pollinterval * 1000 * 60
