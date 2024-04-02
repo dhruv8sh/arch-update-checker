@@ -37,6 +37,29 @@ Kirigami.Page {
                 Layout.alignment: Qt.AlignCenter
                 text: i18n("This is a basic setup and should take <2 minutes.")
             }
+            RowLayout{
+                Layout.alignment: Qt.AlignCenter
+                Image {
+                    Layout.alignment: Qt.AlignCenter
+                    source: "./github-konqi.png"
+                    sourceSize.width: 200
+                    sourceSize.height: 200
+
+                    HoverHandler {
+                        id: handlerGithub
+                        cursorShape: Qt.PointingHandCursor
+                    }
+
+                    TapHandler {
+                        onTapped: Qt.openUrlExternally("https://www.github.com/dhruv8sh/arch-update-checker")
+                    }
+
+                    QQC2.ToolTip {
+                        visible: handlerGithub.hovered
+                        text: i18n("Visit Github Repo")
+                    }
+                }
+            }
             Kirigami.UrlButton {
                 Layout.alignment: Qt.AlignCenter
                 text: i18n("Github")

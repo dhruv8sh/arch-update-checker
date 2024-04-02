@@ -7,7 +7,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 
-Kirigami.Page {
+Kirigami.ScrollablePage {
     id: appearancePage
     readonly property int margins: Kirigami.Units.gridUnit
     title: i18nc("@title", "Appearance")
@@ -81,11 +81,9 @@ Kirigami.Page {
                 Layout.alignment: Qt.AlignCenter
                 text: "→"
             }
-            RowLayout {
+            QQC2.Label{
                 Layout.alignment: Qt.AlignCenter
-                QQC2.Label{
-                    text: "v6.9"+sprtrText.text+"v9.6"
-                }
+                text: "v6.9"+sprtrText.text+"v9.6"
             }
         }
     }

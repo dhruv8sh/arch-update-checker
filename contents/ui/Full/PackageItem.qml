@@ -11,10 +11,10 @@ PlasmaExtras.ExpandableListItem {
     property bool showSeparator
     property var localDataCache
     icon: {
-    if( Source == "FLATPAK" ) return "flatpak-discover";
-    else if( Source == "SNAP" ) return "folder-snap-symbolic";
-    else if( Source == "AUR" ) return "package-symbolic";
-    else return "";
+        if( Source == "FLATPAK" ) return "flatpak-discover";
+        else if( Source == "SNAP" ) return "folder-snap-symbolic";
+        else if( Source == "AUR" ) return "package-symbolic";
+        else return "";
     }
     title: PackageName
     subtitle: FromVersion + plasmoid.configuration.packageSeparator + ToVersion
@@ -37,6 +37,14 @@ PlasmaExtras.ExpandableListItem {
             onTriggered: packageManager.uninstall(Source === "FLATPAK"?ToVersion:PackageName,Source)
         }
     ]
+
+    Connections{
+        target: main
+        function onClearProperties(){
+            collapse()
+            localDataCache = undefined
+        }
+    }
 
     KSvg.SvgItem {
         id: separatorLine
@@ -65,7 +73,6 @@ PlasmaExtras.ExpandableListItem {
         repeat: false
         onTriggered: {
             localDataCache = main.details
-            detailsText.details = localDataCache;
             if( localDataCache.length === 0 ) humanMomentTimer.start()
         }
     }

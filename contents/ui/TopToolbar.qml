@@ -1,4 +1,4 @@
- 
+
 import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.components as PlasmaComponents
@@ -6,12 +6,13 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.extras as PlasmaExtras
 
+
 RowLayout {
-    spacing: Kirigami.Units.smallSpacing * 3
     width: parent.width
     property alias searchTextField: searchTextField
-
-
+    property bool sortByName: false
+    spacing: Kirigami.Units.smallSpacing * 3
+    enabled: !plasmoid.configuration.showIntro
     RowLayout {
         Layout.leftMargin: Kirigami.Units.smallSpacing
         spacing: parent.spacing
@@ -54,4 +55,16 @@ RowLayout {
         }
         focus: main.expanded && !Kirigami.InputMethod.willShowOnActive
     }
+    PlasmaComponents.ToolButton {
+        id: sortButton
+        icon.name: "view-sort-ascending-name"
+        onClicked: {
+            sortByName = !sortByName
+            main.clearProperties();
+        }
+        PlasmaComponents.ToolTip {
+            text: i18n("Sort by name/repository")
+        }
+    }
 }
+

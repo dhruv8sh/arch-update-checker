@@ -94,5 +94,13 @@
       <default>false</default>
     </entry>
 
+    <!-- Intro -->
+    <entry name="showIntro" type="Bool">
+          <label>Show intro</label>
+          <whatsthis>If true, intro is shown...</whatsthis>
+      <default>true</default>
+    </entry>
+
+
   </group>
 </kcfg>
