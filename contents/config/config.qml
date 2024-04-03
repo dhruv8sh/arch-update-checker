@@ -4,11 +4,11 @@ ConfigModel {
     ConfigCategory {
         name: i18n("General")
         icon: "configure"
-        source: "configGeneral.qml"
+        source: "Config/configGeneral.qml"
     }
     ConfigCategory {
         name: i18n("Appearance")
         icon: "preferences-desktop-theme-global"
-        source: "configAppearance.qml"
+        source: "Config/configAppearance.qml"
     }
 }

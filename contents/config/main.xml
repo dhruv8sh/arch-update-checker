@@ -4,73 +4,43 @@
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
                           http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
   <kcfgfile name=""/>
+
   <group name="General">
+
+    <!-- Repos -->
+    <entry name="flatpakEnabled" type="Bool">
+      <label>Flatpak</label>
+      <whatsthis>If true, flatpak is enabled.</whatsthis>
+      <default>true</default>
+    </entry>
+    <entry name="aurWrapper" type="String">
+      <label>AUR Wrapper</label>
+      <whatsthis>AUR wrapper name</whatsthis>
+      <default>paru</default>
+    </entry>
+
+
+
+      <!-- UPdate after every -->
     <entry name="pollinterval" type="Int">
       <label>Polling Interval</label>
       <whatsthis>Polling interval (in minutes).</whatsthis>
       <default>30</default>
     </entry>
-    <entry name="packageSeparator" type="String">
-      <label>Show badge even when zero packages available</label>
-      <whatsthis>Used to separate version values</whatsthis>
-      <default>&#032;&#032;→&#032;&#032;</default>
-    </entry>
-    <entry name="dotColor" type="Color">
-      <label>Dot Color</label>
-      <whatsthis>Color of the badge</whatsthis>
-      <default>White</default>
-    </entry>
-    <entry name="numberAvailable" type="Bool">
-      <label>Show number of updates</label>
-      <whatsthis>Is number available on the badge</whatsthis>
-      <default>True</default>
-    </entry>
+
+    <!-- Update on... -->
     <entry name="updateOnExpand" type="Bool">
       <label>Update package update list when expanding the applet</label>
       <whatsthis>If enabled, checks for updates when expanding</whatsthis>
-      <default>True</default>
-    </entry>
-    <entry name="zeroPackageBadge" type="Bool">
-      <label>Show badge even when zero packages available</label>
-      <whatsthis>If enabled, shows badge along with the text even when zero packages are available to updgrade</whatsthis>
       <default>False</default>
     </entry>
-    <entry name="customColorsEnabled" type="Bool">
-          <label>Use Custom Colors</label>
-          <whatsthis>If custom colors should be used</whatsthis>
-      <default>false</default>
-    </entry>
-    <entry name="dotColor" type="String">
-          <label>Dot Color</label>
-          <whatsthis>Color for the dot</whatsthis>
-      <default>white</default>
-    </entry>
-    <entry name="textColor" type="String">
-          <label>Text Color</label>
-          <whatsthis>Color for the text</whatsthis>
-      <default>black</default>
-    </entry>
-    <entry name="position" type="Int">
-          <label>Badge Position</label>
-          <whatsthis>Position of the badge</whatsthis>
-      <default>3</default>
-    </entry>
-    <entry name="flatpakEnabled" type="Bool">
-          <label>Use Flatpak</label>
-          <whatsthis>Whether to use flatpaks</whatsthis>
-      <default>true</default>
-    </entry>
-
-    <!-- Wrapper -->
-
-    <entry name="aurWrapper" type="String">
-          <label>AUR Wrapper</label>
-          <whatsthis>AUR Wrapper to use</whatsthis>
-      <default>paru</default>
+    <entry name="updateOnStartup" type="Bool">
+      <label>Update package update list when expanding the applet</label>
+      <whatsthis>If enabled, checks for updates when expanding</whatsthis>
+      <default>False</default>
     </entry>
 
     <!-- Flags -->
-
     <entry name="flatpakFlags" type="String">
           <label>Flatpak Flags</label>
           <whatsthis>Which flatpak flags to use</whatsthis>
@@ -86,13 +56,61 @@
           <whatsthis>If true, does not close konsole after update</whatsthis>
       <default>false</default>
     </entry>
+    <entry name="terminal" type="String">
+          <label>Terminal to be used</label>
+          <whatsthis>Name of the terminal</whatsthis>
+      <default>konsole</default>
+    </entry>
+  </group>
 
-    <!-- System breakage -->
+
+  <group name="Appearance">
+    <entry name="packageSeparator" type="String">
+      <label>Show badge even when zero packages available</label>
+      <whatsthis>Used to separate version values</whatsthis>
+      <default>→</default>
+    </entry>
+    <entry name="customColorsEnabled" type="Bool">
+      <label>Custom Colors</label>
+      <whatsthis>If true, custom colors are enabled.</whatsthis>
+      <default>false</default>
+    </entry>
+    <entry name="dotColor" type="Color">
+      <label>Dot Color</label>
+      <whatsthis>Color of the badge</whatsthis>
+      <default>White</default>
+    </entry>
+    <entry name="textColor" type="Color">
+      <label>Text Color</label>
+      <whatsthis>Color of the badge text</whatsthis>
+      <default>Black</default>
+    </entry>
+    <entry name="numberAvailable" type="Bool">
+      <label>Show number of updates</label>
+      <whatsthis>Is number available on the badge</whatsthis>
+      <default>True</default>
+    </entry>
+    <entry name="position" type="Int">
+      <label>Indicator Position</label>
+      <whatsthis>Position of the indicator</whatsthis>
+      <default>3</default>
+    </entry>
+
+
+
+    <!-- HIGH WARNING -->
     <entry name="allowSingularModifications" type="Int">
           <label>Allow singular modifications</label>
           <whatsthis>0 is undecided state, 1 is false, 2 is true</whatsthis>
       <default>false</default>
     </entry>
 
+    <!-- Intro -->
+    <entry name="showIntro" type="Bool">
+          <label>Show intro</label>
+          <whatsthis>If true, intro is shown...</whatsthis>
+      <default>true</default>
+    </entry>
   </group>
+
 </kcfg>

@@ -38,7 +38,7 @@ Item{
                 else main.error ="Command:"+sourceName+ "\nError code: "+exitCode+ "\n"+(stderr.length>200 ? stderr.substring(0,201)+"..." : stderr );
             }
             //Error handling ends
-            else if( sourceName.startsWith("konsole")) return;
+            else if( sourceName.startsWith(plasmoid.configuration.terminal)) return;
             else if( sourceName.includes(" -Qi ")) { fetchDetails(packagelines); return; }
             else if( sourceName.startsWith("flatpak info")) { fetchDetailsFlatpak(packagelines); return; }
             else if( sourceName.startsWith("upd=$(flatpak") ) fetchFlatpakInformation(packagelines)
@@ -124,18 +124,18 @@ Item{
         main.wasFlatpakDisabled = false;
         isUpdating = false
         stillUpdating = 0
-        var command = "konsole "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags+" && echo -en \"Finished updating.\n\"";
+        var command = plasmoid.configuration.terminal+" "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags+" && echo -en \"Finished updating.\n\"";
         if( plasmoid.configuration.flatpakEnabled )
-            command += " && konsole "+konsoleFlags+" -e flatpak update "+plasmoid.configuration.flatpakFlags+" && echo -en \"Finished updating.\n\"";
+            command += " && "+plasmoid.configuration.terminal+" "+konsoleFlags+" -e flatpak update "+plasmoid.configuration.flatpakFlags+" && echo -en \"Finished updating.\n\"";
         executable.exec(command);
         timer.start()
     }
 
     //Uninstall
     function uninstall(name, source) {
-        if( source === "FLATPAK" ) executable.exec("konsole --hold -e flatpak uninstall "+name.split(" ").pop());
+        if( source === "FLATPAK" ) executable.exec(plasmoid.configuration.terminal + " --hold -e flatpak uninstall "+name.split(" ").pop());
         else if( source == "SNAP" ) console.log("SNAP support coming soon!");
-        else executable.exec("konsole --hold -e sudo pacman -R "+name);
+        else executable.exec(plasmoid.configuration.terminal + " --hold -e sudo pacman -R "+name);
     }
 
     //update One package
@@ -144,18 +144,18 @@ Item{
             main.showAllowSingularModifications = true;
             return;
         }
-        if( source === "FLATPAK" ) executable.exec("konsole "+konsoleFlags+" -e flatpak update "+name.split(" ").pop()+" && echo -en \"Finished updating.\n\"");
+        if( source === "FLATPAK" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e flatpak update "+name.split(" ").pop()+" && echo -en \"Finished updating.\n\"");
         else if( source === "SNAP" ) console.log("SNAP support coming soon!");
-        else if( source === "AUR" ) executable.exec("konsole "+konsoleFlags+" -e yay -S "+name+" && echo -en \"Finished updating.\n\"")
-        else executable.exec("konsole "+konsoleFlags+" -e sudo pacman -S "+name+" && echo -en \"Finished updating.\n\"");
+        else if( source === "AUR" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e yay -S "+name+" && echo -en \"Finished updating.\n\"")
+        else executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e sudo pacman -S "+name+" && echo -en \"Finished updating.\n\"");
     }
     function showInfo(name, source) {
         if( source == "FLATPAK" ) {
             const id = name.split(" ").pop();
-            executable.exec("konsole --hold -e flatpak info "+id);
+            executable.exec(plasmoid.configuration.terminal + " --hold -e flatpak info "+id);
         } else if( source == "SNAP" )  console.log("SNAP support coming soon!");
-        else if( source == "AUR" ) executable.exec("konsole --hold -e "+plasmoid.configuration.aurWrapper+" -Qi "+name)
-        else executable.exec("konsole --hold -e pacman -Qi "+name)
+        else if( source == "AUR" ) executable.exec(plasmoid.configuration.terminal + " --hold -e "+plasmoid.configuration.aurWrapper+" -Qi "+name)
+        else executable.exec(plasmoid.configuration.terminal + " --hold -e pacman -Qi "+name)
     }
     function action_checkForUpdates() {
         if( main.isUpdating || packageManager.stillUpdating > 0 ) return;

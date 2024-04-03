@@ -3,6 +3,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kquickcontrols as KQuickControls
+import "../Pages/" as Pages
 
 Kirigami.ScrollablePage {
     id: root
@@ -12,8 +13,6 @@ Kirigami.ScrollablePage {
     property alias cfg_dotColor: dotColor.color
     property alias cfg_textColor: textColor.color
     property alias cfg_position: position.currentIndex
-
-
 
     Kirigami.FormLayout {
         QQC2.TextField {

@@ -3,6 +3,7 @@ import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.kquickcontrols as KQuickControls
+import "../Pages/" as Pages
 
 Kirigami.ScrollablePage {
     id: root
@@ -17,6 +18,8 @@ Kirigami.ScrollablePage {
     property alias cfg_flatpakEnabled: flatpakEnabled.checked
     property alias cfg_holdKonsole: holdKonsole.checked
     property alias cfg_allowSingularModifications: allowSingularModifications.value
+    property alias cfg_terminal: terminal.value
+    property alias cfg_updateOnStartup: updateOnStartup.checked
 
     Kirigami.FormLayout {
         anchors.fill: parent
@@ -74,8 +77,30 @@ Kirigami.ScrollablePage {
             Kirigami.FormData.label: i18n("Search on expand:")
         }
         QQC2.CheckBox {
+            id: updateOnStartup
+            Kirigami.FormData.label: i18n("Search on startup:")
+        }
+        QQC2.ComboBox {
+            id: terminal
+            property string value: model[currentIndex].text
+            Kirigami.FormData.label: i18n("AUR Wrapper:")
+            textRole: "text"
+            model: [
+                {text: "konsole"},
+                {text: "alacritty"}
+            ];
+            currentIndex: {
+                switch(plasmoid.configuration.aurWrapper) {
+                    case "konsole"   : return 0;
+                    case "alacritty" : return 1;
+                    default      : return 0;
+                }
+            }
+            onCurrentIndexChanged: value = model[currentIndex].text
+        }
+        QQC2.CheckBox {
             id: holdKonsole
-            Kirigami.FormData.label: i18n("Do not close konsole:")
+            Kirigami.FormData.label: i18n("Do not close terminal:")
             text: i18n("After update")
         }
         Kirigami.InlineMessage {
