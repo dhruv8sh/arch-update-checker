@@ -46,9 +46,10 @@ Item{
             else fetchAURUpdateInformation(packagelines, sourceName)
             stillUpdating --;
             main.isUpdating = stillUpdating > 0;
-            // if( !main.isUpdating ) {
-            //     notification.sendEvent()
-            // }
+            if( !main.isUpdating && main.showNotification ) {
+                main.showNotification = false;
+                notif.sendEvent()
+            }
         }
     }
 

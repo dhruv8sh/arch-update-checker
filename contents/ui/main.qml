@@ -23,6 +23,7 @@ PlasmoidItem {
   property string error: ""
   property bool wasFlatpakDisabled: false
   property bool showAllowSingularModifications: false
+  property bool showNotification: false
   property string outputText: ''
   signal clearProperties();
 
@@ -43,6 +44,7 @@ PlasmoidItem {
     repeat: true
     onTriggered: {
       hasUserSeen = false
+      showNotification = true
       packageManager.action_checkForUpdates()
     }
   }
