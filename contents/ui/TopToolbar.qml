@@ -58,6 +58,7 @@ RowLayout {
     PlasmaComponents.ToolButton {
         id: sortButton
         icon.name: "view-sort-ascending-name"
+        enabled: packageModel.count > 0
         onClicked: {
             sortByName = !sortByName
             main.clearProperties();

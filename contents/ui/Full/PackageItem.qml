@@ -23,18 +23,18 @@ PlasmaExtras.ExpandableListItem {
         icon.name: "run-install"
         text: i18n("Update")
         enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingularModifications != 1
-        onTriggered: packageManager.installOnly(PackageName,Source)
+        onTriggered: packageManager.action_installOne(PackageName,Source)
     }
     contextualActions: [
         Action {
             text: i18n("Show more information")
             icon.name: "showinfo"
-            onTriggered: packageManager.showInfo(Source === "FLATPAK"?ToVersion:PackageName,Source)
+            onTriggered: packageManager.action_showInfo(Source === "FLATPAK"?ToVersion:PackageName,Source)
         },
         Action {
             text: i18n("Uninstall")
             icon.name: "uninstall"
-            onTriggered: packageManager.uninstall(Source === "FLATPAK"?ToVersion:PackageName,Source)
+            onTriggered: packageManager.action_uninstall(Source === "FLATPAK"?ToVersion:PackageName,Source)
         }
     ]
 
@@ -61,7 +61,7 @@ PlasmaExtras.ExpandableListItem {
         id: detailsText
         details: {
             if( localDataCache ) return localDataCache
-            packageManager.getDetailsFor(Source === "FLATPAK"?ToVersion:PackageName,Source)
+            packageManager.fillDetailsFor(Source === "FLATPAK"?ToVersion:PackageName,Source)
             humanMomentTimer.start()
             return ["","","","","","","","","","","","","","","","","","","","","",""];
         }

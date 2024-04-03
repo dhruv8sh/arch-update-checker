@@ -44,7 +44,6 @@ PlasmoidItem {
     onTriggered: {
       hasUserSeen = false
       packageManager.action_checkForUpdates()
-      console.log(packageModel.count)
     }
   }
   Notification {
@@ -58,7 +57,6 @@ PlasmoidItem {
   Component.onCompleted : {
     hasUserSeen = false;
     packageManager.action_checkForUpdates()
-    notif.sendEvent();
   }
   Plasmoid.contextualActions: [
       PlasmaCore.Action {

@@ -1,4 +1,5 @@
 import QtQuick
+import org.kde.plasma.plasmoid as Plasmoid
 import org.kde.plasma.plasma5support as Plasma5Support
 
 Item{
@@ -25,68 +26,131 @@ Item{
     Connections {
         target: executable
         function onExited(sourceName, exitCode, exitStatus, stdout, stderr){
+            stdout = stdout.replace(/\u001b\[[0-9;]*[m|K]/g, '');   // Replace ANSI characters with ASCII
             var packagelines = stdout.split("\n")
 
             // Error handling
             if( stderr.trim() !== "" && stdout.trim() === "" ) {
-                if( stderr.includes("flatpak: command not found")   //for bash
-                    || stderr.includes("Command not found: flatpak") //for zsh
-                    || stderr.includes("Unknown command: flatpak") ) {  //for fish
+                if( stderr.includes(   i18n("flatpak: command not found"))   //for bash
+                    || stderr.includes(i18n("Command not found: flatpak")) //for zsh
+                    || stderr.includes(i18n("Unknown command: flatpak"  )) ) {  //for fish
                     plasmoid.configuration.flatpakEnabled = false;
                     main.wasFlatpakDisabled = true;
                 } else if( stderr.includes("Temporary failure in name resolution") ) main.error = i18n("Problem connecting to the internet.");
                 else main.error ="Command:"+sourceName+ "\nError code: "+exitCode+ "\n"+(stderr.length>200 ? stderr.substring(0,201)+"..." : stderr );
             }
             //Error handling ends
-            else if( sourceName.startsWith(plasmoid.configuration.terminal)) return;
-            else if( sourceName.includes(" -Qi ")) { fetchDetails(packagelines); return; }
-            else if( sourceName.startsWith("flatpak info")) { fetchDetailsFlatpak(packagelines); return; }
-            else if( sourceName.startsWith("upd=$(flatpak") ) fetchFlatpakInformation(packagelines)
-            else fetchAURorPACMANInformation(packagelines, sourceName)
-            packageManager.stillUpdating --;
-            main.isUpdating = packageManager.stillUpdating > 0;
+            else if( sourceName.startsWith(term)) return;
+            else if( sourceName.startsWith("pacman -Qi ") || sourceName.startsWith("flatpak info")) { fetchDetails(packagelines, sourceName); return; }
+            else if( sourceName === flatpakFetchCommand ) fetchFlatpakUpdateInformation(packagelines)
+            else fetchAURUpdateInformation(packagelines, sourceName)
+            stillUpdating --;
+            main.isUpdating = stillUpdating > 0;
             // if( !main.isUpdating ) {
             //     notification.sendEvent()
             // }
         }
     }
-    function removeANSIEscapeCodes(str) {
-        return str.replace(/\u001b\[[0-9;]*[m|K]/g, '');
-    }
 
-    //Gets package details
-    function fetchDetails(lines) {
+    // ---------------------------- UTILIITY BEGIN ------------------------------------------ //
+
+    readonly property string aur: plasmoid.configuration.aurWrapper;
+    readonly property string flatpakOn: plasmoid.configuration.flatpakEnabled;
+    readonly property string term: plasmoid.configuration.terminal;
+    readonly property string hold: plasmoid.configuration.holdKonsole ? " --hold -e ":" -e ";
+
+    // These fields will shown in detailsText view ( Maximum 10, or it overflows )
+    property var neededInfoFields: [
+        "Description",
+        "Installed Size",
+        "Licences",
+        "Replaces",
+        "Build Date",
+        "Install Reason",
+        "Conflicts With",
+        "Groups",
+        "Optional For",
+        "Provides"];
+    // These fields will shown in detailsText view for flatpaks ( Maximum 10, or it overflows )
+    property var neededInfoFieldsFlatpak: [
+        "Id",
+        "Ref",
+        "Arch",
+        "Branch",
+        "Origin",
+        "Collection",
+        "Installation",
+        "System",
+        "Commit",
+        "Date"];
+    /*
+    * Shell command to fetch flatpak update information with their version
+    * Format: TODO
+    * Inspiration from exequtic
+    */
+    property string flatpakFetchCommand: `upd=$(flatpak remote-ls --columns=name,application,version --app --updates | \
+                            sed 's/ /-/g' | sed 's/\t/ /g')
+                            output=""
+                            if [ -n "$upd" ]; then
+                                while IFS= read -r app; do
+                                    id=$(echo "$app" | awk '{print $2}')
+                                    ver=$(flatpak info "$id" | grep "Version:" | awk '{print $2}')
+                                    output+="$(echo "$app $ver\n")"
+                                done <<< "$upd"
+                            fi
+                            echo -en "$output"
+                            `;
+    /*
+    * Shell command to fetch update information for AUR ONLY
+    * Format: TODO
+    */
+    property string aurFetchCommand: aur+" -Qua"
+
+    /*
+    * Shell command to fetch update information from PACMAN ONLY
+    * Format: TODO
+    */
+    property string pacmanFetchCommand: "checkupdates"
+
+    // Shell Command to UPDATE AUR and PACMAN
+    property string updateAURCommand: term+hold+aur+" -Syu "+plasmoid.configuration.aurFlags;
+    // Shell Command to FLATPAKS
+    property string updateFLATPAKCommand: term+hold+"flatpak update "+plasmoid.configuration.flatpakFlags;
+    // Shell Command to show AUR/PACMAN package info
+    property string showAURInfoCommand: term+" --hold -e pacman -Qi ";
+    // Shell Command to show Flatpak package info
+    property string showFLATPAKInfoCommand: term+" --hold -e flatpak info ";
+
+    // Util function to fill details about a package
+    function fillDetailsFor(name, source) {
+        if( source === "FLATPAK" ) executable.exec("flatpak info"+name.split(" ").pop());
+        // else if( source === "SNAP" ) details = ["Not Supported","yet"];
+        else executable.exec( "pacman -Qi " + name );
+    }
+    // Puts package info into main.details
+    function fetchDetails( lines, source ) {
         var details = [];
+        const isFlatpak = flatpakOn && source.startsWith("flatpak info ");
+        if( isFlatpak ) {
+            lines.shift()
+            details.push("Description")
+            details.push(lines[0].substring(lines[0].indexOf(' - ')+3))
+            lines.shift()
+            lines.shift()
+        }
         lines.forEach(line => {
-            line = removeANSIEscapeCodes(line.trim());
-            const info = line.split("  : ");
-            if (isNeededInfoField(info[0].trim())) {
+            const info = line.split(isFlatpak?"  : ":": ")
+            const tag = info[0].trim()
+            if ((  isFlatpak && neededInfoFieldsFlatpak.includes(tag))
+                || ( !isFlatpak && neededInfoFields.includes(tag)) ) {
                 details.push(info[0].trim());
                 details.push(info[1].trim());
             }
         });
         main.details = details;
     }
-    function fetchDetailsFlatpak(lines) {
-        var details = [];
-        lines.shift()
-        details.push("Description")
-        details.push(lines[0].substring(lines[0].indexOf(' - ')+3))
-        lines.shift()
-        lines.shift()
-        lines.forEach(line => {
-            line = removeANSIEscapeCodes(line.trim());
-            const info = line.split(": ");
-            if (isNeededInfoFieldFlatpak(info[0].trim())) {
-                details.push(info[0].trim());
-                details.push(info[1].trim());
-            }
-        });
-        main.details = details;
-    }
-
-    //Gets package updates
-    function fetchFlatpakInformation(lines) {
+    // Puts FLATPAK package updates into packageModel
+    function fetchFlatpakUpdateInformation(lines) {
         lines.forEach(line => {
             var info = line.split(' ');
             if( info.length > 3 )
@@ -98,131 +162,85 @@ Item{
             });
         });
     }
-    function fetchAURorPACMANInformation(lines, source) {
+    // Puts AUR/PACMAN package updates into packageModel
+    function fetchAURUpdateInformation(lines, source) {
         lines.forEach(line => {
-            line = removeANSIEscapeCodes(line.trim());
-            if( source.startsWith("pikaur -Qua")&& line.startsWith(":: aur") ) line = line.substring(8);
+            if( source === "pikaur -Qua" && line.startsWith(":: aur") )
+                line = line.substring(8);
             const info = line.split(/\s+/);
-            if( source.startsWith("pacaur -Qua") ){
+            if( source === "pacaur -Qua" ){
                 info.shift();
                 info.shift();
             }
             if( info[0] && info[0].trim() != "" )
-            packageModel.append({
-                PackageName: info[0],
-                FromVersion: info[1],
-                ToVersion: info[3],
-                Source: source === "checkupdates" ? "" : "AUR"
-            });
+                packageModel.append({
+                    PackageName: info[0],
+                    FromVersion: info[1],
+                    ToVersion: info[3],
+                    Source: source === "checkupdates" ? "" : "AUR"
+                });
         });
     }
+    // ---------------------------- UTILIITY END  ------------------------------------------ //
 
-    //Updates everything
+    // ---------------------------- ACTIONS BEGIN ------------------------------------------ //
+
+    // Updates EVERYTHING
     function action_updateSystem() {
-        timer.stop()
-        packageModel.clear()
+        timer.stop();
+        packageModel.clear();
         main.wasFlatpakDisabled = false;
-        isUpdating = false
-        stillUpdating = 0
-        var command = plasmoid.configuration.terminal+" "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -Syu "+plasmoid.configuration.aurFlags+" && echo -en \"Finished updating.\n\"";
-        if( plasmoid.configuration.flatpakEnabled )
-            command += " && "+plasmoid.configuration.terminal+" "+konsoleFlags+" -e flatpak update "+plasmoid.configuration.flatpakFlags+" && echo -en \"Finished updating.\n\"";
-        executable.exec(command);
-        timer.start()
+        isUpdating = false;
+        stillUpdating = 0;
+        executable.exec( updateAURCommand );
+        if( flatpakOn )
+            executable.exec( updateFLATPAKCommand );
+        timer.start();
     }
-
-    //Uninstall
-    function uninstall(name, source) {
-        if( source === "FLATPAK" ) executable.exec(plasmoid.configuration.terminal + " --hold -e flatpak uninstall "+name.split(" ").pop());
-        else if( source == "SNAP" ) console.log("SNAP support coming soon!");
-        else executable.exec(plasmoid.configuration.terminal + " --hold -e sudo pacman -R "+name);
+    // UNINSTALL a package
+    function action_uninstall(name, source) {
+        if( source === "FLATPAK" ) executable.exec(term + " --hold -e flatpak uninstall "+name.split(" ").pop());
+        // else if( source == "SNAP" ) console.log("SNAP support coming soon!");
+        else executable.exec(term + " --hold -e sudo pacman -R "+name);
     }
-
-    //update One package
-    function installOnly(name, source) {
+    // Updates ONE PACKAGE
+    function action_installOne(name, source) {
         if( plasmoid.configuration.allowSingularModifications === 0 ) {
             main.showAllowSingularModifications = true;
             return;
         }
+<<<<<<< Updated upstream
         if( source === "FLATPAK" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e flatpak update "+name.split(" ").pop()+" && echo -en \"Finished updating.\n\"");
         else if( source === "SNAP" ) console.log("SNAP support coming soon!");
         else if( source === "AUR" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -S "+name+" && echo -en \"Finished updating.\n\"")
         else executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e sudo pacman -S "+name+" && echo -en \"Finished updating.\n\"");
+=======
+        if( source === "FLATPAK" ) executable.exec(term+hold+"flatpak update "+name.split(" ").pop());
+        // else if( source === "SNAP" ) console.log("SNAP support coming soon!");
+        else executable.exec(term+hold+aur+" -S "+name);
+>>>>>>> Stashed changes
     }
-    function showInfo(name, source) {
-        if( source == "FLATPAK" ) {
-            const id = name.split(" ").pop();
-            executable.exec(plasmoid.configuration.terminal + " --hold -e flatpak info "+id);
-        } else if( source == "SNAP" )  console.log("SNAP support coming soon!");
-        else if( source == "AUR" ) executable.exec(plasmoid.configuration.terminal + " --hold -e "+plasmoid.configuration.aurWrapper+" -Qi "+name)
-        else executable.exec(plasmoid.configuration.terminal + " --hold -e pacman -Qi "+name)
+    //Show details in a terminal window
+    function action_showInfo(name, source) {
+        if( source == "FLATPAK" ) executable.exec(showFLATPAKInfoCommand+name.split(" ").pop());
+        // else if( source == "SNAP" )  console.log("SNAP support coming soon!");
+        else executable.exec(showAURInfoCommand+name)
     }
     function action_checkForUpdates() {
-        if( main.isUpdating || packageManager.stillUpdating > 0 ) return;
+        if( main.isUpdating || stillUpdating > 0 ) return;
         packageModel.clear()
         main.error = "";
         main.wasFlatpakDisabled = false;
         main.isUpdating = true;
         main.showAllowSingularModifications = false;
-        if( plasmoid.configuration.flatpakEnabled ) {
-            stillUpdating = 3;
-            //modified code from exequtic
-            executable.exec(`upd=$(flatpak remote-ls --columns=name,application,version --app --updates | \
-                            sed 's/ /-/g' | sed 's/\t/ /g')
-                            output=""
-                            if [ -n "$upd" ]; then
-                                while IFS= read -r app; do
-                                    id=$(echo "$app" | awk '{print $2}')
-                                    ver=$(flatpak info "$id" | grep "Version:" | awk '{print $2}')
-                                    output+="$(echo "$app $ver\n")"
-                                done <<< "$upd"
-                            fi
-                            echo -en "$output"
-                            `);
-        }
-        else stillUpdating = 2;
-        executable.exec(plasmoid.configuration.aurWrapper+" -Qua");
-        if(plasmoid.configuration.aurWrapper!== 'pacaur' && plasmoid.configuration.aurWrapper!== 'aura' ) executable.exec("checkupdates");
+        stillUpdating = 3;
+
+        if( flatpakOn ) executable.exec( flatpakFetchCommand );
         else stillUpdating --;
-    }
-    function getDetailsFor(name, source) {
-        if( source === "" ) executable.exec("pacman -Qi "+name)
-        else if( source === "AUR" ) executable.exec(plasmoid.configuration.aurWrapper+" -Qi "+name);
-        else if( source === "FLATPAK" ) {
-            const id = name.split(" ").pop();
-            executable.exec("flatpak info "+id);
-        }
-        else if( source === "SNAP" ) details = ["Not Supported","yet"];
-    }
-    function isNeededInfoField( key ) {
-        switch( key ) {
-            // case "Name":
-            case "Description":
-            case "Installed Size":
-            case "Licences":
-            case "Provides":
-            case "Replaces":
-            case "Build Date":
-            case "Install Reason":
-            case "Conflicts With":
-            case "Groups":
-            case "Optional For": return true;
-            default: return false;
-        }
-    }
-    function isNeededInfoFieldFlatpak( key ) {
-        switch( key ) {
-            case "Id":
-            case "Ref":
-            case "Arch":
-            case "Branch":
-            case "Origin":
-            case "Collection":
-            case "Installation":
-            case "System":
-            case "Commit":
-            case "Date": return true;
-            default: return false;
-        }
+
+        executable.exec(aurFetchCommand);
+
+        if(aur !== 'pacaur' && aur !== 'aura' ) executable.exec(pacmanFetchCommand);
+        else stillUpdating --;
     }
 }

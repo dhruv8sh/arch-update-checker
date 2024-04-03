@@ -71,7 +71,6 @@ PlasmaExtras.Representation {
         }
     }
     Component.onCompleted: {
-        console.log(packageModel);
         if(plasmoid.configuration.showIntro) {
 
         } else {

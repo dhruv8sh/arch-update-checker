@@ -83,9 +83,6 @@ ColumnLayout {
             bottomMargin: Kirigami.Units.smallSpacing * 2
             leftMargin: Kirigami.Units.smallSpacing * 2
             rightMargin: Kirigami.Units.smallSpacing * 2
-            Component.onCompleted:{
-                console.log(height+"x"+width)
-            }
             spacing: Kirigami.Units.smallSpacing
             model: filterModel
             currentIndex: -1
