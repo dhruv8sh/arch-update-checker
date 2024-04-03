@@ -146,7 +146,7 @@ Item{
         }
         if( source === "FLATPAK" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e flatpak update "+name.split(" ").pop()+" && echo -en \"Finished updating.\n\"");
         else if( source === "SNAP" ) console.log("SNAP support coming soon!");
-        else if( source === "AUR" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e yay -S "+name+" && echo -en \"Finished updating.\n\"")
+        else if( source === "AUR" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -S "+name+" && echo -en \"Finished updating.\n\"")
         else executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e sudo pacman -S "+name+" && echo -en \"Finished updating.\n\"");
     }
     function showInfo(name, source) {
