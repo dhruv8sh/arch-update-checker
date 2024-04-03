@@ -209,16 +209,9 @@ Item{
             main.showAllowSingularModifications = true;
             return;
         }
-<<<<<<< Updated upstream
-        if( source === "FLATPAK" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e flatpak update "+name.split(" ").pop()+" && echo -en \"Finished updating.\n\"");
-        else if( source === "SNAP" ) console.log("SNAP support coming soon!");
-        else if( source === "AUR" ) executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e "+plasmoid.configuration.aurWrapper+" -S "+name+" && echo -en \"Finished updating.\n\"")
-        else executable.exec(plasmoid.configuration.terminal+" "+konsoleFlags+" -e sudo pacman -S "+name+" && echo -en \"Finished updating.\n\"");
-=======
         if( source === "FLATPAK" ) executable.exec(term+hold+"flatpak update "+name.split(" ").pop());
         // else if( source === "SNAP" ) console.log("SNAP support coming soon!");
         else executable.exec(term+hold+aur+" -S "+name);
->>>>>>> Stashed changes
     }
     //Show details in a terminal window
     function action_showInfo(name, source) {
