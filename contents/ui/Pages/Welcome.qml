@@ -29,6 +29,12 @@ Kirigami.Page {
                 text: "\n\nArch Update Checker"
                 wrapMode: Text.WordWrap
             }
+            PlasmaExtras.Heading {
+                Layout.alignment: Qt.AlignCenter
+                text: "(Experimental setup)"
+                wrapMode: Text.WordWrap
+                level: 3
+            }
             Kirigami.Icon {
                 Layout.alignment: Qt.AlignCenter
                 source: "update-none-symbolic"
@@ -44,12 +50,10 @@ Kirigami.Page {
                     source: "./github-konqi.png"
                     sourceSize.width: 200
                     sourceSize.height: 200
-
                     HoverHandler {
                         id: handlerGithub
                         cursorShape: Qt.PointingHandCursor
                     }
-
                     TapHandler {
                         onTapped: Qt.openUrlExternally("https://www.github.com/dhruv8sh/arch-update-checker")
                     }
@@ -68,7 +72,7 @@ Kirigami.Page {
             Kirigami.UrlButton {
                 Layout.alignment: Qt.AlignCenter
                 text: i18n("KDE Store")
-                url: "https://www.github.com/dhruv8sh/arch-update-checker/"
+                url: "https://www.pling.com/p/2130541/"
             }
         }
     }

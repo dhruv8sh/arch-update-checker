@@ -14,7 +14,7 @@ PlasmaExtras.ExpandableListItem {
         if( Source == "FLATPAK" ) return "flatpak-discover";
         else if( Source == "SNAP" ) return "folder-snap-symbolic";
         else if( Source == "AUR" ) return "package-symbolic";
-        else return "";
+        else return "folder-database-symbolic";
     }
     title: PackageName
     subtitle: FromVersion + plasmoid.configuration.packageSeparator + ToVersion

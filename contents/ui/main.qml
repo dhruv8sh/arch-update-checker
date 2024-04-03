@@ -35,12 +35,6 @@ PlasmoidItem {
     id: config
     property int interval: plasmoid.configuration.pollinterval * 1000 * 60
   }
-  property bool showIntro: plasmoid.configuration.showIntro
-
-  onShowIntroChanged: {
-    if( !showIntro )
-    fullRepresentation = Qt.createComponent("Full/FullRepresentation.qml")
-  }
 
   Timer {
     id: timer
@@ -50,19 +44,21 @@ PlasmoidItem {
     onTriggered: {
       hasUserSeen = false
       packageManager.action_checkForUpdates()
+      console.log(packageModel.count)
     }
   }
-  // Notification {
-  //     id: notification
-  //     componentName: "archupdatechecker"
-  //     eventId: "popup"
-  //     title: "Arch Update Checker"
-  //     text: packageModel.count + "updates available!"
-  //     iconName: "update-high"
-  // }
+  Notification {
+      id: notif
+      componentName: "plasma_workspace"
+      eventId: "warning"
+      iconName: "update-high"
+      title: i18n("Arch Update Checker")
+      text: i18n(packageModel.count+" updates available")
+  }
   Component.onCompleted : {
     hasUserSeen = false;
     packageManager.action_checkForUpdates()
+    notif.sendEvent();
   }
   Plasmoid.contextualActions: [
       PlasmaCore.Action {

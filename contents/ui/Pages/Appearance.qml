@@ -5,7 +5,9 @@ import org.kde.plasma.plasmoid as Plasmoid
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents
+import org.kde.kquickcontrols as KQuickControls
 import org.kde.kirigami as Kirigami
+import "../Common/" as Common
 
 Kirigami.ScrollablePage {
     id: appearancePage
@@ -26,7 +28,7 @@ Kirigami.ScrollablePage {
             anchors.fill: parent
             PlasmaExtras.Heading {
                 Layout.alignment: Qt.AlignCenter
-                text: i18n("\n\nAppearance Settings\n\n")
+                text: i18n("\nAppearance Settings\n")
                 wrapMode: Text.WordWrap
             }
             PlasmaExtras.Heading {
@@ -45,11 +47,19 @@ Kirigami.ScrollablePage {
                     anchors.top: parent.top
                     LayoutMirroring.enabled: true
                     text: i18n("Top-Left")
+                    checked: plasmoid.configuration.position == 0
+                    onCheckedChanged: {
+                        if( checked ) plasmoid.configuration.position = 0;
+                    }
                 }
                 QQC2.RadioButton{
                     anchors.left: parent.right
                     anchors.top: parent.top
                     text: i18n("Top-Right")
+                    checked: plasmoid.configuration.position == 1
+                    onCheckedChanged: {
+                        if( checked ) plasmoid.configuration.position = 1;
+                    }
                 }
                 Kirigami.Icon {
                     height: 100
@@ -61,11 +71,19 @@ Kirigami.ScrollablePage {
                     anchors.left: parent.right
                     anchors.bottom: parent.bottom
                     LayoutMirroring.enabled: true
+                    checked: plasmoid.configuration.position == 2
+                    onCheckedChanged: {
+                        if( checked ) plasmoid.configuration.position = 2;
+                    }
                     text: i18n("Bottom-Left")
                 }
                 QQC2.RadioButton{
                     anchors.left: parent.right
                     anchors.bottom: parent.bottom
+                    checked: plasmoid.configuration.position == 3
+                    onCheckedChanged: {
+                        if( checked ) plasmoid.configuration.position = 3;
+                    }
                     text: i18n("Bottom-Right")
                 }
             }
@@ -79,11 +97,35 @@ Kirigami.ScrollablePage {
                 id: sprtrText
                 horizontalAlignment: TextInput.AlignHCenter
                 Layout.alignment: Qt.AlignCenter
-                text: "→"
+                text: plasmoid.configuration.packageSeparator
+                onTextChanged: plasmoid.configuration.packageSeparator = text
             }
             QQC2.Label{
                 Layout.alignment: Qt.AlignCenter
-                text: "v6.9"+sprtrText.text+"v9.6"
+                text: "v6.9"+sprtrText.text+"v9.6\n"
+            }
+            RowLayout{
+                Layout.alignment: Qt.AlignCenter
+                Common.CustomSwitch{
+                    text:i18n("Custom Colors")
+                    icon:"settings-configure"
+                    checked: plasmoid.configuration.customColorsEnabled
+                    onCheckedChanged: {
+                        plasmoid.configuration.customColorsEnabled = checked
+                    }
+                }
+                KQuickControls.ColorButton {
+                    id: dotColor
+                    visible: plasmoid.configuration.customColorsEnabled
+                    color: plasmoid.configuration.dotColor
+                    onColorChanged: plasmoid.configuration.dotColor = color
+                }
+                KQuickControls.ColorButton {
+                    id: textColor
+                    visible: plasmoid.configuration.customColorsEnabled
+                    color: plasmoid.configuration.textColor
+                    onColorChanged: plasmoid.configuration.textColor = color
+                }
             }
         }
     }

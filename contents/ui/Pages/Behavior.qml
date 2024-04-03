@@ -28,18 +28,14 @@ Kirigami.Page {
 
             PlasmaExtras.Heading {
                 Layout.alignment: Qt.AlignCenter
-                text: i18n("\n\nBehavior\n\n")
+                text: i18n("\nBehavior\n")
                 wrapMode: Text.WordWrap
             }
-            Common.CustomSwitch {
-                icon : "view-refresh"
-                checked: true
-                text: i18n("Search on startup")
-            }
-            Common.CustomSwitch {
-                icon : "zoom-out-y-symbolic"
-                checked: true
-                text: i18n("Search on expand")
+            Kirigami.InlineMessage {
+                Layout.fillWidth: true
+                text: "Higher value recommended for better battery life!"
+                type: Kirigami.MessageType.Warning
+                visible: time.value < 11
             }
             RowLayout{
                 id: time
@@ -49,7 +45,7 @@ Kirigami.Page {
                     source: "accept_time_event"
                 }
                 PlasmaExtras.Heading {
-                    text: i18n("Interval ")
+                    text: i18n("Search Interval ")
                     wrapMode: Text.WordWrap
                     level: 2
                 }
@@ -76,11 +72,36 @@ Kirigami.Page {
                     text: i18n("m")
                 }
             }
-            Kirigami.InlineMessage {
-                Layout.fillWidth: true
-                text: "Higher value recommended for better battery life!"
-                type: Kirigami.MessageType.Warning
-                visible: time.value < 11
+            Common.CustomSwitch {
+                icon : "view-refresh"
+                checked: plasmoid.configuration.updateOnStartup
+                onCheckedChanged: plasmoid.configuration.updateOnStartup = checked
+                text: i18n("Search on startup")
+            }
+            Common.CustomSwitch {
+                icon : "zoom-out-y-symbolic"
+                text: i18n("Search on expand")
+                checked: plasmoid.configuration.updateOnExpand
+                onCheckedChanged: plasmoid.configuration.updateOnExpand = checked
+            }
+            QQC2.Label{}
+            Common.CustomComboBox{
+                text: "Terminal: "
+                icon: "akonadiconsole"
+                model: [
+                    {text: "konsole"},
+                    {text: "alacritty"}
+                ];
+                function onIndexChanged(newindex){
+                    plasmoid.configuration.terminal = model[newindex].text
+                }
+                index: model.findIndex(item => item.text === plasmoid.configuration.terminal)
+            }
+            Common.CustomSwitch {
+                icon : "project-development-close"
+                text: i18n("Close after update")
+                checked: plasmoid.configuration.holdKonsole
+                onCheckedChanged: plasmoid.configuration.holdKonsole = checked
             }
         }
     }

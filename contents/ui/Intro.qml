@@ -45,7 +45,7 @@ PlasmaExtras.Representation {
                 onClicked:{
                     plasmoid.configuration.showIntro = false;
                     stack2.clear();
-                    stack2.push("Pages/ListPage2.qml");
+                    stack2.push("Pages/ListPage.qml");
                 }
             }
             PlasmaComponents.ToolButton {
@@ -76,7 +76,7 @@ PlasmaExtras.Representation {
 
         } else {
             stack2.clear();
-            stack2.push("Pages/ListPage2.qml");
+            stack2.push("Pages/ListPage.qml");
         }
     }
     QQC2.StackView {

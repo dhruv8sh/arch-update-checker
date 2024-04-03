@@ -28,7 +28,7 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 ```
 git clone https://github.com/dhruv8sh/arch-update-checker/
 cd arch-update-checker
-plasmapkg2 -i .
+kpackagetool6 -i .
 ```
 Or just use the plasma "Download new widget" functionality
 

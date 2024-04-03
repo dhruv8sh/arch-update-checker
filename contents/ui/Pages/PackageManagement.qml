@@ -34,53 +34,39 @@ Kirigami.Page {
                 id: flatpakSwitch
                 icon: "flatpak-discover"
                 text: i18n("Flatpaks")
-                checked: true
+                checked: plasmoid.configuration.flatpakEnabled
+                onCheckedChanged: plasmoid.configuration.flatpakEnabled = checked
             }
             RowLayout {
+                enabled: flatpakSwitch.checked
                 Layout.alignment: Qt.AlignCenter
                 QQC2.Label {
                     text: i18n("Flags:")
                     wrapMode: Text.WordWrap
                 }
                 QQC2.TextField {
-                    visible: flatpakSwitch.checked
-                    text: "--assumeyes"
+                    text: plasmoid.configuration.flatpakFlags
+                    onTextChanged : plasmoid.configuration.flatpakFlags = text
                 }
             }
             QQC2.Label{}
-            Common.CustomSwitch{
-                id: aurSwitch
-                icon: "package"
-                text: i18n("AUR")
-                checked: true
-            }
-            QQC2.ComboBox {
-                property string value: model[currentIndex].text
-                Layout.alignment: Qt.AlignCenter
-                textRole: "text"
-                enabled: aurSwitch.checked
-                model: [
-                    {text: "yay"},
-                    {text: "paru"},
-                    {text: "trizen"},
-                    {text: "pikaur"},
-                    {text: "pacaur"},
-                    {text: "aura"}
-                ];
-                currentIndex: {
-                    switch(plasmoid.configuration.aurWrapper) {
-                        case "yay"   : return 0;
-                        case "paru"  : return 1;
-                        case "trizen": return 2;
-                        case "pikaur": return 3;
-                        case "pacaur": return 4;
-                        case "aura"  : return 5;
-                        default      : return 0;
-                    }
-                }
-                onCurrentIndexChanged: value = model[currentIndex].text
-            }
 
+            Common.CustomComboBox{
+                text: "AUR: "
+                icon: "package"
+                model: [
+                    {"text": "yay"},
+                    {"text": "paru"},
+                    {"text": "trizen"},
+                    {"text": "pikaur"},
+                    {"text": "pacaur"},
+                    {"text": "aura"}
+                ];
+                function onIndexChanged(newindex){
+                    plasmoid.configuration.aurWrapper = model[newindex].text
+                }
+                index: model.findIndex(item => item.text === plasmoid.configuration.aurWrapper)
+            }
             RowLayout {
                 Layout.alignment: Qt.AlignCenter
                 QQC2.Label {
@@ -88,8 +74,8 @@ Kirigami.Page {
                     wrapMode: Text.WordWrap
                 }
                 QQC2.TextField {
-                    enabled: flatpakSwitch.checked
-                    text: "--noconfirm"
+                    text: plasmoid.configuration.aurFlags
+                    onTextChanged : plasmoid.configuration.aurFlags = text
                 }
             }
         }
