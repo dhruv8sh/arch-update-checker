@@ -111,6 +111,11 @@
           <whatsthis>If true, intro is shown...</whatsthis>
       <default>true</default>
     </entry>
+    <entry name="showIntro" type="Int">
+          <label>Last Count</label>
+          <whatsthis>Last update count</whatsthis>
+      <default>0</default>
+    </entry>
   </group>
 
 </kcfg>

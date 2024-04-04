@@ -28,47 +28,16 @@ PlasmaExtras.Representation {
     }
     header: PlasmaExtras.PlasmoidHeading {
         focus: true
-        contentItem: TopToolbar{ id: toolbar }
+        contentItem: TopToolbar{
+            id: toolbar
+            headName: stack2.currentItem?.title
+        }
         Loader {
             sourceComponent: stack2.currentItem?.headerItems
         }
     }
     footer: PlasmaExtras.PlasmoidHeading {
-        focus: true
-        visible: plasmoid.configuration.showIntro
-        contentItem: RowLayout {
-            Layout.fillWidth: true
-            PlasmaComponents.ToolButton {
-                Layout.alignment: Qt.AlignLeft
-                text: i18n("Done")
-                icon.name: "dialog-ok-apply"
-                onClicked:{
-                    plasmoid.configuration.showIntro = false;
-                    stack2.clear();
-                    stack2.push("Pages/ListPage.qml");
-                }
-            }
-            PlasmaComponents.ToolButton {
-                Layout.alignment: Qt.AlignRight
-                icon.name: "go-previous-view-page"
-                text: i18n("Previous")
-                onClicked: {
-                    pageNo --;
-                    stack2.pop();
-                }
-                enabled: pageNo > 0
-            }
-            PlasmaComponents.ToolButton {
-                Layout.alignment: Qt.AlignRight
-                icon.name: "go-next-view-page"
-                text: i18n("Next")
-                onClicked: {
-                    pageNo ++;
-                    stack2.push(getPage())
-                }
-                enabled: pageNo < 3
-            }
-        }
+        contentItem: BottomToolbar{ id: bottomToolbar }
     }
     Component.onCompleted: {
         if(plasmoid.configuration.showIntro) {

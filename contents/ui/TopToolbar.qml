@@ -11,10 +11,11 @@ RowLayout {
     width: parent.width
     property alias searchTextField: searchTextField
     property bool sortByName: false
+    property string headName: ""
     spacing: Kirigami.Units.smallSpacing * 3
-    enabled: !plasmoid.configuration.showIntro
     RowLayout {
         Layout.leftMargin: Kirigami.Units.smallSpacing
+        visible: searchTextField.visible
         spacing: parent.spacing
         PlasmaComponents.Switch {
             id: pauseButton
@@ -53,6 +54,7 @@ RowLayout {
         onTextChanged: {
             filterModel.setFilterFixedString(text)
         }
+        visible: headName === "" && !plasmoid.configuration.showIntro && !newsEnabled
         focus: main.expanded && !Kirigami.InputMethod.willShowOnActive
     }
     PlasmaComponents.ToolButton {
@@ -63,9 +65,15 @@ RowLayout {
             sortByName = !sortByName
             main.clearProperties();
         }
+        visible: searchTextField.visible
         PlasmaComponents.ToolTip {
             text: i18n("Sort by name/repository")
         }
+    }
+    PlasmaExtras.Heading {
+        text: headName
+        Layout.alignment: Qt.AlignCenter
+        visible: headName !== ""
     }
 }
 

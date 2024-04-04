@@ -25,6 +25,7 @@ PlasmoidItem {
   property bool showAllowSingularModifications: false
   property bool showNotification: false
   property string outputText: ''
+    property bool newsEnabled: false
   signal clearProperties();
 
   PackageManager{ id: packageManager }

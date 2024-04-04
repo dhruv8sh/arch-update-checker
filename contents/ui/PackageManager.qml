@@ -31,7 +31,8 @@ Item{
 
             // Error handling
             if( stderr.trim() !== "" && stdout.trim() === "" ) {
-                if( stderr.includes(   i18n("flatpak: command not found"))   //for bash
+                if( plasmoid.configuration.flatpakEnabled
+                    && stderr.includes(   i18n("flatpak: command not found"))   //for bash
                     || stderr.includes(i18n("Command not found: flatpak")) //for zsh
                     || stderr.includes(i18n("Unknown command: flatpak"  )) ) {  //for fish
                     plasmoid.configuration.flatpakEnabled = false;
@@ -46,7 +47,7 @@ Item{
             else fetchAURUpdateInformation(packagelines, sourceName)
             stillUpdating --;
             main.isUpdating = stillUpdating > 0;
-            if( !main.isUpdating && main.showNotification ) {
+            if( !main.isUpdating && main.showNotification && plasmoid.configuration.lastCount != packageModel.count ) {
                 main.showNotification = false;
                 notif.sendEvent()
             }
@@ -56,7 +57,6 @@ Item{
     // ---------------------------- UTILIITY BEGIN ------------------------------------------ //
 
     readonly property string aur: plasmoid.configuration.aurWrapper;
-    readonly property string flatpakOn: plasmoid.configuration.flatpakEnabled;
     readonly property string term: plasmoid.configuration.terminal;
     readonly property string hold: plasmoid.configuration.holdKonsole ? " --hold -e ":" -e ";
 
@@ -131,7 +131,7 @@ Item{
     // Puts package info into main.details
     function fetchDetails( lines, source ) {
         var details = [];
-        const isFlatpak = flatpakOn && source.startsWith("flatpak info ");
+        const isFlatpak = plasmoid.configuration.flatpakEnabled && source.startsWith("flatpak info ");
         if( isFlatpak ) {
             lines.shift()
             details.push("Description")
@@ -194,7 +194,7 @@ Item{
         isUpdating = false;
         stillUpdating = 0;
         executable.exec( updateAURCommand );
-        if( flatpakOn )
+        if( plasmoid.configuration.flatpakEnabled )
             executable.exec( updateFLATPAKCommand );
         timer.start();
     }
@@ -229,7 +229,7 @@ Item{
         main.showAllowSingularModifications = false;
         stillUpdating = 3;
 
-        if( flatpakOn ) executable.exec( flatpakFetchCommand );
+        if( plasmoid.configuration.flatpakEnabled ) executable.exec( flatpakFetchCommand );
         else stillUpdating --;
 
         executable.exec(aurFetchCommand);
