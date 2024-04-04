@@ -3,9 +3,30 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 
 ## Screenshots
 
-![Screenshot_20240317_035250](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/7a0fb498-0611-418c-8758-ac16f01ae678)
+<div align="center">
+<p>
 
-![Screenshot_20240317_035940](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/f4540d46-a7a6-4ae5-8fa1-d672713691c7)
+![Screenshot_20240405_002625](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/395a88d8-2d40-46fb-84d3-01be429edb5f)<br/>
+<i>Available updates view</i>
+<br/><br/>
+</p>
+
+<p>
+
+![Screenshot_20240405_002649](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/c5d726d4-a769-4dba-918b-06e921650e5e)<br/>
+<i>Arch Linux Update News</i>
+<br/><br/>
+</p>
+
+<p>
+
+![image](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/7ff8ae04-e257-4214-b0ed-d468f1410b54)<br/>
+<i>Setup screen</i>
+
+<br/><br/>
+</p>
+
+</div>
 
 ## Todo
 - [x] Support for YAY, Trizen, Paru and Pikaur
@@ -32,5 +53,6 @@ git clone https://github.com/dhruv8sh/arch-update-checker/
 cd arch-update-checker
 kpackagetool6 -i .
 ```
+If ```kpackagetool6``` does not work use ```plasmapkg2``` instead.
 Or just use the plasma "Download new widget" functionality
 
