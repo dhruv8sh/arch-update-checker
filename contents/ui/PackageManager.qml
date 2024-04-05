@@ -5,7 +5,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 Item{
     id: packageManager
     property int stillUpdating: 0
-    property string konsoleFlags: plasmoid.configuration.holdKonsole ? "--hold" : ""
+    property string konsoleFlags: plasmoid.configuration.holdKonsole ? " --hold -e " : " -e "
     Plasma5Support.DataSource {
         id: "executable"
         engine: "executable"
@@ -47,7 +47,7 @@ Item{
             else fetchAURUpdateInformation(packagelines, sourceName)
             stillUpdating --;
             main.isUpdating = stillUpdating > 0;
-            if( !main.isUpdating && main.showNotification && plasmoid.configuration.lastCount != packageModel.count ) {
+            if( !main.isUpdating && main.showNotification && plasmoid.configuration.lastCount != packageModel.count && packageModel.count != 0 ) {
                 main.showNotification = false;
                 notif.sendEvent()
             }
@@ -118,7 +118,7 @@ Item{
     // Shell Command to FLATPAKS
     property string updateFLATPAKCommand: term+hold+"flatpak update "+plasmoid.configuration.flatpakFlags;
     // Shell Command to show AUR/PACMAN package info
-    property string showAURInfoCommand: term+" --hold -e pacman -Qi ";
+    property string showAURInfoCommand: term+" --hold -e pacman -Qii ";
     // Shell Command to show Flatpak package info
     property string showFLATPAKInfoCommand: term+" --hold -e flatpak info ";
 
@@ -236,5 +236,8 @@ Item{
 
         if(aur !== 'pacaur' && aur !== 'aura' ) executable.exec(pacmanFetchCommand);
         else stillUpdating --;
+    }
+    function action_clearOrphans() {
+        executable.exec(term+hold+"sudo pacman -Rns $(pacman -Qtdq)");
     }
 }

@@ -10,9 +10,9 @@ import QtQml.XmlListModel
 import "../Full/" as Full
 
 ColumnLayout {
-    id: listPage
     // height: parent.height
-    property string title: "Update News"
+    property int kind: 2
+    property string title: i18nc("@title", "Update News")
     Layout.fillWidth: true
     XmlListModel {
         id: feedModel

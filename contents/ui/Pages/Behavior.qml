@@ -10,6 +10,7 @@ import "../Common/" as Common
 
 Kirigami.Page {
     id: welcomePage
+    property int kind: 1
     readonly property int margins: Kirigami.Units.gridUnit
     title: i18nc("@title", "Behavior")
     topPadding: 0
@@ -90,7 +91,8 @@ Kirigami.Page {
                 icon: "akonadiconsole"
                 model: [
                     {text: "konsole"},
-                    {text: "alacritty"}
+                    {text: "alacritty"},
+                    {text: "kitty"}
                 ];
                 function onIndexChanged(newindex){
                     plasmoid.configuration.terminal = model[newindex].text

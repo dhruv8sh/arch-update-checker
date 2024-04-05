@@ -31,13 +31,17 @@ PlasmaExtras.Representation {
         contentItem: TopToolbar{
             id: toolbar
             headName: stack2.currentItem?.title
+            currentIndex: stack2.currentItem?.kind
         }
-        Loader {
-            sourceComponent: stack2.currentItem?.headerItems
-        }
+        // Loader {
+        //     sourceComponent: stack2.currentItem?.headerItems
+        // }
     }
     footer: PlasmaExtras.PlasmoidHeading {
-        contentItem: BottomToolbar{ id: bottomToolbar }
+        contentItem: BottomToolbar{
+            id: bottomToolbar
+            currentIndex: stack2.currentItem?.kind
+        }
     }
     Component.onCompleted: {
         if(plasmoid.configuration.showIntro) {

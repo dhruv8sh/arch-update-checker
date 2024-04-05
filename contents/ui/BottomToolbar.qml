@@ -4,58 +4,79 @@ import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents
 
-RowLayout {
-    height: 100
-    spacing: 0
+StackLayout {
+    // spacing: 0
     Layout.fillWidth: true
-    PlasmaComponents.ToolButton {
-        visible: plasmoid.configuration.showIntro
-        Layout.alignment: Qt.AlignLeft
-        text: i18n("Done")
-        icon.name: "dialog-ok-apply"
-        onClicked: {
-            plasmoid.configuration.showIntro = false;
-            stack2.clear();
-            stack2.push("Pages/ListPage.qml");
+    RowLayout {
+        QQC2.Label {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignLeft
+            text: "    "+packageModel.count+" updates available"
+        }
+        PlasmaComponents.ToolButton {
+            id: clearOrphansButton
+            icon.name: "node-delete"
+            onClicked: packageManager.action_clearOrphans()
+            PlasmaComponents.ToolTip {
+                text: i18n("Clear orphans")
+            }
+        }
+        PlasmaComponents.ToolButton {
+            Layout.alignment: Qt.AlignRight
+            icon.name: "news-subscribe"
+            onClicked: stack2.push("Pages/UpdateNews.qml");
+            PlasmaComponents.ToolTip { text: i18n("Official Arch Update News") }
         }
     }
-    PlasmaComponents.ToolButton {
-        visible: plasmoid.configuration.showIntro
-        Layout.alignment: Qt.AlignRight
-        icon.name: "go-previous-view-page"
-        text: i18n("Previous")
-        onClicked: {
-            pageNo --;
-            stack2.pop();
+    RowLayout {
+        QQC2.Label{
+            Layout.fillWidth: true
         }
-        enabled: pageNo > 0
-    }
-    PlasmaComponents.ToolButton {
-        visible: plasmoid.configuration.showIntro
-        Layout.alignment: Qt.AlignRight
-        icon.name: "go-next-view-page"
-        text: i18n("Next")
-        onClicked: {
-            pageNo ++;
-            stack2.push(getPage())
+        PlasmaComponents.ToolButton {
+            Layout.alignment: Qt.AlignRight
+            icon.name: pageNo == 0 ? "dialog-cancel":"go-previous-view-page"
+            text: pageNo == 0 ? i18n("Skip") : i18n("Previous")
+            onClicked: {
+                if( pageNo > 0 ) {
+                    pageNo --;
+                    stack2.pop();
+                } else {
+                    plasmoid.configuration.showIntro = false;
+                    stack2.clear();
+                    stack2.push("Pages/ListPage.qml");
+                }
+            }
         }
-        enabled: pageNo < 3
-    }
-    QQC2.Label {
-        visible: !plasmoid.configuration.showIntro
-        Layout.alignment: Qt.AlignLeft
-        text: "    "+packageModel.count+" updates available"
-    }
-    PlasmaComponents.ToolButton {
-        visible: !plasmoid.configuration.showIntro
-        Layout.alignment: Qt.AlignRight
-        icon.name: newsEnabled ? "view-list-details":"news-subscribe"
-        onClicked: {
-            newsEnabled ? stack2.pop() : stack2.push("Pages/UpdateNews.qml");
-            newsEnabled = !newsEnabled;
+        PlasmaComponents.ToolButton {
+            Layout.alignment: Qt.AlignRight
+            icon.name: pageNo == 3?"checkmark":"go-next-view-page"
+            text: pageNo == 3?i18n("Done"):i18n("Next")
+            onClicked: {
+                if( pageNo < 3 ) {
+                    pageNo ++;
+                    stack2.push(getPage())
+                } else {
+                    plasmoid.configuration.showIntro = false;
+                    stack2.clear();
+                    stack2.push("Pages/ListPage.qml");
+                }
+            }
         }
-        PlasmaComponents.ToolTip {
-            text: !newsEnabled ? i18n("Official Arch Update News") : i18n("Package List View")
+        // Component
+    }
+    RowLayout {
+        QQC2.Label {
+            Layout.alignment: Qt.AlignLeft
+            text: "    "+packageModel.count+" updates available"
+        }
+        QQC2.Label{
+            Layout.fillWidth: true
+        }
+        PlasmaComponents.ToolButton {
+            Layout.alignment: Qt.AlignRight
+            icon.name: "view-list-details"
+            onClicked: stack2.pop()
+            PlasmaComponents.ToolTip { text: i18n("Package List View") }
         }
     }
 }

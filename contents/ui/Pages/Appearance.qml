@@ -11,6 +11,7 @@ import "../Common/" as Common
 
 Kirigami.ScrollablePage {
     id: appearancePage
+    property int kind: 1
     readonly property int margins: Kirigami.Units.gridUnit
     title: i18nc("@title", "Appearance")
     topPadding: 0

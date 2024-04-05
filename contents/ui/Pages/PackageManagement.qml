@@ -10,6 +10,7 @@ import "../Common/" as Common
 
 Kirigami.Page {
     id: welcomePage
+    property int kind: 1
     readonly property int margins: Kirigami.Units.gridUnit
     title: i18nc("@title", "Package Management")
     topPadding: 0

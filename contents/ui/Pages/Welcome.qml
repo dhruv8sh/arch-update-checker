@@ -9,6 +9,7 @@ import org.kde.kirigami as Kirigami
 
 Kirigami.Page {
     id: welcomePage
+    property int kind: 1
     readonly property int margins: Kirigami.Units.gridUnit
     title: i18nc("@title", "Welcome")
     topPadding: 0
@@ -48,8 +49,8 @@ Kirigami.Page {
                 Image {
                     Layout.alignment: Qt.AlignCenter
                     source: "./github-konqi.png"
-                    sourceSize.width: 200
-                    sourceSize.height: 200
+                    sourceSize.width: 150
+                    sourceSize.height: 150
                     HoverHandler {
                         id: handlerGithub
                         cursorShape: Qt.PointingHandCursor
@@ -64,6 +65,12 @@ Kirigami.Page {
                     }
                 }
             }
+            Kirigami.UrlButton {
+                Layout.alignment: Qt.AlignCenter
+                text: i18n("Konqi Art by exequtic")
+                url: "https://www.github.com/exequtic/"
+            }
+            QQC2.Label{}
             Kirigami.UrlButton {
                 Layout.alignment: Qt.AlignCenter
                 text: i18n("Github")

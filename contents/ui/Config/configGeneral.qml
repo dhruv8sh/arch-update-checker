@@ -87,12 +87,14 @@ Kirigami.ScrollablePage {
             textRole: "text"
             model: [
                 {text: "konsole"},
-                {text: "alacritty"}
+                {text: "alacritty"},
+                {text: "kitty"}
             ];
             currentIndex: {
                 switch(plasmoid.configuration.terminal) {
                     case "konsole"   : return 0;
                     case "alacritty" : return 1;
+                    case "kitty"     : return 2;
                     default      : return 0;
                 }
             }

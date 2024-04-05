@@ -11,7 +11,8 @@ import "../Full/" as Full
 ColumnLayout {
     id: listPage
     // height: parent.height
-    property string title: ""
+    property int kind: 0
+    property string title: i18nc("@title", "Update View")
     Layout.fillWidth: true
     Kirigami.InlineMessage {
         id: pausedMessage

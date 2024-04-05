@@ -13,6 +13,11 @@
       <whatsthis>If true, flatpak is enabled.</whatsthis>
       <default>true</default>
     </entry>
+    <entry name="aurEnabled" type="Bool">
+      <label>AUR Enabled</label>
+      <whatsthis>If true, an aur wrapper is enabled.</whatsthis>
+      <default>true</default>
+    </entry>
     <entry name="aurWrapper" type="String">
       <label>AUR Wrapper</label>
       <whatsthis>AUR wrapper name</whatsthis>
