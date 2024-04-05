@@ -20,6 +20,7 @@ Kirigami.ScrollablePage {
     property alias cfg_allowSingularModifications: allowSingularModifications.value
     property alias cfg_terminal: terminal.value
     property alias cfg_updateOnStartup: updateOnStartup.checked
+    property alias cfg_notificationsEnabled: notificationsToggle.checked
 
     Kirigami.FormLayout {
         anchors.fill: parent
@@ -79,6 +80,11 @@ Kirigami.ScrollablePage {
         QQC2.CheckBox {
             id: updateOnStartup
             Kirigami.FormData.label: i18n("Search on startup:")
+        }
+        QQC2.CheckBox {
+            id: notificationsToggle
+            Kirigami.FormData.label: i18n("Notifications:")
+            text: i18n("Enabled")
         }
         QQC2.ComboBox {
             id: terminal

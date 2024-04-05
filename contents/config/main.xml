@@ -25,6 +25,11 @@
     </entry>
 
 
+    <entry name="notificationsEnabled" type="Bool">
+      <label>Notifications Enabled</label>
+      <whatsthis>If true, notifications are shown</whatsthis>
+      <default>false</default>
+    </entry>
 
       <!-- UPdate after every -->
     <entry name="pollinterval" type="Int">

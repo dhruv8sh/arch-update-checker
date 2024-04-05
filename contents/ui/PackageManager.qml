@@ -47,7 +47,11 @@ Item{
             else fetchAURUpdateInformation(packagelines, sourceName)
             stillUpdating --;
             main.isUpdating = stillUpdating > 0;
-            if( !main.isUpdating && main.showNotification && plasmoid.configuration.lastCount != packageModel.count && packageModel.count != 0 ) {
+            if( plasmoid.configuration.notificationsEnabled
+                && !main.isUpdating
+                && main.showNotification
+                && plasmoid.configuration.lastCount != packageModel.count
+                && packageModel.count != 0 ) {
                 main.showNotification = false;
                 notif.sendEvent()
             }
