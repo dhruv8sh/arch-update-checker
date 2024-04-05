@@ -36,6 +36,7 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
   - [x] Flatpak details on expand
   - [x] Ask for modifying singular updates
   - [x] Complete support for AURA and PACAUR
+  - [x] Orphan Removal
   - [ ] (8/10) Better error handling
   - [ ] (1/2) Extensive logging support
 - [x] Notification on update
