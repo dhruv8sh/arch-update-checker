@@ -83,14 +83,14 @@ Kirigami.ScrollablePage {
         QQC2.ComboBox {
             id: terminal
             property string value: model[currentIndex].text
-            Kirigami.FormData.label: i18n("AUR Wrapper:")
+            Kirigami.FormData.label: i18n("Terminal:")
             textRole: "text"
             model: [
                 {text: "konsole"},
                 {text: "alacritty"}
             ];
             currentIndex: {
-                switch(plasmoid.configuration.aurWrapper) {
+                switch(plasmoid.configuration.terminal) {
                     case "konsole"   : return 0;
                     case "alacritty" : return 1;
                     default      : return 0;
