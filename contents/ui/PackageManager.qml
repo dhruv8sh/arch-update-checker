@@ -124,7 +124,7 @@ Item{
 
     // Util function to fill details about a package
     function fillDetailsFor(name, source) {
-        if( source === "FLATPAK" ) executable.exec("flatpak info"+name.split(" ").pop());
+        if( source === "FLATPAK" ) executable.exec("flatpak info "+name.split(" ").pop());
         // else if( source === "SNAP" ) details = ["Not Supported","yet"];
         else executable.exec( "pacman -Qi " + name );
     }
