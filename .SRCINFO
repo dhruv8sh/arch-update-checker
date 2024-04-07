@@ -1,0 +1,13 @@
+pkgbase = plasma6-applets-archupdatechecker
+	pkgdesc = A KDE Plasma 6 applet to show and install all your updates.
+	pkgver = r82.ec11d06
+	pkgrel = 1
+	url = https://github.com/dhruv8sh/arch-update-checker
+	arch = any
+	license = GPL-2.0
+	makedepends = git
+	depends = plasma-workspace
+	source = git+https://github.com/dhruv8sh/arch-update-checker.git
+	sha256sums = SKIP
+
+pkgname = plasma6-applets-archupdatechecker
