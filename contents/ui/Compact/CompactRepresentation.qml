@@ -32,7 +32,7 @@ Kirigami.Icon {
             if (mouse.button == Qt.MiddleButton) packageManager.action_updateSystem()
             else {
                 expanded = !wasExpanded;
-                if( expanded && plasmoid.configuration.updateOnExpand && main.hasUserSeen )
+                if( expanded && plasmoid.configuration.searchOnExpand && main.hasUserSeen )
                     packageManager.action_checkForUpdates();
                 main.hasUserSeen = true
             }

@@ -59,6 +59,7 @@ StackLayout {
                     plasmoid.configuration.showIntro = false;
                     stack2.clear();
                     stack2.push("Pages/ListPage.qml");
+                    packageManager.action_checkForUpdates();
                 }
             }
         }

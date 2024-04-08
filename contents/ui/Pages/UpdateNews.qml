@@ -22,25 +22,23 @@ ColumnLayout {
         XmlListModelRole { name: "hyperlink"; elementName: "link"; attributeName: "" }
         XmlListModelRole { name: "description"; elementName: "description"; attributeName: "" }
         XmlListModelRole { name: "pubDate"; elementName: "pubDate"; attributeName: "" }
-        onCountChanged: {
-            console.log(count)
-            console.log(title)
-        }
     }
     PlasmaComponents.ScrollView {
         id: scrollView
         Layout.fillWidth: true
         Layout.fillHeight: true
         visible: !main.isUpdating
-        contentWidth: availableWidth - contentItem.leftMargin - contentItem.rightMargin
+        contentWidth: availableWidth
         contentItem: ListView {
+            id: content
             width: 180; height: 300
             model: feedModel
             currentIndex: -1
+            spacing: Kirigami.Units.smallSpacing
             boundsBehavior: Flickable.StopAtBounds
             highlight: PlasmaExtras.Highlight { }
-            highlightMoveDuration: 0
-            highlightResizeDuration: 0
+            highlightMoveDuration: 1000
+            highlightResizeDuration: 1000
             delegate: Full.NewsItem {
                 title: head
                 link: hyperlink
@@ -55,6 +53,6 @@ ColumnLayout {
         Layout.fillHeight: true
         Layout.topMargin: 150
         Layout.bottomMargin: 150
-        visible: scrollView.contentItem.model.count == 0
+        visible: content.model.count == 0
     }
 }

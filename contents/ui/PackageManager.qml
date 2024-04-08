@@ -5,7 +5,7 @@ import org.kde.plasma.plasma5support as Plasma5Support
 Item{
     id: packageManager
     property int stillUpdating: 0
-    property string konsoleFlags: plasmoid.configuration.holdKonsole ? " --hold -e " : " -e "
+    property string aur: plasmoid.configuration.aurWrapper
     Plasma5Support.DataSource {
         id: "executable"
         engine: "executable"
@@ -13,10 +13,16 @@ Item{
         onNewData:function(sourceName, data){
             var exitCode = data["exit code"]
             var exitStatus = data["exit status"]
-            var stdout = data["stdout"]
+            var stdout = data["stdout"].replace(/\u001b\[[0-9;]*[m|K]/g, '') //replaces ANSCI characters
             var stderr = data["stderr"]
             exited(sourceName, exitCode, exitStatus, stdout, stderr)
             disconnectSource(sourceName)
+        }
+        function execInTermH(command) {
+            connectSource(plasmoid.configuration.terminal+ " --hold -e " +command)
+        }
+        function execInTermA(cmd) {
+            connectSource(plasmoid.configuration.terminal + ( plasmoid.configuration.holdTerminal ? " --hold -e ":" -e " ) + cmd )
         }
         function exec(cmd) {
             connectSource(cmd)
@@ -26,45 +32,39 @@ Item{
     Connections {
         target: executable
         function onExited(sourceName, exitCode, exitStatus, stdout, stderr){
-            stdout = stdout.replace(/\u001b\[[0-9;]*[m|K]/g, '');   // Replace ANSI characters with ASCII
             var packagelines = stdout.split("\n")
 
             // Error handling
             if( stderr.trim() !== "" && stdout.trim() === "" ) {
-                if( plasmoid.configuration.flatpakEnabled
-                    && stderr.includes(   i18n("flatpak: command not found"))   //for bash
-                    || stderr.includes(i18n("Command not found: flatpak")) //for zsh
+                if( plasmoid.configuration.useFlatpak
+                    && stderr.includes(i18n("flatpak: command not found"))      //for bash
+                    || stderr.includes(i18n("Command not found: flatpak"))      //for zsh
                     || stderr.includes(i18n("Unknown command: flatpak"  )) ) {  //for fish
-                    plasmoid.configuration.flatpakEnabled = false;
+                    plasmoid.configuration.useFlatpak = false;
                     main.wasFlatpakDisabled = true;
                 } else if( stderr.includes("Temporary failure in name resolution") ) main.error = i18n("Problem connecting to the internet.");
                 else main.error ="Command:"+sourceName+ "\nError code: "+exitCode+ "\n"+(stderr.length>200 ? stderr.substring(0,201)+"..." : stderr );
             }
             //Error handling ends
-            else if( sourceName.startsWith(term)) return;
+            else if( sourceName.startsWith(plasmoid.configuration.terminal)) return;
             else if( sourceName.startsWith("pacman -Qi ") || sourceName.startsWith("flatpak info")) { fetchDetails(packagelines, sourceName); return; }
             else if( sourceName === flatpakFetchCommand ) fetchFlatpakUpdateInformation(packagelines)
             else fetchAURUpdateInformation(packagelines, sourceName)
             stillUpdating --;
             main.isUpdating = stillUpdating > 0;
-            if( plasmoid.configuration.notificationsEnabled
+            if( plasmoid.configuration.useNotifications
                 && !main.isUpdating
                 && main.showNotification
                 && plasmoid.configuration.lastCount != packageModel.count
                 && packageModel.count != 0 ) {
                 main.showNotification = false;
-                notif.sendEvent()
+                notif.sendEvent();
+                plasmoid.configuration.lastCount = packageModel.count;
             }
         }
     }
 
     // ---------------------------- UTILIITY BEGIN ------------------------------------------ //
-
-    readonly property string aur: plasmoid.configuration.aurWrapper;
-    readonly property string term: plasmoid.configuration.terminal;
-    readonly property string hold: plasmoid.configuration.holdKonsole ? " --hold -e ":" -e ";
-
-    // These fields will shown in detailsText view ( Maximum 10, or it overflows )
     property var neededInfoFields: [
         "Description",
         "Installed Size",
@@ -76,7 +76,6 @@ Item{
         "Groups",
         "Optional For",
         "Provides"];
-    // These fields will shown in detailsText view for flatpaks ( Maximum 10, or it overflows )
     property var neededInfoFieldsFlatpak: [
         "Id",
         "Ref",
@@ -88,11 +87,6 @@ Item{
         "System",
         "Commit",
         "Date"];
-    /*
-    * Shell command to fetch flatpak update information with their version
-    * Format: TODO
-    * Inspiration from exequtic
-    */
     property string flatpakFetchCommand: `upd=$(flatpak remote-ls --columns=name,application,version --app --updates | \
                             sed 's/ /-/g' | sed 's/\t/ /g')
                             output=""
@@ -105,37 +99,13 @@ Item{
                             fi
                             echo -en "$output"
                             `;
-    /*
-    * Shell command to fetch update information for AUR ONLY
-    * Format: TODO
-    */
-    property string aurFetchCommand: aur+" -Qua"
-
-    /*
-    * Shell command to fetch update information from PACMAN ONLY
-    * Format: TODO
-    */
-    property string pacmanFetchCommand: "checkupdates"
-
-    // Shell Command to UPDATE AUR and PACMAN
-    property string updateAURCommand: term+hold+aur+" -Syu "+plasmoid.configuration.aurFlags;
-    // Shell Command to FLATPAKS
-    property string updateFLATPAKCommand: term+hold+"flatpak update "+plasmoid.configuration.flatpakFlags;
-    // Shell Command to show AUR/PACMAN package info
-    property string showAURInfoCommand: term+" --hold -e pacman -Qii ";
-    // Shell Command to show Flatpak package info
-    property string showFLATPAKInfoCommand: term+" --hold -e flatpak info ";
-
-    // Util function to fill details about a package
     function fillDetailsFor(name, source) {
         if( source === "FLATPAK" ) executable.exec("flatpak info "+name.split(" ").pop());
-        // else if( source === "SNAP" ) details = ["Not Supported","yet"];
-        else executable.exec( "pacman -Qi " + name );
+        else executable.exec("pacman -Qi " + name );
     }
-    // Puts package info into main.details
     function fetchDetails( lines, source ) {
         var details = [];
-        const isFlatpak = plasmoid.configuration.flatpakEnabled && source.startsWith("flatpak info ");
+        const isFlatpak = plasmoid.configuration.useFlatpak && source.startsWith("flatpak info ");
         if( isFlatpak ) {
             lines.shift()
             details.push("Description")
@@ -154,7 +124,6 @@ Item{
         });
         main.details = details;
     }
-    // Puts FLATPAK package updates into packageModel
     function fetchFlatpakUpdateInformation(lines) {
         lines.forEach(line => {
             var info = line.split(' ');
@@ -167,7 +136,6 @@ Item{
             });
         });
     }
-    // Puts AUR/PACMAN package updates into packageModel
     function fetchAURUpdateInformation(lines, source) {
         lines.forEach(line => {
             if( source === "pikaur -Qua" && line.startsWith(":: aur") )
@@ -186,6 +154,19 @@ Item{
                 });
         });
     }
+    function notificationInstall() {
+        let notifypath= '~/.local/share/knotifications6/archupdatechecker.notifyrc'
+        let notifycontent= `[Global]
+IconName=update-none
+Comment=Arch Update Checker
+
+[Event/sound]
+Name=Sound popup
+Comment=Popup and Sound options enabled
+Action=Popup|Sound
+Sound=message-new-instant.ogg`
+        executable.exec("echo \'"+notifycontent+"\' > "+notifypath)
+    }
     // ---------------------------- UTILIITY END  ------------------------------------------ //
 
     // ---------------------------- ACTIONS BEGIN ------------------------------------------ //
@@ -196,33 +177,33 @@ Item{
         packageModel.clear();
         main.wasFlatpakDisabled = false;
         isUpdating = false;
+        if( plasmoid.configuration.useCustomInstall ) {
+            executable.execInTermH( plasmoid.configuration.customScript )
+            return;
+        }
         stillUpdating = 0;
-        executable.exec( updateAURCommand );
+        if( plasmoid.configuration.useAUR ) executable.execInTermA( aur+" -Syu "+plasmoid.configuration.aurFlags );
+        else executable.execInTermA( "pacman -Syu "+plasmoid.configuration.aurFlags );
         if( plasmoid.configuration.flatpakEnabled )
-            executable.exec( updateFLATPAKCommand );
+            executable.execInTermA( "flatpak update "+plasmoid.configuration.flatpakFlags );
         timer.start();
     }
-    // UNINSTALL a package
     function action_uninstall(name, source) {
-        if( source === "FLATPAK" ) executable.exec(term + " --hold -e flatpak uninstall "+name.split(" ").pop());
-        // else if( source == "SNAP" ) console.log("SNAP support coming soon!");
-        else executable.exec(term + " --hold -e sudo pacman -R "+name);
+        if( source === "FLATPAK" ) executable.execInTermH("flatpak uninstall "+name.split(" ").pop());
+        else executable.execInTermH("sudo pacman -R "+name);
     }
-    // Updates ONE PACKAGE
     function action_installOne(name, source) {
-        if( plasmoid.configuration.allowSingularModifications === 0 ) {
+        if( plasmoid.configuration.allowSingleModification === 0 ) {
             main.showAllowSingularModifications = true;
             return;
         }
-        if( source === "FLATPAK" ) executable.exec(term+hold+"flatpak update "+name.split(" ").pop());
-        // else if( source === "SNAP" ) console.log("SNAP support coming soon!");
-        else executable.exec(term+hold+aur+" -S "+name);
+        if( source === "FLATPAK" ) executable.execInTermA("flatpak update "+name.split(" ").pop());
+        else if( source === "" ) executable.execInTermA("sudo pacman -S "+name);
+        else executable.execInTermA(aur+" -S "+name);
     }
-    //Show details in a terminal window
     function action_showInfo(name, source) {
-        if( source == "FLATPAK" ) executable.exec(showFLATPAKInfoCommand+name.split(" ").pop());
-        // else if( source == "SNAP" )  console.log("SNAP support coming soon!");
-        else executable.exec(showAURInfoCommand+name)
+        if( source == "FLATPAK" ) executable.execInTermH("flatpak info "+name.split(" ").pop());
+        else executable.execInTermH("pacman -Qii "+name)
     }
     function action_checkForUpdates() {
         if( main.isUpdating || stillUpdating > 0 ) return;
@@ -233,15 +214,11 @@ Item{
         main.showAllowSingularModifications = false;
         stillUpdating = 3;
 
-        if( plasmoid.configuration.flatpakEnabled ) executable.exec( flatpakFetchCommand );
-        else stillUpdating --;
-
-        executable.exec(aurFetchCommand);
-
-        if(aur !== 'pacaur' && aur !== 'aura' ) executable.exec(pacmanFetchCommand);
-        else stillUpdating --;
+        if( plasmoid.configuration.useFlatpak ) executable.exec( flatpakFetchCommand ); else stillUpdating --;
+        if( plasmoid.configuration.useAUR     ) executable.exec( aur+" -Qua");          else stillUpdating--;
+        if( !plasmoid.configuration.useAUR || (plasmoid.configuration.useAUR && aur !== 'pacaur' && aur !== 'aura') ) executable.exec("checkupdates");        else stillUpdating --;
     }
     function action_clearOrphans() {
-        executable.exec(term+hold+"sudo pacman -Rns $(pacman -Qtdq)");
+        executable.execInTermA("sudo pacman -Rns $(pacman -Qtdq)");
     }
 }

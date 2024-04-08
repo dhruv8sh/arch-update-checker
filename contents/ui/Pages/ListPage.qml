@@ -37,11 +37,11 @@ ColumnLayout {
         actions: [
             Kirigami.Action {
                 text: i18nc("@action:button", "Allow")
-                onTriggered: plasmoid.configuration.allowSingularModifications = 2
+                onTriggered: plasmoid.configuration.allowSingleModification = 2
             },
             Kirigami.Action {
-                text: i18nc("@action:button", "Don' Allow")
-                onTriggered: plasmoid.configuration.allowSingularModifications = 1
+                text: i18nc("@action:button", "Don't Allow")
+                onTriggered: plasmoid.configuration.allowSingleModification = 1
             }
         ]
     }
@@ -68,8 +68,7 @@ ColumnLayout {
             text: i18nc("@action:button", "Re-enable")
             onTriggered: {
                 main.wasFlatpakDisabled = false
-                plasmoid.configuration.flatpakEnabled = true
-
+                plasmoid.configuration.useFlatpak = true
             }
         }
     }
@@ -78,7 +77,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         visible: !main.isUpdating
-        contentWidth: availableWidth - contentItem.leftMargin - contentItem.rightMargin
+        contentWidth: availableWidth - (contentItem.leftMargin + contentItem.rightMargin + 1)
         contentItem: ListView {
             id: packageView
             topMargin: pausedMessage.visible ? 0 : Kirigami.Units.smallSpacing * 2

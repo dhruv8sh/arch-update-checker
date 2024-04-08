@@ -40,7 +40,7 @@ Kirigami.Page {
             }
             RowLayout{
                 id: time
-                property int value: plasmoid.configuration.pollinterval
+                property int value: plasmoid.configuration.pollInterval
                 Layout.alignment: Qt.AlignCenter
                 Kirigami.Icon {
                     source: "accept_time_event"
@@ -75,15 +75,15 @@ Kirigami.Page {
             }
             Common.CustomSwitch {
                 icon : "view-refresh"
-                checked: plasmoid.configuration.updateOnStartup
-                onCheckedChanged: plasmoid.configuration.updateOnStartup = checked
+                checked: plasmoid.configuration.searchOnStart
+                onCheckedChanged: plasmoid.configuration.searchOnStart = checked
                 text: i18n("Search on startup")
             }
             Common.CustomSwitch {
                 icon : "zoom-out-y-symbolic"
                 text: i18n("Search on expand")
-                checked: plasmoid.configuration.updateOnExpand
-                onCheckedChanged: plasmoid.configuration.updateOnExpand = checked
+                checked: plasmoid.configuration.searchOnExpand
+                onCheckedChanged: plasmoid.configuration.searchOnExpand = checked
             }
             QQC2.Label{}
             Common.CustomComboBox{
@@ -102,8 +102,8 @@ Kirigami.Page {
             Common.CustomSwitch {
                 icon : "project-development-close"
                 text: i18n("Close after update")
-                checked: plasmoid.configuration.holdKonsole
-                onCheckedChanged: plasmoid.configuration.holdKonsole = checked
+                checked: plasmoid.configuration.holdTerminal
+                onCheckedChanged: plasmoid.configuration.holdTerminal = checked
             }
         }
     }

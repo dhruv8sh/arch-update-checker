@@ -13,7 +13,6 @@ PlasmaExtras.ExpandableListItem {
     property string desc
     property bool showSeparator
     icon: "news-subscribe"
-    subtitle: FromVersion + plasmoid.configuration.packageSeparator + ToVersion
 
     KSvg.SvgItem {
         id: separatorLine

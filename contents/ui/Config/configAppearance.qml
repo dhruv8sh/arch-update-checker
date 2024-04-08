@@ -1,62 +1,130 @@
 import QtQuick
-import QtQuick.Controls as QQC2
 import QtQuick.Layouts
-import org.kde.kirigami as Kirigami
+import QtQuick.Controls as QQC2
+import org.kde.plasma.plasmoid as Plasmoid
+import org.kde.plasma.extras as PlasmaExtras
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.components as PlasmaComponents
 import org.kde.kquickcontrols as KQuickControls
-import "../Pages/" as Pages
+import org.kde.kirigami as Kirigami
+import "../Common/" as Common
 
 Kirigami.ScrollablePage {
-    id: root
-    property alias cfg_numberAvailable: numbersVisible.checked
-    property alias cfg_packageSeparator: packageSeparator.text
-    property alias cfg_customColorsEnabled: customColorsEnabled.checked
-    property alias cfg_dotColor: dotColor.color
-    property alias cfg_textColor: textColor.color
-    property alias cfg_position: position.currentIndex
+    id: appearancePage
 
-    Kirigami.FormLayout {
-        QQC2.TextField {
-            id: packageSeparator
-            Kirigami.FormData.label: i18n("Package seperator:")
-            placeholderText: i18n("Example: ->, =>, to, etc.")
-            text: plasmoid.configuration.packageSeparator
+    property alias cfg_dotColor : dotColor.color
+    property alias cfg_textColor: textColor.color
+    property alias cfg_useCustomColors: customColors.checked
+    property alias cfg_badgePosition: badgePositionItem.position
+    property alias cfg_packageSeparator: sprtrText.text
+
+
+    property int kind: 1
+    readonly property int margins: Kirigami.Units.gridUnit
+    title: i18nc("@title", "Appearance")
+    ColumnLayout {
+        anchors.fill: parent
+        PlasmaExtras.Heading {
+            Layout.alignment: Qt.AlignCenter
+            text: i18n("Indicator Position")
+            wrapMode: Text.WordWrap
+            level: 2
         }
         Item {
-            Kirigami.FormData.isSection: true
+            id: badgePositionItem
+            property int position
+            clip: false
+            Layout.alignment: Qt.AlignCenter
+            Layout.minimumWidth : 100
+            Layout.minimumHeight: 100
+            QQC2.RadioButton{
+                anchors.left: parent.right
+                anchors.top: parent.top
+                LayoutMirroring.enabled: true
+                text: i18n("Top-Left")
+                checked: parent.position == 0
+                onCheckedChanged: {
+                    if( checked ) parent.position = 0;
+                }
+            }
+            QQC2.RadioButton{
+                anchors.left: parent.right
+                anchors.top: parent.top
+                text: i18n("Top-Right")
+                checked: parent.position == 1
+                onCheckedChanged: {
+                    if( checked ) parent.position = 1;
+                }
+            }
+            Kirigami.Icon {
+                height: 100
+                width: 100
+                anchors.centerIn: parent
+                source: "update-none-symbolic"
+            }
+            QQC2.RadioButton{
+                anchors.left: parent.right
+                anchors.bottom: parent.bottom
+                LayoutMirroring.enabled: true
+                checked: parent.position == 2
+                onCheckedChanged: {
+                    if( checked ) parent.position = 2;
+                }
+                text: i18n("Bottom-Left")
+            }
+            QQC2.RadioButton{
+                anchors.left: parent.right
+                anchors.bottom: parent.bottom
+                checked: parent.position == 3
+                onCheckedChanged: {
+                    if( checked ) parent.position = 3;
+                }
+                text: i18n("Bottom-Right")
+            }
         }
-        QQC2.CheckBox {
-            id: numbersVisible
-            Kirigami.FormData.label: i18n("Badge:")
-            text: i18n("Show numbers on badge")
+        PlasmaExtras.Heading {
+            Layout.alignment: Qt.AlignCenter
+            text: i18n("\nVersion Seperator")
+            wrapMode: Text.WordWrap
+            level: 2
         }
-        QQC2.ComboBox {
-            id: position
-            textRole: "text"
-            model: [
-                {text:"Top-Left"},
-                {text:"Top-Right"},
-                {text:"Bottom-Left"},
-                {text:"Bottom-Right"}
-            ]
-            currentIndex : plasmoid.configuration.position
-            onCurrentIndexChanged: cfg_position = currentIndex
+        QQC2.TextField{
+            id: sprtrText
+            horizontalAlignment: TextInput.AlignHCenter
+            Layout.alignment: Qt.AlignCenter
         }
-        Item { Kirigami.FormData.isSection: true }
-        QQC2.CheckBox {
-            id: customColorsEnabled
-            Kirigami.FormData.label: i18n("Colors:")
-            checked: true
-            text: i18n("Use custom colors")
+        QQC2.Label{
+            Layout.alignment: Qt.AlignCenter
+            text: "v6.9"+sprtrText.text+"v9.6\n"
         }
-        KQuickControls.ColorButton {
-            id: dotColor
-            Kirigami.FormData.label: i18n("Dot Color:")
-            visible: customColorsEnabled.checked
-        }
-        KQuickControls.ColorButton {
-            id: textColor
-            Kirigami.FormData.label: i18n("Text Color:")
-            visible: customColorsEnabled.checked
+        RowLayout{
+            Layout.alignment: Qt.AlignCenter
+            spacing: 20
+            Common.CustomSwitch{
+                id: customColors
+                text:i18n("Custom Colors")
+                icon:"settings-configure"
+            }
+            ColumnLayout {
+                visible: customColors.checked
+                KQuickControls.ColorButton {
+                    Layout.alignment: Qt.AlignCenter
+                    id: dotColor
+                }
+                QQC2.Label {
+                    text: i18n("Circle color")
+                }
+            }
+            ColumnLayout {
+                visible: customColors.checked
+                KQuickControls.ColorButton {
+                    Layout.alignment: Qt.AlignCenter
+                    id: textColor
+                }
+                QQC2.Label {
+                    text: i18n("Text color")
+                }
+            }
         }
     }
 }

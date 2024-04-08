@@ -24,7 +24,7 @@ PlasmaExtras.ExpandableListItem {
         text: i18n("Update")
         onTriggered: packageManager.action_installOne(PackageName,Source)
     }
-    enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingularModifications != 1
+    enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingleModification != 1
     contextualActions: [
         Action {
             text: i18n("Show more information")

@@ -25,7 +25,7 @@ PlasmoidItem {
   property bool showAllowSingularModifications: false
   property bool showNotification: false
   property string outputText: ''
-    property bool newsEnabled: false
+  property bool newsEnabled: false
   signal clearProperties();
 
   PackageManager{ id: packageManager }
@@ -35,7 +35,7 @@ PlasmoidItem {
   Plasmoid.status: (packageModel.count > 0 || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
   Item{
     id: config
-    property int interval: plasmoid.configuration.pollinterval * 1000 * 60
+    property int interval: plasmoid.configuration.pollInterval * 1000 * 60
   }
 
   Timer {
@@ -51,15 +51,19 @@ PlasmoidItem {
   }
   Notification {
       id: notif
-      componentName: "plasma_workspace"
-      eventId: "warning"
-      iconName: "update-high"
-      title: i18n("Arch Update Checker")
-      text: i18n(packageModel.count+" updates available")
+      componentName: "archupdatechecker"
+      eventId: "sound"
+      title: {
+        let diff = packageModel.count - plasmoid.configuration.lastCount;
+        if( diff == packageModel.count || diff < 0 ) return packageModel.count + " updates available!"
+        else if( diff > 0 ) return "+"+diff+" new updates available! \n Total: "+packageModel.count;
+      }
   }
   Component.onCompleted : {
     hasUserSeen = false;
-    packageManager.action_checkForUpdates()
+    packageManager.notificationInstall()
+    if( plasmoid.configuration.searchOnStart )
+      packageManager.action_checkForUpdates()
   }
   Plasmoid.contextualActions: [
       PlasmaCore.Action {

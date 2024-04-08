@@ -35,8 +35,8 @@ Kirigami.Page {
                 id: flatpakSwitch
                 icon: "flatpak-discover"
                 text: i18n("Flatpaks")
-                checked: plasmoid.configuration.flatpakEnabled
-                onCheckedChanged: plasmoid.configuration.flatpakEnabled = checked
+                checked: plasmoid.configuration.useFlatpak
+                onCheckedChanged: plasmoid.configuration.useFlatpak = checked
             }
             RowLayout {
                 enabled: flatpakSwitch.checked

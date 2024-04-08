@@ -50,8 +50,12 @@ StackLayout {
             PlasmaComponents.ToolButton {
                 id: installButton
                 icon.name: "install"
-                onClicked: packageManager.action_updateSystem()
+                onClicked: {
+                    localTooltip.visible = !visible
+                    packageManager.action_updateSystem()
+                }
                 PlasmaComponents.ToolTip {
+                    id: localTooltip
                     text: i18n("Update your system")
                 }
             }

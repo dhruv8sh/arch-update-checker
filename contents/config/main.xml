@@ -3,129 +3,55 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
                           http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
-  <kcfgfile name=""/>
+  <kcfgfile name="archupdatechecker"/>
 
-  <group name="General">
-
-    <!-- Repos -->
-    <entry name="flatpakEnabled" type="Bool">
-      <label>Flatpak</label>
-      <whatsthis>If true, flatpak is enabled.</whatsthis>
-      <default>true</default>
-    </entry>
-    <entry name="aurEnabled" type="Bool">
-      <label>AUR Enabled</label>
-      <whatsthis>If true, an aur wrapper is enabled.</whatsthis>
-      <default>true</default>
-    </entry>
-    <entry name="aurWrapper" type="String">
-      <label>AUR Wrapper</label>
-      <whatsthis>AUR wrapper name</whatsthis>
-      <default>paru</default>
-    </entry>
-
-
-    <entry name="notificationsEnabled" type="Bool">
-      <label>Notifications Enabled</label>
-      <whatsthis>If true, notifications are shown</whatsthis>
-      <default>false</default>
-    </entry>
-
-      <!-- UPdate after every -->
-    <entry name="pollinterval" type="Int">
-      <label>Polling Interval</label>
-      <whatsthis>Polling interval (in minutes).</whatsthis>
-      <default>30</default>
-    </entry>
-
-    <!-- Update on... -->
-    <entry name="updateOnExpand" type="Bool">
-      <label>Update package update list when expanding the applet</label>
-      <whatsthis>If enabled, checks for updates when expanding</whatsthis>
-      <default>False</default>
-    </entry>
-    <entry name="updateOnStartup" type="Bool">
-      <label>Update package update list when expanding the applet</label>
-      <whatsthis>If enabled, checks for updates when expanding</whatsthis>
-      <default>False</default>
-    </entry>
-
-    <!-- Flags -->
-    <entry name="flatpakFlags" type="String">
-          <label>Flatpak Flags</label>
-          <whatsthis>Which flatpak flags to use</whatsthis>
-      <default>--assumeyes</default>
-    </entry>
-    <entry name="aurFlags" type="String">
-      <label>Aur Flags</label>
-      <whatsthis>These flags will be used while updating AUR packages</whatsthis>
-      <default>--noconfirm</default>
-    </entry>
-    <entry name="holdKonsole" type="Bool">
-          <label>Do not close konsole</label>
-          <whatsthis>If true, does not close konsole after update</whatsthis>
-      <default>false</default>
-    </entry>
-    <entry name="terminal" type="String">
-          <label>Terminal to be used</label>
-          <whatsthis>Name of the terminal</whatsthis>
-      <default>konsole</default>
-    </entry>
+  <group name="Pacman">
+    <entry name="usePamac"   type="Bool"><default>false</default></entry>
+    <entry name="useAUR"     type="Bool"><default>true </default></entry>
+    <entry name="useFlatpak" type="Bool"><default>false</default></entry>
+    <entry name="aurWrapper"   type="String"><default>paru</default></entry>
+    <entry name="pacmanFlags"  type="String"><default>--noconfirm</default></entry>
+    <entry name="aurFlags"     type="String"><default>--noconfirm</default></entry>
+    <entry name="flatpakFlags" type="String"><default>--assumeyes</default></entry>
   </group>
 
 
   <group name="Appearance">
-    <entry name="packageSeparator" type="String">
-      <label>Show badge even when zero packages available</label>
-      <whatsthis>Used to separate version values</whatsthis>
-      <default>→</default>
-    </entry>
-    <entry name="customColorsEnabled" type="Bool">
-      <label>Custom Colors</label>
-      <whatsthis>If true, custom colors are enabled.</whatsthis>
-      <default>false</default>
-    </entry>
-    <entry name="dotColor" type="Color">
-      <label>Dot Color</label>
-      <whatsthis>Color of the badge</whatsthis>
-      <default>White</default>
-    </entry>
-    <entry name="textColor" type="Color">
-      <label>Text Color</label>
-      <whatsthis>Color of the badge text</whatsthis>
-      <default>Black</default>
-    </entry>
-    <entry name="numberAvailable" type="Bool">
-      <label>Show number of updates</label>
-      <whatsthis>Is number available on the badge</whatsthis>
-      <default>True</default>
-    </entry>
-    <entry name="position" type="Int">
-      <label>Indicator Position</label>
-      <whatsthis>Position of the indicator</whatsthis>
-      <default>3</default>
-    </entry>
-
-
-
-    <!-- HIGH WARNING -->
-    <entry name="allowSingularModifications" type="Int">
-          <label>Allow singular modifications</label>
-          <whatsthis>0 is undecided state, 1 is false, 2 is true</whatsthis>
-      <default>false</default>
-    </entry>
-
-    <!-- Intro -->
-    <entry name="showIntro" type="Bool">
-          <label>Show intro</label>
-          <whatsthis>If true, intro is shown...</whatsthis>
-      <default>true</default>
-    </entry>
-    <entry name="showIntro" type="Int">
-          <label>Last Count</label>
-          <whatsthis>Last update count</whatsthis>
-      <default>0</default>
-    </entry>
+    <entry name="useCustomColors" type="Bool"><default>false</default></entry>
+    <entry name="useBadge"        type="Bool"><default>true </default></entry>
+    <entry name="useBadgeNumber"  type="Bool"><default>true </default></entry>
+    <entry name="badgePosition"    type="Int"><default>3</default></entry>
+    <entry name="minimumBadgeTextSize" type="Int"><default>10</default></entry>
+    <entry name="dotColor"  type="Color"><default>white</default></entry>
+    <entry name="textColor" type="Color"><default>black</default></entry>
+    <entry name="packageSeparator" type="String"><default>→</default></entry>
   </group>
 
+
+  <group name="Behavior">
+    <entry name="pollInterval" type="Int"><default>30</default></entry>
+    <entry name="searchOnExpand"   type="Bool"><default>false</default></entry>
+    <entry name="searchOnStart"    type="Bool"><default>false</default></entry>
+    <entry name="UseNotifications" type="Bool"><default>false</default></entry>
+    <entry name="holdTerminal"     type="Bool"><default>true </default></entry>
+    <entry name="useCustomInstall" type="Bool"><default>false</default></entry>
+    <entry name="customScript" type="String"><default></default></entry>
+  </group>
+
+
+  <group name="Unsafe">
+    <entry name="debugNormal"     type="Bool"><default>false</default></entry>
+    <entry name="debugCommands"   type="Bool"><default>false</default></entry>
+    <entry name="showBadgeAlways" type="Bool"><default>false</default></entry>
+    <entry name="alwaysActive"    type="Bool"><default>false</default></entry>
+    <entry name="showIntro"       type="Bool"><default>true </default></entry>
+<!--     <entry name="showIntroAlways" type="Bool"><default>true </default></entry> -->
+    <entry name="allowSingleModification" type="Int" ><default>0</default></entry>
+
+
+    <!--  HIDDEN UTILITY SETTINGS    -->
+    <entry name="lastCount" type="Int">       <default>0</default></entry>
+    <entry name="unupdatedList" type="String"><default></default></entry>
+
+  </group>
 </kcfg>
