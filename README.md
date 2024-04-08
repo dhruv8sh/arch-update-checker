@@ -31,16 +31,17 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 ## Todo
 - [x] Support for YAY, Trizen, Paru and Pikaur
 - [x] Flatpak Support
+- [x] Complete support for AURA and PACAUR
+- [x] Orphan Removal
 - [x] Rewrite to look native
   - [x] Details on item expand
   - [x] Flatpak details on expand
   - [x] Ask for modifying singular updates
-  - [x] Complete support for AURA and PACAUR
-  - [x] Orphan Removal
   - [ ] (8/10) Better error handling
   - [ ] (1/2) Extensive logging support
 - [x] Notification on update
   - [x] Basic Support
+  - [x] Native Support
   - [ ] Support for update diff
 - [x] Support for Arch Linux Update News
 - [ ] (1/2) Support for mirrorlist update
