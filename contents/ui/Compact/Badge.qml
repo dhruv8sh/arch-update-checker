@@ -14,13 +14,12 @@ Rectangle {
         left   : !rightAnchor  ? parent.left   : undefined
         top    : !bottomAnchor ? parent.top    : undefined
     }
-    onWidthChanged : width  = Math.max(parent.width/2, implicitWidth)
-    onHeightChanged: height = parent.height/2
     color: plasmoid.configuration.useCustomColors ? plasmoid.configuration.dotColor : Kirigami.Theme.textColor
 
     radius: height / 2
-    height: Math.max(parent.width/2, label.implicitHeight)
-    width: Math.max(parent.width/2, label.implicitWidth)
+    width: Math.min(parent.width/2, parent.height/2)
+    height: width
+    onWidthChanged : height = width
     Label {
         id: label
         color              : plasmoid.configuration.useCustomColors ? plasmoid.configuration.textColor : Kirigami.Theme.backgroundColor;
