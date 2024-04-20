@@ -81,7 +81,7 @@ MouseArea {
             PropertyChanges{
                 target: badge
                 visible: true
-                text: 999//packageModel.count
+                text: packageModel.count
             }
             PropertyChanges{
                 target: busyInd
