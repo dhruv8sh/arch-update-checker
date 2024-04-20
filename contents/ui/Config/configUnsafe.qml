@@ -29,11 +29,12 @@ Kirigami.ScrollablePage {
                 Kirigami.FormData.isSection: true
             }
             QQC2.CheckBox {
-                Kirigami.FormData.label: i18n("Show Badge Always:")
+                Kirigami.FormData.label: i18n("Always Show Badge:")
                 id: showBadgeAlways
             }
             QQC2.CheckBox {
-                Kirigami.FormData.label:: i18n("Show Intro Pages:")
+                Kirigami.FormData.label: i18n("Show Intro Pages:")
+                text: i18n("On next startup")
                 id: showIntroAgain
             }
             Item {
