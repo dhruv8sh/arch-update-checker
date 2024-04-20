@@ -17,14 +17,16 @@ PlasmaExtras.ExpandableListItem {
         else return "folder-database-symbolic";
     }
     title: PackageName
-    subtitle: FromVersion + plasmoid.configuration.packageSeparator + ToVersion
+    // listItemTitle.textFormat: Text.RichText
+    allowStyledText: true
+    subtitle: "<b>"+Source+"</b>   |   " + FromVersion + plasmoid.configuration.packageSeparator + ToVersion
     defaultActionButtonAction: Action {
         id: singleInstallButton
         icon.name: "run-install"
         text: i18n("Update")
         onTriggered: packageManager.action_installOne(PackageName,Source)
+        enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingleModification != 1
     }
-    enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingleModification != 1
     contextualActions: [
         Action {
             text: i18n("Show more information")

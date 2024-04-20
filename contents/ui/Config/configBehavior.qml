@@ -15,6 +15,8 @@ Kirigami.ScrollablePage {
     property alias cfg_useNotifications: notificationsToggle.checked
     property alias cfg_customScript    : customScript.text
     property alias cfg_useCustomInstall: useCustomScript.checked
+    property alias cfg_activeAmount    : activeWhen.value
+    property alias cfg_rememberState   : rememberState.checked
     ColumnLayout{
         anchors.fill: parent
         Kirigami.InlineMessage {
@@ -54,6 +56,18 @@ Kirigami.ScrollablePage {
             Item {
                 Kirigami.FormData.isSection: true
             }
+            RowLayout {
+                Kirigami.FormData.label: i18n("Show in tray when:")
+                QQC2.SpinBox {
+                    id: activeWhen
+                    from: 0
+                    to: 2000
+                }
+                QQC2.Label{ text: i18n("update(s) available.")}
+            }
+            Item {
+                Kirigami.FormData.isSection: true
+            }
             QQC2.CheckBox {
                 id: updateOnExpand
                 Kirigami.FormData.label: i18n("Search on expand:")
@@ -61,6 +75,10 @@ Kirigami.ScrollablePage {
             QQC2.CheckBox {
                 id: updateOnStartup
                 Kirigami.FormData.label: i18n("Search on startup:")
+            }
+            QQC2.CheckBox {
+                id: rememberState
+                Kirigami.FormData.label: i18n("Remember if News Page is opened:")
             }
             Item {
                 Kirigami.FormData.isSection: true
@@ -88,7 +106,7 @@ Kirigami.ScrollablePage {
                         case "konsole"   : return 0;
                         case "alacritty" : return 1;
                         case "kitty"     : return 2;
-                        default      : return 0;
+                        default          : return 0;
                     }
                 }
                 onCurrentIndexChanged: value = model[currentIndex].text

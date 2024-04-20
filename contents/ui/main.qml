@@ -25,14 +25,15 @@ PlasmoidItem {
   property bool showAllowSingularModifications: false
   property bool showNotification: false
   property string outputText: ''
-  property bool newsEnabled: false
   signal clearProperties();
+  signal pop();
+  // signal sendErrorSignal(errorCode, error);
 
   PackageManager{ id: packageManager }
 
   toolTipMainText: i18n("Arch Update Checker")
   toolTipSubText: i18n("Updates available: "+packageModel.count)
-  Plasmoid.status: (packageModel.count > 0 || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
+  Plasmoid.status: (packageModel.count >= plasmoid.configuration.activeAmount || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
   Item{
     id: config
     property int interval: plasmoid.configuration.pollInterval * 1000 * 60

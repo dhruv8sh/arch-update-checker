@@ -79,7 +79,7 @@ StackLayout {
                 main.clearProperties();
             }
             PlasmaComponents.ToolTip {
-                text: i18n("Sort by name/repository")
+                text: sortByName ? i18n("Currently sorted by: Package Name\nSort by Repository name") : i18n("Currently sorted by: Repository Name\nSort by Package name")
             }
         }
     }

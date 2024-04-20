@@ -33,9 +33,6 @@ PlasmaExtras.Representation {
             headName: stack2.currentItem?.title
             currentIndex: stack2.currentItem?.kind
         }
-        // Loader {
-        //     sourceComponent: stack2.currentItem?.headerItems
-        // }
     }
     footer: PlasmaExtras.PlasmoidHeading {
         contentItem: BottomToolbar{
@@ -57,11 +54,17 @@ PlasmaExtras.Representation {
         initialItem: Pages.Welcome{}
     }
     function getPage() {
+        if( plasmoid.configuration.debugNormal)
+            console.log("Switching to page no.:"+pageNo);
         switch( pageNo ) {
             case 0: return "Pages/Welcome.qml";
             case 1: return "Pages/PackageManagement.qml";
             case 2: return "Pages/Behavior.qml";
             case 3: return "Pages/Appearance.qml";
         }
+    }
+    Connections {
+        target: main
+        onPop: stack2.pop();
     }
 }

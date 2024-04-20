@@ -6,6 +6,8 @@ Item{
     id: packageManager
     property int stillUpdating: 0
     property string aur: plasmoid.configuration.aurWrapper
+    property string startMessage: `--------------------- Arch Update Checker by dhruv8sh ---------------------`;
+    property string endMessage  : `------------------------------ Process Ended ------------------------------`
     Plasma5Support.DataSource {
         id: "executable"
         engine: "executable"
@@ -19,10 +21,11 @@ Item{
             disconnectSource(sourceName)
         }
         function execInTermH(command) {
-            connectSource(plasmoid.configuration.terminal+ " --hold -e " +command)
+            connectSource(`${plasmoid.configuration.terminal} -e bash -c 'trap "" SIGINT; echo ${startMessage}; ${command}; echo ${endMessage}; read -p "Press Any Key to exit..."'`)
         }
         function execInTermA(cmd) {
-            connectSource(plasmoid.configuration.terminal + ( plasmoid.configuration.holdTerminal ? " --hold -e ":" -e " ) + cmd )
+            if( plasmoid.configuration.terminal ) execInTermH(cmd);
+            else connectSource(`${plasmoid.configuration.terminal} -e bash -c 'trap "" SIGINT; echo ${startMessage}; ${command}; echo ${endMessage};'`)
         }
         function exec(cmd) {
             connectSource(cmd)
@@ -33,7 +36,13 @@ Item{
         target: executable
         function onExited(sourceName, exitCode, exitStatus, stdout, stderr){
             var packagelines = stdout.split("\n")
-
+            if( plasmoid.configuration.debugCommands ) {
+                console.log("source:"+source);
+                console.log("stdout:"+stdout);
+                console.log("exitCode:"+exitCode);
+                console.log("exitStatus:"+exitStatus);
+                console.log("stderr:"+stderr);
+            }
             // Error handling
             if( stderr.trim() !== "" && stdout.trim() === "" ) {
                 if( plasmoid.configuration.useFlatpak
@@ -51,7 +60,11 @@ Item{
             else if( sourceName === flatpakFetchCommand ) fetchFlatpakUpdateInformation(packagelines)
             else fetchAURUpdateInformation(packagelines, sourceName)
             stillUpdating --;
-            main.isUpdating = stillUpdating > 0;
+            isUpdating = stillUpdating > 0;
+            if( plasmoid.configuration.debugNormal && !isUpdating ) {
+                console.log("Update List count : "+packageModel.count);
+                console.log("Verbose mode is work in progress.");
+            }
             if( plasmoid.configuration.useNotifications
                 && !main.isUpdating
                 && main.showNotification
@@ -150,7 +163,7 @@ Item{
                     PackageName: info[0],
                     FromVersion: info[1],
                     ToVersion: info[3],
-                    Source: source === "checkupdates" ? "" : "AUR"
+                    Source: source.startsWith("checkupdates") ? info[4].toUpperCase() : "AUR"
                 });
         });
     }
@@ -216,7 +229,12 @@ Sound=message-new-instant.ogg`
 
         if( plasmoid.configuration.useFlatpak ) executable.exec( flatpakFetchCommand ); else stillUpdating --;
         if( plasmoid.configuration.useAUR     ) executable.exec( aur+" -Qua");          else stillUpdating--;
-        if( !plasmoid.configuration.useAUR || (plasmoid.configuration.useAUR && aur !== 'pacaur' && aur !== 'aura') ) executable.exec("checkupdates");        else stillUpdating --;
+        if( !plasmoid.configuration.useAUR || (plasmoid.configuration.useAUR && aur !== 'pacaur' && aur !== 'aura') ) executable.exec(`
+            checkupdates | while IFS= read -r line; do
+                echo -n "$line"
+                pacman -Si $(echo "$line" | awk '{print $1}') | awk 'NR==1' | awk -F':' '{print $2}'
+            done
+                                    `);        else stillUpdating --;
     }
     function action_clearOrphans() {
         executable.execInTermA("sudo pacman -Rns $(pacman -Qtdq)");

@@ -5,11 +5,23 @@ import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents
 
-Kirigami.Icon {
-    property PlasmoidItem plasmoidItem
-    source: "update-none"
-    active: mouseArea.containsMouse
-    activeFocusOnTab: true
+MouseArea {
+    id: mouseArea
+    property bool wasExpanded: false
+    acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+    hoverEnabled: true
+    onPressed: wasExpanded = expanded
+    onClicked: mouse => {
+        if (mouse.button == Qt.MiddleButton) packageManager.action_updateSystem()
+        else {
+            expanded = !wasExpanded;
+            if( expanded && plasmoid.configuration.searchOnExpand && main.hasUserSeen )
+                packageManager.action_checkForUpdates();
+            if( !plasmoid.configuration.rememberState )
+                main.pop();
+            main.hasUserSeen = true
+        }
+    }
     Keys.onPressed: event => {
         switch (event.key) {
         case Qt.Key_Space:
@@ -21,33 +33,74 @@ Kirigami.Icon {
             break;
         }
     }
-    MouseArea {
-        id: mouseArea
-        property bool wasExpanded: false
-        acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+    Kirigami.Icon {
+        source: "update-none"
+        active: mouseArea.containsMouse
+        activeFocusOnTab: true
         anchors.fill: parent
-        hoverEnabled: true
-        onPressed: wasExpanded = expanded
-        onClicked: mouse => {
-            if (mouse.button == Qt.MiddleButton) packageManager.action_updateSystem()
-            else {
-                expanded = !wasExpanded;
-                if( expanded && plasmoid.configuration.searchOnExpand && main.hasUserSeen )
-                    packageManager.action_checkForUpdates();
-                main.hasUserSeen = true
+    }
+    states:[
+        State {
+            name: "updating"
+            when: isUpdating
+            PropertyChanges{
+                target: badge
+                visible: false
+            }PropertyChanges{
+                target: busyInd
+                visible: true
+            }
+        },
+        State {
+            name: "noUpdates"
+            when: packageModel.count == 0
+            PropertyChanges{
+                target: badge
+                visible: plasmoid.configuration.showBadgeAlways
+            }PropertyChanges{
+                target: busyInd
+                visible: false
+            }
+        },
+        State{
+            name: "manyUpdates"
+            when: packageModel.count > 999
+            PropertyChanges{
+                target: badge
+                visible: true
+                text: "∞"
+            }
+            PropertyChanges{
+                target: busyInd
+                visible: false
+            }
+        },
+        State {
+            name: "someUpdates"
+            when: packageModel.count != 0
+            PropertyChanges{
+                target: badge
+                visible: true
+                text: 999//packageModel.count
+            }
+            PropertyChanges{
+                target: busyInd
+                visible: false
             }
         }
-    }
-    Badge {
-        id: packageBadge
-        visible: packageModel.count > 0
-        text: packageModel.count
-    }
+    ]
 
+
+
+
+
+
+
+
+    Badge { id: badge}
     PlasmaComponents.BusyIndicator {
-        id: busyIndicator2
+        id: busyInd
         anchors.centerIn: parent
-        visible: main.isUpdating
         anchors.fill: parent
     }
 }
