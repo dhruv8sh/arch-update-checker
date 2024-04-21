@@ -158,6 +158,7 @@ Item{
                 info.shift();
                 info.shift();
             }
+            console.log(source.startsWith("checkupdates"));
             if( info[0] && info[0].trim() != "" )
                 packageModel.append({
                     PackageName: info[0],
@@ -178,6 +179,7 @@ Name=Sound popup
 Comment=Popup and Sound options enabled
 Action=Popup|Sound
 Sound=message-new-instant.ogg`
+        executable.exec("mkdir -p ~/.local/share/knotifications6/")
         executable.exec("echo \'"+notifycontent+"\' > "+notifypath)
     }
     // ---------------------------- UTILIITY END  ------------------------------------------ //
@@ -229,8 +231,7 @@ Sound=message-new-instant.ogg`
 
         if( plasmoid.configuration.useFlatpak ) executable.exec( flatpakFetchCommand ); else stillUpdating --;
         if( plasmoid.configuration.useAUR     ) executable.exec( aur+" -Qua");          else stillUpdating--;
-        if( !plasmoid.configuration.useAUR || (plasmoid.configuration.useAUR && aur !== 'pacaur' && aur !== 'aura') ) executable.exec(`
-            checkupdates | while IFS= read -r line; do
+        if( !plasmoid.configuration.useAUR || (plasmoid.configuration.useAUR && aur !== 'pacaur' && aur !== 'aura') ) executable.exec(`checkupdates | while IFS= read -r line; do
                 echo -n "$line"
                 pacman -Si $(echo "$line" | awk '{print $1}') | awk 'NR==1' | awk -F':' '{print $2}'
             done
