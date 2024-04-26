@@ -7,7 +7,6 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
 import org.kde.kitemmodels as KItemModels
 import "./Pages/" as Pages
-import "./Full/" as Full
 
 PlasmaExtras.Representation {
     id: fullIntro
@@ -52,6 +51,7 @@ PlasmaExtras.Representation {
         id: stack2
         anchors.fill: parent
         initialItem: Pages.Welcome{}
+        Layout.fillWidth: true
     }
     function getPage() {
         if( plasmoid.configuration.debugNormal)

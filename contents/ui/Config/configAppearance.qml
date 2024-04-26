@@ -17,6 +17,8 @@ Kirigami.ScrollablePage {
     property alias cfg_useCustomColors: customColors.checked
     property alias cfg_badgePosition: badgePositionItem.position
     property alias cfg_packageSeparator: sprtrText.text
+    property alias cfg_customIcons: customIconList.text
+    property alias cfg_useCustomIcons: useCustomIcons.checked
 
 
     property int kind: 1
@@ -103,7 +105,7 @@ Kirigami.ScrollablePage {
             Common.CustomSwitch{
                 id: customColors
                 text:i18n("Custom Colors")
-                icon:"settings-configure"
+                icon:"color-picker"
             }
             ColumnLayout {
                 visible: customColors.checked
@@ -125,6 +127,26 @@ Kirigami.ScrollablePage {
                     text: i18n("Text color")
                 }
             }
+        }
+        QQC2.Label {}
+        RowLayout {
+            Layout.alignment: Qt.AlignCenter
+            Common.CustomSwitch{
+                id: useCustomIcons
+                text:i18n("Custom icons")
+                icon:"settings-configure"
+            }
+            PlasmaComponents.ToolButton {
+                icon.name: "documentinfo"
+                PlasmaComponents.ToolTip {
+                    text: i18n("Format: type > name > icon-name\nTypes: group, name, source\nName: '...' at the end matches any following string.\n'lib' and 'lib32-' in the package name match automatically.\nicon-name: '~' is same as package-name.")
+                }
+            }
+        }
+        QQC2.TextArea {
+            id: customIconList
+            Layout.alignment: Qt.AlignCenter
+            visible: useCustomIcons.checked
         }
     }
 }

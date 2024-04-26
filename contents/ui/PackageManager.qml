@@ -37,7 +37,7 @@ Item{
         function onExited(sourceName, exitCode, exitStatus, stdout, stderr){
             var packagelines = stdout.split("\n")
             if( plasmoid.configuration.debugCommands ) {
-                console.log("source:"+source);
+                console.log("source:"+sourceName);
                 console.log("stdout:"+stdout);
                 console.log("exitCode:"+exitCode);
                 console.log("exitStatus:"+exitStatus);
@@ -52,11 +52,11 @@ Item{
                     plasmoid.configuration.useFlatpak = false;
                     main.wasFlatpakDisabled = true;
                 } else if( stderr.includes("Temporary failure in name resolution") ) main.error = i18n("Problem connecting to the internet.");
-                else main.error ="Command:"+sourceName+ "\nError code: "+exitCode+ "\n"+(stderr.length>200 ? stderr.substring(0,201)+"..." : stderr );
+                else main.error ="Error code: "+exitCode+ "\n"+(stderr.length>200 ? stderr.substring(0,201)+"..." : stderr );
             }
             //Error handling ends
             else if( sourceName.startsWith(plasmoid.configuration.terminal)) return;
-            else if( sourceName.startsWith("pacman -Qi ") || sourceName.startsWith("flatpak info")) { fetchDetails(packagelines, sourceName); return; }
+            else if( sourceName.startsWith("pamac info") || sourceName.startsWith("pacman -Qi") || sourceName.startsWith("flatpak info")) { fetchDetails(packagelines, sourceName); return; }
             else if( sourceName === flatpakFetchCommand ) fetchFlatpakUpdateInformation(packagelines)
             else fetchAURUpdateInformation(packagelines, sourceName)
             stillUpdating --;
@@ -110,10 +110,22 @@ Item{
                                     output+="$(echo "$app $ver\n")"
                                 done <<< "$upd"
                             fi
-                            echo -en "$output"
-                            `;
+                            echo -en "$output"`;
+    property string pacmanFetchCommand: `checkupdates | while IFS= read -r line; do
+                echo -n "$line"
+                ans=$(pacman -Si $(echo "$line" | awk '{print $1}'))
+                echo -n "$(echo "$ans" | awk 'NR==1' | awk -F':' '{print $2}') "
+                echo "$ans" | awk 'NR==8' | awk -F':' '{print $2}'
+
+            done`;
+    property string pamacFetchCommand: `pamac checkupdates | while IFS= read -r line; do
+                echo -n "$line"
+                echo pamac info $(echo "$line" | awk '{print $1}') | awk 'NR==9' | awk -F':' '{print $2}'
+
+            done`
     function fillDetailsFor(name, source) {
         if( source === "FLATPAK" ) executable.exec("flatpak info "+name.split(" ").pop());
+        else if( plasmoid.configuration.usePamacInstead ) executable.exec("pamac info "+name);
         else executable.exec("pacman -Qi " + name );
     }
     function fetchDetails( lines, source ) {
@@ -145,7 +157,8 @@ Item{
                 PackageName: info[0],
                 FromVersion: info[3],
                 ToVersion: info[2]+"    "+info[1],
-                Source: "FLATPAK"
+                Source: "FLATPAK",
+                Group: ""
             });
         });
     }
@@ -158,13 +171,13 @@ Item{
                 info.shift();
                 info.shift();
             }
-            console.log(source.startsWith("checkupdates"));
             if( info[0] && info[0].trim() != "" )
                 packageModel.append({
                     PackageName: info[0],
                     FromVersion: info[1],
                     ToVersion: info[3],
-                    Source: source.startsWith("checkupdates") ? info[4].toUpperCase() : "AUR"
+                    Source: info[4] ? info[4].toUpperCase() : "AUR",
+                    Group: info[5] ? info[5].toUpperCase() : ""
                 });
         });
     }
@@ -198,27 +211,27 @@ Sound=message-new-instant.ogg`
         }
         stillUpdating = 0;
         if( plasmoid.configuration.useAUR ) executable.execInTermA( aur+" -Syu "+plasmoid.configuration.aurFlags );
-        else executable.execInTermA( "pacman -Syu "+plasmoid.configuration.aurFlags );
+        else executable.execInTermA( plasmoid.configuration.usePamacInstead ? "pamac update":"pacman -Syu "+plasmoid.configuration.aurFlags );
         if( plasmoid.configuration.flatpakEnabled )
             executable.execInTermA( "flatpak update "+plasmoid.configuration.flatpakFlags );
         timer.start();
     }
     function action_uninstall(name, source) {
         if( source === "FLATPAK" ) executable.execInTermH("flatpak uninstall "+name.split(" ").pop());
-        else executable.execInTermH("sudo pacman -R "+name);
+        else executable.execInTermH(plasmoid.configuration.usePamacInstead ? ("pamac remove "+name):("sudo pacman -R "+name));
     }
     function action_installOne(name, source) {
-        if( plasmoid.configuration.allowSingleModification === 0 ) {
+        if( plasmoid.configuration.allowSingleModification === 1 ) {
             main.showAllowSingularModifications = true;
             return;
         }
         if( source === "FLATPAK" ) executable.execInTermA("flatpak update "+name.split(" ").pop());
-        else if( source === "" ) executable.execInTermA("sudo pacman -S "+name);
+        else if( source === "" ) executable.execInTermA(plasmoid.configuration.usePamacInstead ? ("pamac install "+name):("sudo pacman -S "+name));
         else executable.execInTermA(aur+" -S "+name);
     }
     function action_showInfo(name, source) {
         if( source == "FLATPAK" ) executable.execInTermH("flatpak info "+name.split(" ").pop());
-        else executable.execInTermH("pacman -Qii "+name)
+        else executable.execInTermH(plasmoid.configuration.usePamacInstead ? ("pamac info "+name):("pacman -Qii "+name))
     }
     function action_checkForUpdates() {
         if( main.isUpdating || stillUpdating > 0 ) return;
@@ -231,13 +244,10 @@ Sound=message-new-instant.ogg`
 
         if( plasmoid.configuration.useFlatpak ) executable.exec( flatpakFetchCommand ); else stillUpdating --;
         if( plasmoid.configuration.useAUR     ) executable.exec( aur+" -Qua");          else stillUpdating--;
-        if( !plasmoid.configuration.useAUR || (plasmoid.configuration.useAUR && aur !== 'pacaur' && aur !== 'aura') ) executable.exec(`checkupdates | while IFS= read -r line; do
-                echo -n "$line"
-                pacman -Si $(echo "$line" | awk '{print $1}') | awk 'NR==1' | awk -F':' '{print $2}'
-            done
-                                    `);        else stillUpdating --;
+        if( !plasmoid.configuration.useAUR || (plasmoid.configuration.useAUR && aur !== 'pacaur' && aur !== 'aura') ) executable.exec(plasmoid.configuration.usePamacInstead ? pamacFetchCommand : pacmanFetchCommand);
+        else stillUpdating --;
     }
     function action_clearOrphans() {
-        executable.execInTermA("sudo pacman -Rns $(pacman -Qtdq)");
+        executable.execInTermA(plasmoid.configuration.usePamacInstead ? "pamac remove -o":"sudo pacman -Rns $(pacman -Qtdq)");
     }
 }

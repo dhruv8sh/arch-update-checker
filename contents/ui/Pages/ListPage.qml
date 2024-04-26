@@ -6,7 +6,7 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
-import "../Full/" as Full
+import "../Common/" as Common
 
 ColumnLayout {
     id: listPage
@@ -31,17 +31,22 @@ ColumnLayout {
         Layout.fillWidth: true
         type: Kirigami.MessageType.Warning
         icon.name: "data-warning"
-        text: i18n("Updating single packages is blocked by default due HIGH RISK OF SYSTEM BREAKAGE.\nDo you want to enable this?")
-        visible: main.showAllowSingularModifications
-        showCloseButton: true
+        text: i18n("Updating single packages is blocked by default due HIGH RISK OF SYSTEM BREAKAGE.\nYou have been warned.\nDo you want to enable this?")
+        visible: showAllowSingularModifications
         actions: [
             Kirigami.Action {
                 text: i18nc("@action:button", "Allow")
-                onTriggered: plasmoid.configuration.allowSingleModification = 2
+                onTriggered: {
+                    plasmoid.configuration.allowSingleModification = 2
+                    showAllowSingularModifications = false
+                }
             },
             Kirigami.Action {
                 text: i18nc("@action:button", "Don't Allow")
-                onTriggered: plasmoid.configuration.allowSingleModification = 1
+                onTriggered: {
+                    plasmoid.configuration.allowSingleModification = 0
+                    showAllowSingularModifications = false
+                }
             }
         ]
     }
@@ -53,14 +58,17 @@ ColumnLayout {
         icon.name: "data-error"
         text: main.error
         visible: main.error != ""
-        showCloseButton: true
+        actions: Kirigami.Action {
+            text: i18nc("@action:button","Clear")
+            onTriggered: error = ""
+        }
     }
     Kirigami.InlineMessage {
         id: managerNotFoundMessage
         Layout.fillWidth: true
         type: Kirigami.MessageType.Information
         icon.name: "dialog-information"
-        text: i18n("Flatpak was not found! It is now disabled.")
+        text: i18n("Flatpak was not found! It is now disabled. ")+"<html><a href=\"https://flathub.org/setup\">Flathub Setup</a></html>"
         onLinkActivated: Qt.openUrlExternally("https://flathub.org/setup")
         visible: main.wasFlatpakDisabled
         showCloseButton: true
@@ -77,13 +85,13 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         visible: !main.isUpdating
-        contentWidth: availableWidth - (contentItem.leftMargin + contentItem.rightMargin + 1)
+        contentWidth: availableWidth //- (contentItem.leftMargin + contentItem.rightMargin + 18)
         contentItem: ListView {
             id: packageView
-            topMargin: pausedMessage.visible ? 0 : Kirigami.Units.smallSpacing * 2
-            bottomMargin: Kirigami.Units.smallSpacing * 2
-            leftMargin: Kirigami.Units.smallSpacing * 2
-            rightMargin: Kirigami.Units.smallSpacing * 2
+            // topMargin: Kirigami.Units.smallSpacing * 2
+            // bottomMargin: Kirigami.Units.smallSpacing * 2
+            // leftMargin: Kirigami.Units.smallSpacing * 2
+            // rightMargin: Kirigami.Units.smallSpacing * 2
             spacing: Kirigami.Units.smallSpacing
             model: filterModel
             currentIndex: -1
@@ -91,12 +99,10 @@ ColumnLayout {
             highlight: PlasmaExtras.Highlight { }
             highlightMoveDuration: 0
             highlightResizeDuration: 0
-            delegate: Full.PackageItem {
+            delegate: Common.PackageItem {
                 showSeparator: index !== 0
-                width: packageView.width - Kirigami.Units.smallSpacing * 4
-                // height: 70
+                width: packageView.width //- Kirigami.Units.smallSpacing * 4
             }
-            // Placeholder message
             Loader {
                 anchors.centerIn: parent
                 width: parent.width - (Kirigami.Units.largeSpacing * 4)
@@ -113,8 +119,8 @@ ColumnLayout {
     PlasmaComponents.BusyIndicator {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.topMargin: 150
-        Layout.bottomMargin: 150
+        Layout.topMargin: width / 3
+        Layout.bottomMargin: width / 3
         visible: main.isUpdating
     }
 }

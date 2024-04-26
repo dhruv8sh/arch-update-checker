@@ -34,8 +34,10 @@ MouseArea {
         }
     }
     Kirigami.Icon {
+        id: updateIcon
         source: "update-none"
         active: mouseArea.containsMouse
+        color: error === "" ? Kirigami.Theme.textColor : Kirigami.Theme.negativeTextColor
         activeFocusOnTab: true
         anchors.fill: parent
     }

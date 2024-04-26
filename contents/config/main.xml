@@ -6,7 +6,7 @@
   <kcfgfile name="archupdatechecker"/>
 
   <group name="Pacman">
-    <entry name="usePamac"   type="Bool"><default>false</default></entry>
+    <entry name="usePamacInstead"   type="Bool"><default>false</default></entry>
     <entry name="useAUR"     type="Bool"><default>true </default></entry>
     <entry name="useFlatpak" type="Bool"><default>false</default></entry>
     <entry name="aurWrapper"   type="String"><default>paru</default></entry>
@@ -25,6 +25,91 @@
     <entry name="dotColor"  type="Color"><default>white</default></entry>
     <entry name="textColor" type="Color"><default>black</default></entry>
     <entry name="packageSeparator" type="String"><default>→</default></entry>
+    <entry name="useCustomIcons" type="Bool"><default>true</default></entry>
+    <entry name="customIcons" type="String">
+      <default>name > heroic-games-launcher... > heroic
+name > obs-studio > com.obsproject.Studio
+name > vlc > vlc
+name > kpipewire > speaker
+name > blender > blender
+name > akonadi-calendar-tools > view-calendar
+name > akonadi-import-wizard > kontact-import-wizard
+name > angelfish > org.kde.angelfish
+name > steam > steam
+name > steam-native-runtime > steam
+name > spotify > spotify
+name > spotify-adblock > spotify
+name > code > com.visualstudio.code
+name > linux... > preferences-system-linux
+name > visual-studio-code... > com.visualstudio.code
+name > plasma6-applet... > node-add
+name > wireplumber... > speaker
+name > pipewire... > speaker
+name > wayland... > preferences-desktop-display
+name > nvidia... > cpu
+name > intel... > cpu
+name > amd... > cpu
+name > mesa... > cpu
+name > wine... > wine
+name > proton... > wine
+name > python... > pythonbackend
+name > firefox... > firefox
+name > lua... > luabackend
+name > jre... > folder-java-symbolic
+name > jdk... > folder-java-symbolic
+name > openjdk... > folder-java-symbolic
+name > ttf-... > font
+name > xorg... > xorg
+name > emacs... > emacs
+name > vim... > gvim
+name > neovi... > neovim
+name > thunderbird-... > org.mozilla.Thunderbird
+name > perl... > application-x-perl
+name > appimagelauncher... > AppImageLauncher
+name > google... > im-google
+name > telegram... > telegram
+name > dropbox... > dropboxstatus-logo
+group > rhvoice > text-speak
+group > texlive > texcompiler
+group > texlive-lang > texcompiler
+group > plasma > ~
+group > kde-applications > kde-symbolic
+group > arch-linux-tools > preferences-system-linux
+group > kde-accessibility > kaccess
+group > kde-education > applications-education
+group > kde-games > applications-games
+group > kde-graphics > applications-graphics
+group > kde-multimedia > applications-multimedia
+group > kde-network > applications-network
+group > kde-office > applications-office
+group > kde-pim > view-pim-mail
+group > kde-system > applications-system
+group > kde-utilities > applications-utilities
+group > kdesdk > kdesrc-build
+group > kdevelop > kdevelop
+group > kf5 > kde-frameworks
+group > kf6 > kde-frameworks
+group > kf5-aids > kde-frameworks
+group > kf6-aids > kde-frameworks
+group > qt5 > qtlogo
+group > qt6 > qtlogo
+group > arduino > cpu
+group > gnome-extra > preferences-gtk-config
+group > gnome > preferences-gtk-config
+group > firefox-addons > firefox
+group > linux-tools > preferences-system-linux
+group > xorg > xorg
+group > xorg-apps > xorg
+group > xorg-drivers > xorg
+group > xorg-fonts > xorg
+source > flatpak > flatpak-discover
+source > core > show-gpu-effects
+source > extra > view-multiple-objects-symbolic
+source > multilib > vcs-branch
+source > aur > distribute-randomize
+name > ... > server-database
+      </default>
+    </entry>
   </group>
 
 
@@ -48,7 +133,7 @@
     <entry name="showBadgeAlways" type="Bool"><default>false</default></entry>
     <entry name="showIntro"       type="Bool"><default>true </default></entry>
 <!--     <entry name="showIntroAlways" type="Bool"><default>true </default></entry> -->
-    <entry name="allowSingleModification" type="Int" ><default>0</default></entry>
+    <entry name="allowSingleModification" type="Int" ><default>1</default></entry>
 
 
     <!--  HIDDEN UTILITY SETTINGS    -->

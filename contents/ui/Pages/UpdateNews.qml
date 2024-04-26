@@ -7,8 +7,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponents
 import org.kde.kirigami as Kirigami
 import QtQml.XmlListModel
-import "../Full/" as Full
-
+import "../Common/" as Common
 ColumnLayout {
     // height: parent.height
     property int kind: 2
@@ -31,15 +30,18 @@ ColumnLayout {
         contentWidth: availableWidth
         contentItem: ListView {
             id: content
-            width: 180; height: 300
             model: feedModel
             currentIndex: -1
+            // topMargin: Kirigami.Units.smallSpacing * 2
+            // bottomMargin: Kirigami.Units.smallSpacing * 2
+            // leftMargin: Kirigami.Units.smallSpacing * 2
+            // rightMargin: Kirigami.Units.smallSpacing * 2
             spacing: Kirigami.Units.smallSpacing
             boundsBehavior: Flickable.StopAtBounds
             highlight: PlasmaExtras.Highlight { }
-            highlightMoveDuration: 1000
-            highlightResizeDuration: 1000
-            delegate: Full.NewsItem {
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
+            delegate: Common.NewsItem {
                 title: head
                 link: hyperlink
                 desc: description;
@@ -51,8 +53,8 @@ ColumnLayout {
     PlasmaComponents.BusyIndicator {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.topMargin: 150
-        Layout.bottomMargin: 150
+        Layout.topMargin: width / 3
+        Layout.bottomMargin: width / 3
         visible: content.model.count == 0
     }
 }

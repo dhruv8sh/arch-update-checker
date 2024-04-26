@@ -51,7 +51,6 @@ MouseArea {
                 readonly property bool isContent: index % 2
                 elide: isContent ? Text.ElideRight : Text.ElideNone
                 font: Kirigami.Theme.smallFont
-                horizontalAlignment: isContent ? Text.AlignLeft : Text.AlignRight
                 text: isContent ? details[index] : `${details[index]}:`
                 textFormat: Text.PlainText
                 opacity: isContent ? 1 : 0.6

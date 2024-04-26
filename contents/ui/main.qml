@@ -6,7 +6,6 @@ import org.kde.plasma.components as PlasmaComponent
 import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.notification
 import "./Compact/" as Compact
-import "./Full/" as Full
 
 PlasmoidItem {
   id: main
@@ -14,7 +13,7 @@ PlasmoidItem {
   property string title: title
   property alias isNotPaused: timer.running
   compactRepresentation: Compact.CompactRepresentation { }
-  fullRepresentation:  Intro{}
+  fullRepresentation:  Full{}
 
   ListModel { id: packageModel }
   property bool isUpdating: false
@@ -56,8 +55,8 @@ PlasmoidItem {
       eventId: "sound"
       title: {
         let diff = packageModel.count - plasmoid.configuration.lastCount;
-        if( diff == packageModel.count || diff < 0 ) return packageModel.count + " updates available!"
-        else if( diff > 0 ) return "+"+diff+" new updates available! \n Total: "+packageModel.count;
+        if( diff > 0 ) return "+"+diff+" new updates available! \n Total: "+packageModel.count;
+        else return packageModel.count + " updates available!"
       }
   }
   Component.onCompleted : {

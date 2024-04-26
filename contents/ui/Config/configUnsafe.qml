@@ -11,9 +11,12 @@ Kirigami.ScrollablePage {
     property alias cfg_debugCommands    : debugCommands.checked
     property alias cfg_showBadgeAlways  : showBadgeAlways.checked
     property alias cfg_showIntro        : showIntroAgain.checked
+    property alias cfg_allowSingleModification : singleChange.checkState
     ColumnLayout {
         Kirigami.InlineMessage {
-            text: i18n("These flags are used to either debug the application or are experimental!")
+            text: i18n("These flags are used to either debug the applet or are experimental!")
+            Layout.fillWidth: true
+            visible: true
         }
         Kirigami.FormLayout {
             QQC2.CheckBox {
@@ -41,9 +44,10 @@ Kirigami.ScrollablePage {
                 Kirigami.FormData.isSection: true
             }
             QQC2.CheckBox {
-                id: allowSingleModification
+                id: singleChange
                 Kirigami.FormData.label: i18n("NOT RECOMMENDED\nUSE AT YOUR OWN RISK\nYou have been warned!:")
                 text: i18n("Allow updating/uninstalling single native packages.")
+                tristate: true
             }
         }
     }

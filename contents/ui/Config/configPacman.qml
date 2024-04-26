@@ -7,12 +7,12 @@ import "../Pages/" as Pages
 
 Kirigami.ScrollablePage {
     id: root
-    property alias cfg_usePamac      : usePamac.checked
-    property alias cfg_useAUR        : useAUR.checked
-    property alias cfg_useFlatpak    : useFlatpak.checked
-    property alias cfg_aurWrapper    : aurWrapper.value
-    property alias cfg_aurFlags      : aurFlags.text
-    property alias cfg_flatpakFlags  : flatpakFlags.text
+    property alias cfg_usePamacInstead : usePamac.checked
+    property alias cfg_useAUR          : useAUR.checked
+    property alias cfg_useFlatpak      : useFlatpak.checked
+    property alias cfg_aurWrapper      : aurWrapper.value
+    property alias cfg_aurFlags        : aurFlags.text
+    property alias cfg_flatpakFlags    : flatpakFlags.text
 
     Kirigami.FormLayout {
         anchors.fill: parent
@@ -20,8 +20,7 @@ Kirigami.ScrollablePage {
             id: usePamac
             Kirigami.FormData.label: i18n("Use `pamac`:")
             text: "pacman "+i18n("will not be used")
-            visible: false
-            // onCheckedChanged: {}
+            visible: true
         }
 
         Item {
