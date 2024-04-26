@@ -46,6 +46,7 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 - [x] Support for Arch Linux Update News
 - [ ] (1/2) Support for mirrorlist update
 - [x] Support for alacritty and kitty
+- [x] Support for pamac
 - [ ] Snap support
 
 
