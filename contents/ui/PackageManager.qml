@@ -118,10 +118,11 @@ Item{
                 echo "$ans" | awk 'NR==8' | awk -F':' '{print $2}'
 
             done`;
-    property string pamacFetchCommand: `pamac checkupdates | while IFS= read -r line; do
+    property string pamacFetchCommand: `pamac-checkupdates | while IFS= read -r line; do
                 echo -n "$line"
-                echo pamac info $(echo "$line" | awk '{print $1}') | awk 'NR==9' | awk -F':' '{print $2}'
-
+                ans=$(pamac info $(echo "$line" | awk '{print $1}'))
+                echo -n "$(echo "$ans" | grep Repository | awk -F':' '{print $2}') "
+                echo "$ans" | grep Groups | awk -F':' '{print $2}'
             done`
     function fillDetailsFor(name, source) {
         if( source === "FLATPAK" ) executable.exec("flatpak info "+name.split(" ").pop());
