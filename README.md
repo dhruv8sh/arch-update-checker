@@ -1,4 +1,4 @@
-# Arch Update Notifier
+# Arch Update Checker
 A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 
 ## Screenshots
@@ -38,7 +38,7 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
   - [x] Flatpak details on expand
   - [x] Ask for modifying singular updates
   - [ ] (8/10) Better error handling
-  - [ ] (1/2) Extensive logging support
+  - [x] Extensive logging support
 - [x] Notification on update
   - [x] Basic Support
   - [x] Native Support
