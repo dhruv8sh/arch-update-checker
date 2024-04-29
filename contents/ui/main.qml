@@ -24,6 +24,7 @@ PlasmoidItem {
   property bool showAllowSingularModifications: false
   property bool showNotification: false
   property string outputText: ''
+  property var cfg: plasmoid.configuration
   signal clearProperties();
   signal pop();
   // signal sendErrorSignal(errorCode, error);

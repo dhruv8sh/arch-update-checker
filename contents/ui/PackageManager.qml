@@ -9,7 +9,7 @@ Item{
     property string startMessage: `--------------------- Arch Update Checker by dhruv8sh ---------------------`;
     property string endMessage  : `------------------------------ Process Ended ------------------------------`
     Plasma5Support.DataSource {
-        id: "executable"
+        id: executable
         engine: "executable"
         connectedSources: []
         onNewData:function(sourceName, data){
@@ -101,22 +101,19 @@ Item{
         "Commit",
         "Date"];
     property string flatpakFetchCommand: `upd=$(flatpak remote-ls --columns=name,application,version --app --updates | \
-                            sed 's/ /-/g' | sed 's/\t/ /g')
-                            output=""
-                            if [ -n "$upd" ]; then
-                                while IFS= read -r app; do
-                                    id=$(echo "$app" | awk '{print $2}')
-                                    ver=$(flatpak info "$id" | grep "Version:" | awk '{print $2}')
-                                    output+="$(echo "$app $ver\n")"
-                                done <<< "$upd"
-                            fi
-                            echo -en "$output"`;
-    property string pacmanFetchCommand: `checkupdates | while IFS= read -r line; do
-                echo -n "$line"
-                ans=$(pacman -Si $(echo "$line" | awk '{print $1}'))
-                echo -n "$(echo "$ans" | awk 'NR==1' | awk -F':' '{print $2}') "
-                echo "$ans" | awk 'NR==8' | awk -F':' '{print $2}'
-
+                sed 's/ /-/g' | sed 's/\t/ /g')
+                output=""
+                if [ -n "$upd" ]; then
+                    while IFS= read -r app; do
+                        id=$(echo "$app" | awk '{print $2}')
+                        ver=$(flatpak info "$id" | grep "Version:" | awk '{print $2}')
+                        output+="$(echo "$app $ver\n")"
+                    done <<< "$upd"
+                fi
+                echo -en "$output"`;
+    property string pacmanFetchCommand: `checkupdates --nocolor | while IFS= read -r line; do
+                ans=$(pacman -Si $(echo "$line" | awk '{print $1}') | tr '\n' ^)
+                echo "$line^$ans" &
             done`;
     property string pamacFetchCommand: `pamac-checkupdates | while IFS= read -r line; do
                 echo -n "$line"
@@ -184,7 +181,8 @@ Item{
     }
     function notificationInstall() {
         let notifypath= '~/.local/share/knotifications6/archupdatechecker.notifyrc'
-        let notifycontent= `[Global]
+        let notifycontent= `
+[Global]
 IconName=update-none
 Comment=Arch Update Checker
 
