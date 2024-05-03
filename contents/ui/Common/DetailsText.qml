@@ -7,8 +7,7 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.components as PlasmaComponents
 
 MouseArea {
-    height: detailsGrid.implicitHeight
-    property var details : ["","","","","","","","","","","","","","","","","","","","","","",]
+    property var details : []
     acceptedButtons: Qt.RightButton
     onPressed: mouse => {
         const item = detailsGrid.childAt(mouse.x, mouse.y);
@@ -34,8 +33,12 @@ MouseArea {
             text: i18n("Copy \'Name - New Version\'")
             icon: "edit-copy"
             enabled: contextMenu.text !== ""
-            onClicked: clipboard.content = PackageName + " - " + ToVersion
+            onClicked: clipboard.content = Name + " - " + ToVersion
         }
+    }
+    onDetailsChanged: {
+        height = details.length * 8
+        implicitHeight= details.length * 8
     }
     GridLayout {
         id: detailsGrid
@@ -49,11 +52,12 @@ MouseArea {
             PlasmaComponents.Label {
                 Layout.fillWidth: true
                 readonly property bool isContent: index % 2
-                elide: isContent ? Text.ElideRight : Text.ElideNone
                 font: Kirigami.Theme.smallFont
                 text: isContent ? details[index] : `${details[index]}:`
                 textFormat: Text.PlainText
                 opacity: isContent ? 1 : 0.6
+                wrapMode: header ? Text.NoWrap : Text.WordWrap
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
     }

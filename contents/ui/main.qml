@@ -5,6 +5,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.components as PlasmaComponent
 import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.notification
+import "../Util.js" as Util
 import "./Compact/" as Compact
 
 PlasmoidItem {
@@ -16,20 +17,27 @@ PlasmoidItem {
   fullRepresentation:  Full{}
 
   ListModel { id: packageModel }
+  PackageManager{ id: packageManager }
+
   property bool isUpdating: false
   property bool hasUserSeen: false
   property var details: []
   property string error: ""
   property bool wasFlatpakDisabled: false
-  property bool showAllowSingularModifications: false
+  property bool showAllowSingleModifications: false
   property bool showNotification: false
   property string outputText: ''
   property var cfg: plasmoid.configuration
+  property string sourceList : ""
   signal clearProperties();
   signal pop();
+  signal fetchAllDetails();
+  signal bruh();
   // signal sendErrorSignal(errorCode, error);
-
-  PackageManager{ id: packageManager }
+  Connections {
+    target: main
+    function bruh(){ console.log("Bruh") }
+  }
 
   toolTipMainText: i18n("Arch Update Checker")
   toolTipSubText: i18n("Updates available: "+packageModel.count)
@@ -47,7 +55,7 @@ PlasmoidItem {
     onTriggered: {
       hasUserSeen = false
       showNotification = true
-      packageManager.action_checkForUpdates()
+      Util.action_searchForUpdates()
     }
   }
   Notification {
@@ -60,22 +68,22 @@ PlasmoidItem {
         else return packageModel.count + " updates available!"
       }
   }
-  Component.onCompleted : {
+  Component.onCompleted : () => {
     hasUserSeen = false;
-    packageManager.notificationInstall()
-    if( plasmoid.configuration.searchOnStart )
-      packageManager.action_checkForUpdates()
+    Util.action_notificationInstall()
+    if( cfg.searchOnStart )
+      Util.action_searchForUpdates()
   }
   Plasmoid.contextualActions: [
       PlasmaCore.Action {
           text: i18n("Update System")
           icon.name: "install-symbolic"
-          onTriggered: packageManager.action_updateSystem()
+          onTriggered: Util.action_updateSystem()
       },
       PlasmaCore.Action {
           text: i18n("Check for Updates")
           icon.name: "view-refresh"
-          onTriggered: packageManager.action_checkForUpdates()
+          onTriggered: Util.action_searchForUpdates()
       }
     ]
 }

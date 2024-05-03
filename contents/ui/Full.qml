@@ -65,6 +65,6 @@ PlasmaExtras.Representation {
     }
     Connections {
         target: main
-        onPop: stack2.pop();
+        function onPop(){ stack2.pop();}
     }
 }

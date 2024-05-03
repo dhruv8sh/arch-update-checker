@@ -5,11 +5,11 @@ import org.kde.plasma.components as PlasmaComponents
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
 import org.kde.ksvg as KSvg
+import "../../Util.js" as Util
 
 PlasmaExtras.ExpandableListItem {
     id: packageItem
     property bool showSeparator
-    property var localDataCache
     icon: {
         if( !plasmoid.configuration.useCustomIcons ) return "server-database"
         let ans = "";
@@ -35,36 +35,27 @@ PlasmaExtras.ExpandableListItem {
         return ans;
     }
     title: PackageName
-    // listItemTitle.textFormat: Text.RichText
     allowStyledText: true
     subtitle: "<b>"+Source+"</b>   |   " + FromVersion + plasmoid.configuration.packageSeparator + ToVersion
     defaultActionButtonAction: Action {
-        id: singleInstallButton
-        icon.name: "run-install"
-        text: i18n("Update")
-        onTriggered: packageManager.action_installOne(PackageName,Source)
-        enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingleModification != 0
-    }
+            text: i18n("More Info")
+            icon.name: "showinfo"
+            onTriggered: Util.action_showDetailedInfo(Source === "FLATPAK"?ToVersion:PackageName,Source)
+        }
     contextualActions: [
         Action {
-            text: i18n("Show more information")
-            icon.name: "showinfo"
-            onTriggered: packageManager.action_showInfo(Source === "FLATPAK"?ToVersion:PackageName,Source)
+            id: singleInstallButton
+            icon.name: "run-install"
+            text: i18n("Update")
+            onTriggered: Util.action_installOne(PackageName,Source)
+            enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingleModification != 0
         },
         Action {
             text: i18n("Uninstall")
             icon.name: "uninstall"
-            onTriggered: packageManager.action_uninstall(Source === "FLATPAK"?ToVersion:PackageName,Source)
+            onTriggered: Util.action_uninstall(Source === "FLATPAK"?ToVersion:PackageName,Source)
         }
     ]
-
-    Connections{
-        target: main
-        function onClearProperties(){
-            collapse()
-            localDataCache = undefined
-        }
-    }
 
     KSvg.SvgItem {
         id: separatorLine
@@ -79,12 +70,7 @@ PlasmaExtras.ExpandableListItem {
     }
     customExpandedViewContent: DetailsText{
         id: detailsText
-        details: {
-            if( localDataCache ) return localDataCache
-            packageManager.fillDetailsFor(Source === "FLATPAK"?ToVersion:PackageName,Source)
-            humanMomentTimer.start()
-            return ["","","","","","","","","","","","","","","","","","","","","",""];
-        }
+        details: Util.fetchDetails(PackageName, Source)
     }
     Timer{
         id: humanMomentTimer
