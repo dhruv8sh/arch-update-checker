@@ -134,7 +134,7 @@ name > ... > server-database
     <entry name="debugNormal"     type="Bool"><default>false</default></entry>
     <entry name="debugCommands"   type="Bool"><default>false</default></entry>
     <entry name="showBadgeAlways" type="Bool"><default>false</default></entry>
-    <entry name="showIntro"       type="Bool"><default>false </default></entry>
+    <entry name="showIntro"       type="Bool"><default>true </default></entry>
 <!--     <entry name="showIntroAlways" type="Bool"><default>true </default></entry> -->
     <entry name="allowSingleModification" type="Int" ><default>1</default></entry>
 

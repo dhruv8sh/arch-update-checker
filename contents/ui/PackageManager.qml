@@ -25,7 +25,7 @@ Plasma5Support.DataSource {
 
     function exec(cmd, callback) {
         listeners[cmd] = execCallback.bind(executable, callback)
-        console.log("running command:"+cmd)
+	if(cfg.debugCommands)console.log("running command:"+cmd)
         connectSource(cmd)
     }
 

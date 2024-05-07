@@ -1,300 +1,279 @@
-// -------------------------------- UI functions ------------------------------
-function searching() {
-    timer.stop()
-    error = ""
-    isUpdating = true
-    packageModel.clear()
-    wasFlatpakDisabled = false
-    showAllowSingleModifications = false
+//function for UI
+function searching(message, icon) {
+	timer.stop()
+	error = ""
+	isUpdating = true
+	statusMessage = message
+	statusIcon = icon
+	wasFlatpakDisabled = false
+	showAllowSingleModifications = false
 }
-function stopSearching() {
-    timer.start()
-    isUpdating = false
+function stopSearch(){
+	timer.start()
+	isUpdating = false
+	if( packageModel.count == 0 ) {
+		statusMessage = ""
+		statusIcon    = ""
+	} else {
+		statusMessage = packageModel.count + i18n(" updates available")
+		statusIcon    = "update-none"
+	}
+}
+function fetchIcon(PackageName, Source, Group) {
+	if( !plasmoid.configuration.useCustomIcons ) return "server-database"
+	let ans = "";
+	const tempname = PackageName.startsWith("lib") ? PackageName.substring(3) : PackageName
+	let lines = plasmoid.configuration.customIcons.split('\n');
+	for (let line of lines) {
+		let info = line.split('>');
+		if (info.length < 3) continue; // Use continue instead of return
+		let type = info[0].trim();
+		let name = info[1].trim();
+		let tempans = info[2].trim();
+		if (type === "name" && (name === tempname || (name.endsWith('...') && tempname.startsWith(name.substring(0, name.length - 3))))) {
+			ans = tempans;
+			break;
+		} else if (type === "source" && name === Source.toLowerCase()) {
+			ans = tempans;
+			break;
+		} else if (type === "group" && name === Group.toLowerCase()) {
+			ans = tempans === "~" ? tempname : tempans;
+			break;
+		}
+	}
+	return ans;
 }
 
-
-// --------------------------------- Util functions ----------------------------
-function usePacmanTag(tag) {
-    return true;
+//Util functions
+function action_searchForUpdates() {
+	searching("Checking internet connection","speedometer")
+	const flatpakCmd = `flatpak remote-ls --updates | awk '{print $2}' | while read -r appref; do flatpak info "$appref"; echo "--------------"; done`;
+	packageManager.exec("ping -c 1 google.com > /dev/null",(source, stdout, stderr, errcode) => {
+		if( stderr === "" ) {
+			packageModel.clear();
+			fetchPacmanUpdates();
+		}
+		else {
+			stopSearch();
+			error = "Problems connecting to the internet";
+		}
+	});
+	function fetchPacmanUpdates() {
+		let cmd ="| awk '{print $1}' | pacinfo"; 
+		if( cfg.usePamacInstead ) cmd = "pamac checkupdates " + cmd
+		else cmd = "checkupdates --nocolor " + cmd
+		searching("Checking Arch Repositories...","package");
+		packageManager.exec(cmd,(source, stdout, stderr, errcode) => {
+			let details = stdout.trim().split("\n\n");
+			for( let x = 0; x < details.length; x += 2 )
+				pacmanFetchFromPacinfo(details[x].trim().split('\n'), details[x+1].trim().split('\n'));
+			fetchAURUpdates();
+		});
+	}
+	function fetchAURUpdates() {
+		let cmd
+		if( cfg.aurWrapper==="trizen"||cfg.aurWrapper==="pikaur") cmd = cfg.aurWrapper+" -Qua --color never | sort";
+		else cmd = cfg.aurWrapper+" -Qum --color never | sort "
+		searching("Checking Arch User Repositories...","package");
+		if( cfg.useAUR ) packageManager.exec(cmd,(source, stdout, stderr, errcode) => {
+			if( cfg.aurWrapper === "pacaur" ) cmd += " | awk '{print $3}' | pacinfo";
+			else cmd += " | awk '{print $1}' | pacinfo";
+			packageManager.exec(cmd,(source2, stdout2, stderr2, errcode2) => {
+				let names = stdout.trim().split('\n');
+				let details = stdout2.trim().split("\n\n");
+				if( details[0].trim().length != 0 )
+				for( let x = 0; x < details.length; x++ ){
+					if( cfg.aurWrapper === "pacaur" ) aurFetchFromPacinfo(names[x].split(/\s+/)[5],details[x].split('\n'));
+					else aurFetchFromPacinfo(names[x].split(/\s+/)[3],details[x].split('\n'));
+				}
+				fetchFlatpakUpdates();
+			});
+		}); else fetchFlatpakUpdates();
+	}
+	function fetchFlatpakUpdates() {
+		searching("Checking Flatpak for updates...","flatpak-discover");
+		if(cfg.useFlatpak) packageManager.exec(flatpakCmd,(source, stdout, stderr, errcode) => {
+			let lines = stdout.split('--------------');
+			lines.forEach(flatpakFetchFromInfo);
+			stopSearch();
+		}); else stopSearch();
+	}
+	function flatpakFetchFromInfo(infolines) {
+		if( infolines.trim().length === 0 ) return;
+		infolines = infolines.split('\n');
+		infolines.shift();
+		let name = infolines[0].substring(0,infolines[0].indexOf('-')).trim();
+		let desc = infolines[0].substring(infolines[0].indexOf('-')+1).trim();
+		let version, description = "", id;
+		infolines.shift();
+		infolines.forEach( line => {
+			if( line.trim().length > 0 ){
+			const tag = line.substring(0,line.indexOf(':')).trim();
+			const value = line.substring(line.indexOf(':')+1).trim();
+			switch( tag ) {
+				case "ID"      : id      = value; break;
+				case "Version" : version = value; break;
+				default: description += tag+":"+value+"\n"; break;
+			}}
+		});
+		packageModel.append({
+			"PackageName": name,
+			"FromVersion": id,
+			"ToVersion"  : version,
+			"Source"     : "FLATPAK",
+			"Group"      : "None",
+			"Desc"       : "Description:"+desc+"\n"+description,
+			"URL"        : "https://flathub.org/apps/"+id
+		});
+	}
+	function aurFetchFromPacinfo(to, infolist) {
+		let name, from, group, description = "", url, licenses="", requires="", optionaldeps="", provides="";
+		infolist.forEach(line=>{
+			const tag   = line.substring(0,line.indexOf(':')).trim();
+			const value = line.substring(line.indexOf(':')+1).trim();
+			switch( tag ) {
+				case "Name": name = value; break;
+				case "Version": from = value; break;
+				case "URL": url = value; break;
+				case "Description":
+				case "Packager":
+				case "Download Size":
+				case "Installed Size":
+				case "Architecture":description+= tag+":"+value+"\n"; break;
+				case "Licenses": licenses += value + " "; break;
+				case "Requires": requires += value + " "; break;
+				case "Optional Deps": optionaldeps += value + " "; break;
+				case "Provides": provides += value + " "; break;
+			}
+		});
+		packageModel.append({
+			"PackageName": name,
+			"FromVersion": from,
+			"ToVersion"  : to,
+			"Source"     : "AUR",
+			"Group"      : "None",
+			"Desc"       : description,
+			"URL"        : url
+		});
+	}
+	function pacmanFetchFromPacinfo(local, repo) {
+		let name, from, to, source, group, description = "", url, licenses="", requires="", optionaldeps="", provides="";
+		local.forEach(line=>{
+			const info = line.split(":");
+			if( info.length > 1 && info[0].trim() === "Version" ) from = info[1].trim();
+		});
+		repo.forEach(line=>{
+			if( line.trim().length > 1 ){
+				const tag  = line.substring(0, line.indexOf(':'))
+				const value= line.substring(line.indexOf(':')+1).trim()
+				switch( tag ) {
+					case "Name": name = value; break;
+					case "Groups": group = value; break;
+					case "Version": to = value; break;
+					case "Repository": source = value; break;
+					case "URL": url = value; break;
+					case "Description":
+					case "Packager":
+					case "Download Size":
+					case "Installed Size":
+					case "Architecture":description+= tag+":"+value+"\n"; break;
+					case "Licenses": licenses += value + " "; break;
+					case "Requires": requires += value + " "; break;
+					case "Optional Deps": optionaldeps += value + " "; break;
+					case "Provides": provides += value + " "; break;
+				}
+			}
+		});
+		description += (licenses.length>0?"Licenses:" + licenses + '\n':"") + (requires.length>0?"Requires:" + requires + '\n':"")
+		description += (optionaldeps.length>0?"Optional Deps:" + optionaldeps + '\n':"") + (provides.length>0?"Provides:" + provides:"")
+		//console.log(description);
+		packageModel.append({
+			"PackageName": name,
+			"FromVersion": from,
+			"ToVersion"  : to,
+			"Source"     : source.toUpperCase(),
+			"Group"      : group?group:"None",
+			"Desc"       : description,
+			"URL"        : url
+		});
+	}
 }
-function useFlatpakTag(tag) {
-    return true;
+function action_updateSystem() {
+	//change this
+	searching("Updating system","akonadiconsole")
+	let command = ""
+	if( cfg.useCustomInstall ) execInTerminal(cfg.customScript, cfg.holdTerminal, true)
+	if( cfg.useAUR ) command = cfg.aurWrapper == "pamac" ? "pamac upgrade ": cfg.aurWrapper + " -Syu "
+	else command = "sudo pacman -Syu "
+	command += cfg.aurFlags+"; "
+	if( cfg.useFlatpak ) command += "flatpak update "+cfg.flatpakFlags+";"
+	execInTerminal(command, cfg.holdTerminal, true)
+}
+function action_clearOrphans() {
+	let command = ""
+	if( cfg.useAUR && aurWrapper === "pamac") command = "pamac remove -o";
+	else if( cfg.useAUR ) 			  command = `${cfg.aurWrapper} -Rns $(${cfg.aurWrapper} -Qtdq)`;
+	else 					  command = "sudo pacman -Rns $(pacman -Qtdq)";
+	command += ';'
+	execInTerminal(command, true, true)
+}
+function action_installOne(name, source) {
+	if( cfg.showAllowSingleModifications == 1 ){
+		showAllowSingleModifications = true;
+		return;
+	}
+	let command = ""
+	if( source === "FLATPAK" ) command = "flatpak update " + name
+	else if( source === "AUR") command = cfg.aurWrapper+" -S " + name
+	else                       command = "sudo pacman -S " + name
+	command += ';'
+	execInTerminal(command, true, true)
+}
+function action_showDetailedInfo(name, source) {
+	let command = ""
+	if( source === "FLATPAK" )  command = "flatpak info "+name;
+	else if( source === "AUR" ) command = cfg.aurWrapper+" -Sii "+name
+	else 			    command = "pacman -Sii "+name
+	command += ';'
+	execInTerminal(command, true, false)
+}
+function action_uninstall(source, name) {
+	let command = ""
+	if( source === "FLATPAK" ) command = "sudo flatpak uninstall "+name;
+	else if( source === "AUR" )command = cfg.aurWrapper+" -R "+name
+	else command = "sudo pacman -R "+name
+	execInTerminal(command, true, false)
+}
+function action_notificationInstall() {
+	let notifypath= '~/.local/share/knotifications6/archupdatechecker.notifyrc'
+	let notifycontent= `
+	[Global]
+	IconName=update-none
+	Comment=Arch Update Checker
+
+	[Event/sound]
+	Name=Sound popup
+	Comment=Popup and Sound options enabled
+	Action=Popup|Sound
+	Sound=message-new-instant.ogg`
+	packageManager.exec("mkdir -p ~/.local/share/knotifications6/",(source,stdout,stderr,code)=>{})
+	packageManager.exec("echo \'"+notifycontent+"\' > "+notifypath,(source,stdout,stderr,code)=>{})
 }
 function execInTerminal( cmd, hold, searchAfter ) {
-    const startMessage = `
+	const startMessage = `
 ###############################################################################
 ############################# Arch Update Checker #############################
 ########################################################## by dhruv8sh ########`
-    const endMessage = `
+	const endMessage = `
 ###############################################################################
 #############################    Process Ended    #############################
 ###############################################################################`
-    let termCmd  = cfg.terminal + ` -e bash -c 'trap "" SIGINT; echo "${startMessage}"; ${cmd}; echo "${endMessage}";`
-    if( hold ) termCmd += `read -p "Press Any Key to exit...";'`
-    else termCmd += `'`
-    packageManager.exec(termCmd,(source,stdout,stderr,errcode)=>{
-        if( searchAfter ) action_searchForUpdates();
-    })
+	let termCmd  = cfg.terminal + ` -e bash -c 'trap "" SIGINT; echo "${startMessage}"; ${cmd} echo "${endMessage}";`
+	if( hold ) termCmd += `read -n 1 -p "Press Any Key to exit...";'`
+	else termCmd += `'`
+	packageManager.exec(termCmd,(source,stdout,stderr,errcode)=>{
+		console.log("errorlog:"+stderr);
+		if( searchAfter ) action_searchForUpdates();
+	})
 }
 
-
-function isConnectedToInternet() {
-    let ans = true
-    packageManager.exec("ping -c 1 google.com > /dev/null",(source,stdout,stderr,errcode)=>{
-        if(stderr !== "")
-            createErrorPredefined(0, null)
-            ans = false
-    })
-    return ans
-
-}
-function createErrorPredefined(kind, errcode, errinfo) {
-    switch(kind) {
-        case 0: error = "Internet Connection error! Fetching local updates."; break;
-        case 1: error = "Problem with pacman!\n"+errinfo;break;
-        case 2: error = "Problem with pamac!\n"+errinfo;break;
-        case 3: error = "Problem with "+cfg.aurWrapper+"!\n"+errinfo;break;
-        case 4: error = "Problem with flatpak!\n"+errinfo;break;
-        default: error = "Unknown error\n"+errinfo;break;
-    }
-}
-function getGenericDescription(name, source) {
-    let ans = []
-    const cmd = `data=${source} -Si ${name}
-    repo=echo $data | grep Repository | awk -F ':' {print $2}
-    groups=echo $data | grep Groups | awk -F ':' {print $2}
-    echo "$repo"
-    echo "$groups"
-    echo "$data"
-    `
-    packageManager.exec("pacman -Si "+name,(source,stdout,stderr,errcode)=>{
-        ans[0] = stdout.substring(0, stdout.indexOf("\n"))
-        stdout = stdout.substring(stdout.indexOf("\n"))
-        ans[1] = stdout.substring(0, stdout.indexOf("\n"))
-        ans[2] = stdout.substring(stdout.indexOf("\n"))
-    })
-    return ans
-}
-function getPamacDescription(name) {
-    const cmd = `data=pamac info ${name}
-    groups=$(echo $data | grep Groups | awk -F':' '{print $2}')
-    echo "$groups"
-    echo "$data"`
-    let ans = []
-    packageManager.exec(cmd,(source,stdout,stderr,errcode)=>{
-        ans[0] = stdout.substring(0, stdout.indexOf("\n"))
-        ans[1] = stdout.substring(input.indexOf("\n")+1)
-    })
-    return ans
-}
-function getPacaurDescription(name) {
-    const cmd = `data=pacaur -Si ${name}
-    echo "$data"`
-    let ans = ""
-    packageManager.exec(cmd,(source,stdout,stderr,errcode)=>{
-        ans = stdout
-    })
-    return ans
-}
-function fetchPacaur( data, source ) {
-    const lines = data.split('\n');
-    lines.shift();
-    for( let index in lines ) {
-        if( lines[index].trim().length == 0 ) continue;
-        const info = lines[index].split(/\s+/);
-        const group = info[6].substring(1,info[6].length-1).split(' ')[0];
-        packageManager.exec("pacman -Si "+info[0], (sourceName, stdout, stderr, code)=>{
-            let lines = stdout.split('\n');
-            let details = []
-            let source2 = ""
-            let group = ""
-            lines.forEach(line => {
-                if( line.trim().length > 0 ) {
-                    const info = line.split(": ")
-                    const tag = info[0].trim()
-                    if( usePacmanTag(tag) ) {
-                        details.push(tag);
-                        details.push(info[1].trim());
-                    }
-                }
-                packageModel.append({
-                    "PackageName"  : info[0],
-                    "FromVersion"  : info[1],
-                    "ToVersion"    : info[3],
-                    "Source"       : info[4],
-                    "Group"        : group,
-                    "Desc"         : details
-                });
-            });
-        });
-    }
-}
-function fetchPamac( data, source ) {
-    const lines = data.split('\n');
-    for( let index in lines ) {
-        if( lines[index].trim().length == 0 ) continue;
-        const info = lines[index].split(/\s+/);
-        packageModel.append({
-            "PackageName"  : info[0],
-            "FromVersion"  : info[1],
-            "ToVersion"    : info[3],
-            "Source"       : info[4],
-            "Group"        : group
-        });
-    }
-}
-function fetchGeneric( data, source ) {
-    const lines = data.split('\n');
-    for( let index in lines ) {
-        if( lines[index].trim().length == 0 ) continue;
-        const info = lines[index].split(/\s+/);
-        packageManager.exec("pacman -Si "+info[0],(source,stdout,stderr,errcode)=>{
-            let details = []
-            let detailLines = stdout.split("\n")
-            detailLines.forEach(line=>{
-                const data = line.split(": ");
-
-            });
-        }
-        packageModel.append({
-            "PackageName"  : info[0],
-            "FromVersion"  : info[1],
-            "ToVersion"    : info[3],
-            "Source"       : fetch,
-            "Group"        : group
-        });
-    }
-}
-function fetchDetails(name, source) {
-    var details = []
-    if( source === "FLATPAK" ) packageManager.exec("pacman -Si "+PackageName, (sourceName, stdout, stderr, code)=>{
-        let lines = stdout.split('\n');
-        lines.shift()
-        details.push("Description")
-        details.push(lines[0].substring(lines[0].indexOf(' - ')+3))
-        lines.shift()
-        lines.shift()
-        lines.forEach( line => {
-            const info = line.split("  : ")
-            const tag = info[0].trim()
-            details.push(info[0].trim());
-            details.push(info[1].trim());
-        });
-    });
-    else packageManager.exec("pacman -Qi "+PackageName, (sourceName, stdout, stderr, code)=>{
-        let lines = stdout.split('\n');
-        lines.forEach( line => {
-            const info = line.split(": ")
-            const tag = info[0].trim()
-            details.push(tag);
-            details.push(info[1].trim());
-        });
-    });
-    return details;
-}
-function action_searchForUpdates() {
-    searching()
-    let doubleUpdate = false;
-    if( isConnectedToInternet()){
-        doubleUpdate = cfg.useFlatpak;
-        console.log("Connected to internet")
-        if( cfg.useAUR ) checkAUR();
-        else checkPacman();
-        if( cfg.useFlatpak ) checkFlatpak();
-    }
-    //we pre-fetch source list so its faster to fetch packages
-    // function fetchSourceList() { packageManager.exec("pacman -Sl | grep installed",(source,stdout,stderr,errcode)=>{ sourceList = stdout } }
-    function checkPacman() {
-        packageManager.exec("checkupdates",(source,stdout,stderr,errcode)=>{
-            if( stdout == "" && stderr != "" ) createErrorPredefined(1,stderr);
-            else fetchGeneric(stdout,"pacman")
-            if( doubleUpdate ) doubleUpdate = false;
-            else stopSearching()
-        })
-    }
-    function checkAUR() {
-        if( cfg.aurWrapper === "pamac" ) packageManager.exec("pamac checkupdates",(source,stdout,stderr,errcode) => {
-            if( stdout == "" && stderr != "" ) createErrorPredefined(2,stderr);
-            else fetchPamac(stdout)
-            if( doubleUpdate ) doubleUpdate = false
-            else stopSearching()
-        })
-        else if( cfg.aurWrapper === "pacaur" ) packageManager.exec("pacaur -Qu",(source,stdout,stderr,errcode)=>{
-            if( stdout == "" && stderr != "" ) createErrorPredefined(2,stderr);
-            else fetchPacaur(stdout)
-            if( doubleUpdate ) doubleUpdate = false
-            else stopSearching()
-        })
-        else packageManager.exec(cfg.aurWrapper + " -Qu",(source,stdout,stderr,errcode) => {
-            if( stdout == "" && stderr != "" ) createErrorPredefined(3,stderr);
-            else fetchGeneric(stdout, cfg.aurWrapper)
-            if( doubleUpdate ) doubleUpdate = false
-            else stopSearching()
-        })
-    }
-    function checkFlatpak(){
-        packageManager.exec("checkupdates",(source,stdout,stderr,errcode) => {
-            if( stdout == "" && stderr != "" ) createErrorPredefined(4,stderr);
-            else fetchFlatpak(stdout)
-            if( doubleUpdate ) doubleUpdate = false
-            stopSearching()
-        })
-    }
-}
-function action_updateSystem() {
-    //change this
-    searching()
-    let command = ""
-    if( cfg.useAUR ) command = cfg.aurWrapper == "pamac" ? "pamac upgrade ": cfg.aurWrapper + " -Syu "
-    else command = "sudo pacman -Syu "
-    command += cfg.aurFlags+"; "
-    if( cfg.useFlatpak ) command += "flatpak update "+cfg.flatpakFlags+""
-    execInTerminal(command, cfg.holdTerminal, true)
-}
-function action_clearOrphans() {
-    let command = ""
-    if( cfg.useAUR && aurWrapper === "pamac") command = "pamac remove -o";
-    else if( cfg.useAUR ) command = `${cfg.aurWrapper} -Rns $(${cfg.aurWrapper} -Qtdq)`;
-    else command = "sudo pacman -Rns $(pacman -Qtdq)";
-    execInTerminal(command, true, true)
-}
-function action_installOne(name, source) {
-    if( cfg.showAllowSingleModifications == 1 ){
-        showAllowSingleModifications = true;
-        return;
-    }
-    let command = ""
-    if( source === "FLATPAK" ) command = "flatpak update " + name
-    else if( source === "AUR") command = cfg.aurWrapper+" -S " + name
-    else                       command = "sudo pacman -S " + name
-    execInTerminal(command, true, true)
-}
-function action_showDetailedInfo(name, source) {
-    let command = ""
-    if( source === "FLATPAK" ) command = "flatpak info "+name;
-    else if( source === "AUR" )command = cfg.aurWrapper+" -Sii "+name
-    else command = "pacman -Sii "+name
-    execInTerminal(command, true, false)
-}
-function action_uninstall(source, name) {
-    let command = ""
-    if( source === "FLATPAK" ) command = "flatpak uninstall "+name;
-    else if( source === "AUR" )command = cfg.aurWrapper+" -R "+name
-    else command = "pacman -R "+name
-    execInTerminal(command, true, false)
-}
-function action_notificationInstall() {
-    let notifypath= '~/.local/share/knotifications6/archupdatechecker.notifyrc'
-        let notifycontent= `
-[Global]
-IconName=update-none
-Comment=Arch Update Checker
-
-[Event/sound]
-Name=Sound popup
-Comment=Popup and Sound options enabled
-Action=Popup|Sound
-Sound=message-new-instant.ogg`
-        packageManager.exec("mkdir -p ~/.local/share/knotifications6/",(source,stdout,stderr,code)=>{})
-        packageManager.exec("echo \'"+notifycontent+"\' > "+notifypath,(source,stdout,stderr,code)=>{})
-}

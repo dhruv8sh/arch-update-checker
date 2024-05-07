@@ -7,8 +7,9 @@ import org.kde.plasma.extras as PlasmaExtras
 import org.kde.plasma.components as PlasmaComponents
 
 MouseArea {
-    property var details : []
+    required property var details
     acceptedButtons: Qt.RightButton
+    height: detailsGrid.height + Kirigami.Units.mediumSpacing
     onPressed: mouse => {
         const item = detailsGrid.childAt(mouse.x, mouse.y);
         if (!item || !item.isContent) {
@@ -36,29 +37,36 @@ MouseArea {
             onClicked: clipboard.content = Name + " - " + ToVersion
         }
     }
-    onDetailsChanged: {
-        height = details.length * 8
-        implicitHeight= details.length * 8
-    }
-    GridLayout {
+    ColumnLayout {
         id: detailsGrid
-        width: parent.width
-        columns: 2
-        rows: 12
-        rowSpacing: Kirigami.Units.smallSpacing / 4
+	width: parent.width
+        spacing: Kirigami.Units.smallSpacing / 4
         Repeater {
             id: repeater
             model: details
-            PlasmaComponents.Label {
-                Layout.fillWidth: true
-                readonly property bool isContent: index % 2
-                font: Kirigami.Theme.smallFont
-                text: isContent ? details[index] : `${details[index]}:`
-                textFormat: Text.PlainText
-                opacity: isContent ? 1 : 0.6
-                wrapMode: header ? Text.NoWrap : Text.WordWrap
-                onLinkActivated: Qt.openUrlExternally(link)
-            }
+	    RowLayout{
+	    	Layout.fillWidth: true
+            	PlasmaComponents.Label {
+                	font: Kirigami.Theme.smallFont
+                	text: details[index].split(':')[0] + ':'
+                	textFormat: Text.PlainText
+			width: detailsGrid.width*0.2
+			Layout.minimumWidth: width
+			Layout.alignment: Qt.AlignTop
+			horizontalAlignment: Text.AlignRight
+                	opacity: 0.6
+            	}
+            	PlasmaComponents.Label {
+                	Layout.fillWidth: true
+			Layout.alignment: Qt.AlignTop
+                	font: Kirigami.Theme.smallFont
+                	text: details[index].split(':')[1]
+			elide: Text.ElideRight
+                	textFormat: Text.PlainText
+                	//wrapMode: Text.WordWrap
+                	onLinkActivated: Qt.openUrlExternally(link)
+            	}
+	    }
         }
     }
 }

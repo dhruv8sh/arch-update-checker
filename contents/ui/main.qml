@@ -29,6 +29,8 @@ PlasmoidItem {
   property string outputText: ''
   property var cfg: plasmoid.configuration
   property string sourceList : ""
+  property string statusMessage: ""
+  property string statusIcon: ""
   signal clearProperties();
   signal pop();
   signal fetchAllDetails();
