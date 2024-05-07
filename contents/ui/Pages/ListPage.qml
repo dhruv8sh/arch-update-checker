@@ -20,7 +20,7 @@ ColumnLayout {
         type: Kirigami.MessageType.Warning
         icon.name: "media-playback-paused-symbolic"
         text: i18n("Not searching for updates automatically")
-        visible: !main.isNotPaused
+        visible: !main.isNotPaused && !isUpdating
         actions: Kirigami.Action {
             text: i18nc("@action:button", "Resume")
             onTriggered: main.isNotPaused = true
@@ -32,7 +32,7 @@ ColumnLayout {
         type: Kirigami.MessageType.Warning
         icon.name: "data-warning"
         text: i18n("Updating single packages is blocked by default due HIGH RISK OF SYSTEM BREAKAGE.\nYou have been warned.\nDo you want to enable this?")
-        visible: showAllowSingularModifications
+        visible: showAllowSingleModifications
         actions: [
             Kirigami.Action {
                 text: i18nc("@action:button", "Allow")
@@ -44,7 +44,7 @@ ColumnLayout {
             Kirigami.Action {
                 text: i18nc("@action:button", "Don't Allow")
                 onTriggered: {
-                    plasmoid.configuration.allowSingleModification = 0
+                    cfg.allowSingleModification = 0
                     showAllowSingularModifications = false
                 }
             }

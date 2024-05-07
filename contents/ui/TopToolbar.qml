@@ -6,6 +6,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.extras as PlasmaExtras
 import QtQuick.Controls as QQC2
+import "../Util.js" as Util
 
 StackLayout {
     property string headName: ""
@@ -31,7 +32,7 @@ StackLayout {
             PlasmaComponents.Switch {
                 id: pauseButton
                 icon.name: "media-playback-pause"
-                checked: !main.isNotPaused
+                checked: !main.isNotPaused && !isUpdating
                 onToggled: main.isNotPaused = !checked
                 PlasmaComponents.ToolTip { text: i18n("Pause Updates") }
             }
@@ -39,7 +40,7 @@ StackLayout {
                 id: searchButton
                 icon.name: "view-refresh"
                 onClicked: {
-                    packageManager.action_checkForUpdates()
+                    Util.action_searchForUpdates()
                     main.hasUserSeen = true
                 }
                 PlasmaComponents.ToolTip { text: i18n("Check for updates") }
@@ -49,7 +50,7 @@ StackLayout {
                 icon.name: "install"
                 onClicked: {
                     localTooltip.visible = !visible
-                    packageManager.action_updateSystem()
+                    Util.action_updateSystem()
                 }
                 PlasmaComponents.ToolTip {
                     id: localTooltip

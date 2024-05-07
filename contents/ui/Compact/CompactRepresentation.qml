@@ -4,6 +4,7 @@ import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents
+import "../../Util.js" as Util
 
 MouseArea {
     id: mouseArea
@@ -12,11 +13,11 @@ MouseArea {
     hoverEnabled: true
     onPressed: wasExpanded = expanded
     onClicked: mouse => {
-        if (mouse.button == Qt.MiddleButton) packageManager.action_updateSystem()
+        if (mouse.button == Qt.MiddleButton) Util.action_updateSystem()
         else {
             expanded = !wasExpanded;
             if( expanded && plasmoid.configuration.searchOnExpand && main.hasUserSeen )
-                packageManager.action_checkForUpdates();
+                Util.action_searchForUpdates();
             if( !plasmoid.configuration.rememberState )
                 main.pop();
             main.hasUserSeen = true

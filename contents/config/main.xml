@@ -69,6 +69,9 @@ name > appimagelauncher... > AppImageLauncher
 name > google... > im-google
 name > telegram... > telegram
 name > dropbox... > dropboxstatus-logo
+name > kitty > kitty
+name > kitty-terminfo > kitty
+name > kitty-shell-integration > kitty
 group > rhvoice > text-speak
 group > texlive > texcompiler
 group > texlive-lang > texcompiler

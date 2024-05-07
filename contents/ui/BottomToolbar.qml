@@ -3,25 +3,26 @@ import QtQuick.Layouts
 import QtQuick.Controls as QQC2
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents
+import "../Util.js" as Util
 
 StackLayout {
     // spacing: 0
     Layout.fillWidth: true
     RowLayout {
+    	Kirigami.Icon {
+	    source: statusIcon
+	    opacity: 0.7
+	}
         QQC2.Label {
             Layout.alignment: Qt.AlignLeft
             Layout.fillWidth: true
-            text: {
-                if( packageModel.count == 0 ) return "";
-                else if( packageModel.count == 1 ) return packageModel.count + " update available"
-                else return packageModel.count + " updates available"
-            }
+            text: statusMessage
             opacity: 0.7
         }
         PlasmaComponents.ToolButton {
             id: clearOrphansButton
             icon.name: "node-delete"
-            onClicked: packageManager.action_clearOrphans()
+            onClicked: Util.action_clearOrphans()
             PlasmaComponents.ToolTip { text: i18n("Clear orphans") }
         }
         PlasmaComponents.ToolButton {
@@ -60,7 +61,7 @@ StackLayout {
                     plasmoid.configuration.showIntro = false;
                     stack2.clear();
                     stack2.push("Pages/ListPage.qml");
-                    packageManager.action_checkForUpdates();
+                    Util.action_searchForUpdates();
                 }
             }
         }
