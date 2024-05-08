@@ -7,7 +7,7 @@ import org.kde.plasma.components as PlasmaComponents
 import "../../Util.js" as Util
 
 MouseArea {
-    id: mouseArea
+    id: compact
     property bool wasExpanded: false
     acceptedButtons: Qt.LeftButton | Qt.MiddleButton
     hoverEnabled: true
@@ -37,7 +37,7 @@ MouseArea {
     Kirigami.Icon {
         id: updateIcon
         source: "update-none"
-        active: mouseArea.containsMouse
+        active: compact.containsMouse
         color: error === "" ? Kirigami.Theme.textColor : Kirigami.Theme.negativeTextColor
         activeFocusOnTab: true
         anchors.fill: parent

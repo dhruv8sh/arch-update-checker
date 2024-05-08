@@ -16,6 +16,7 @@ Kirigami.ScrollablePage {
     property alias cfg_textColor: textColor.color
     property alias cfg_useCustomColors: customColors.checked
     property alias cfg_badgePosition: badgePositionItem.position
+    property alias cfg_useBadgeNumber: useBadgeNumber.checked
     property alias cfg_packageSeparator: sprtrText.text
     property alias cfg_customIcons: customIconList.text
     property alias cfg_useCustomIcons: useCustomIcons.checked
@@ -119,6 +120,7 @@ Kirigami.ScrollablePage {
             }
             ColumnLayout {
                 visible: customColors.checked
+                enabled: useBadgeNumber.checked
                 KQuickControls.ColorButton {
                     Layout.alignment: Qt.AlignCenter
                     id: textColor
@@ -127,6 +129,11 @@ Kirigami.ScrollablePage {
                     text: i18n("Text color")
                 }
             }
+        }
+        Common.CustomSwitch{
+            id: useBadgeNumber
+            text:i18n("Show text on badge")
+            icon:"draw-number"
         }
         QQC2.Label {}
         RowLayout {

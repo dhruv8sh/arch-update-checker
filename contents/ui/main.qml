@@ -31,22 +31,14 @@ PlasmoidItem {
   property string sourceList : ""
   property string statusMessage: ""
   property string statusIcon: ""
-  signal clearProperties();
   signal pop();
-  signal fetchAllDetails();
-  signal bruh();
-  // signal sendErrorSignal(errorCode, error);
-  Connections {
-    target: main
-    function bruh(){ console.log("Bruh") }
-  }
 
   toolTipMainText: i18n("Arch Update Checker")
   toolTipSubText: i18n("Updates available: "+packageModel.count)
-  Plasmoid.status: (packageModel.count >= plasmoid.configuration.activeAmount || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
+  Plasmoid.status: (packageModel.count >= cfg.activeAmount || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
   Item{
     id: config
-    property int interval: plasmoid.configuration.pollInterval * 1000 * 60
+    property int interval: cfg.pollInterval * 1000 * 60
   }
 
   Timer {
@@ -65,16 +57,25 @@ PlasmoidItem {
       componentName: "archupdatechecker"
       eventId: "sound"
       title: {
-        let diff = packageModel.count - plasmoid.configuration.lastCount;
+        let diff = packageModel.count - cfg.lastCount;
         if( diff > 0 ) return "+"+diff+" new updates available! \n Total: "+packageModel.count;
         else return packageModel.count + " updates available!"
       }
   }
+  Timer {
+    id: startupTimer
+    interval: 5000
+    onTriggered: {
+      isUpdating = true
+      Util.action_searchForUpdates()
+    }
+    running: false
+    repeat: false
+  }
   Component.onCompleted : () => {
     hasUserSeen = false;
     Util.action_notificationInstall()
-    if( cfg.searchOnStart )
-      Util.action_searchForUpdates()
+    if( cfg.searchOnStart ) startupTimer.start()
   }
   Plasmoid.contextualActions: [
       PlasmaCore.Action {
