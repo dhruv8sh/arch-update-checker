@@ -65,6 +65,7 @@ function action_searchForUpdates() {
 		searching("Checking Arch Repositories...","package");
 		packageManager.exec(cmd,(source, stdout, stderr, errcode) => {
 			let details = stdout.trim().split("\n\n");
+			if( details[0].trim().length != 0 )
 			for( let x = 0; x < details.length; x += 2 )
 				pacmanFetchFromPacinfo(details[x].trim().split('\n'), details[x+1].trim().split('\n'));
 			fetchAURUpdates();
@@ -94,6 +95,7 @@ function action_searchForUpdates() {
 		searching("Checking Flatpak for updates...","flatpak-discover");
 		if(cfg.useFlatpak) packageManager.exec(flatpakCmd,(source, stdout, stderr, errcode) => {
 			let lines = stdout.split('--------------');
+			if( lines[0].trim().length != 0 )
 			lines.forEach(flatpakFetchFromInfo);
 			stopSearch();
 		}); else stopSearch();
