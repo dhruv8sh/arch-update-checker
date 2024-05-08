@@ -5,22 +5,22 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 
 <div align="center">
 <p>
-
-![Screenshot_20240405_002625](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/395a88d8-2d40-46fb-84d3-01be429edb5f)<br/>
+  
+![Screenshot_20240508_142812](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/aebae6ed-d075-4a8c-b5ee-57de7fe6c1c7)<br/>
 <i>Available updates view</i>
 <br/><br/>
 </p>
 
 <p>
-
-![Screenshot_20240405_002649](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/c5d726d4-a769-4dba-918b-06e921650e5e)<br/>
+  
+![Screenshot_20240508_143330](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/5edb0542-12f2-40e2-8cb8-1faa348b96ff)<br/>
 <i>Arch Linux Update News</i>
 <br/><br/>
 </p>
 
 <p>
 
-![image](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/7ff8ae04-e257-4214-b0ed-d468f1410b54)<br/>
+![Screenshot_20240508_143537](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/91ee7d25-54fd-4191-b65e-51533aa27f8e)<br/>
 <i>Setup screen</i>
 
 <br/><br/>
