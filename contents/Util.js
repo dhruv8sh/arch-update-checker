@@ -61,9 +61,9 @@ function action_searchForUpdates() {
 		}
 	});
 	function fetchPacmanUpdates() {
-		let cmd = cfg.usePamacInstead ? "pamac checkupdates | sort" : "checkupdates --nocolor | sort";
+		let cmd = cfg.usePamacInstead ? "pamac checkupdates" : "checkupdates --nocolor";
 		searching("Checking Arch Repositories...","package");
-		packageManager.exec(cmd,(_source, stdout, _stderr, _errcode) => {
+		packageManager.exec(cmd+" | sort",(_source, stdout, _stderr, _errcode) => {
 			cmd += " | awk '{print $1}' | pacinfo";
 			packageManager.exec(cmd,(_source2, stdout2, _stderr2, _errcode2) => {
 				let names = stdout.trim().split('\n');
@@ -71,6 +71,7 @@ function action_searchForUpdates() {
 				if( details[0].trim().length > 3 && names.length > 3 )
 				for( let x = 0; x < names.length; x++ ){
 					let namedetails = names[x].split(/\s+/);
+					if( details[2*x+1] && namedetails.length > 3 )
 					pacmanFetchFromPacinfo(namedetails[0],namedetails[1],namedetails[3],details[2*x+1].split('\n'));
 				}
 				fetchAURUpdates();
