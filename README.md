@@ -27,7 +27,6 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 </p>
 
 </div>
-
 ## Todo
 - [x] Support for YAY, Trizen, Paru and Pikaur
 - [x] Flatpak Support
@@ -51,11 +50,15 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 
 
 ## Installation
+
+#### Recommended
+Install using ```Get New Widgets...``` functionality natively available in Plasma.
+
+#### Currently Borked
 ```
 git clone https://github.com/dhruv8sh/arch-update-checker/
 cd arch-update-checker
 kpackagetool6 -i .
 ```
-If ```kpackagetool6``` does not work use ```plasmapkg2``` instead.
-Or just use the plasma "Download new widget" functionality
+If ```kpackagetool6``` does not work use ```plasmapkg2``` instead if you still have Plasma Framework 5.
 
