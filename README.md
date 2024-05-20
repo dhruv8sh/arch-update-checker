@@ -27,6 +27,7 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 </p>
 
 </div>
+
 ## Todo
 - [x] Support for YAY, Trizen, Paru and Pikaur
 - [x] Flatpak Support
