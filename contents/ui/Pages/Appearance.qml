@@ -9,117 +9,112 @@ import org.kde.kquickcontrols as KQuickControls
 import org.kde.kirigami as Kirigami
 import "../Common/" as Common
 
-Kirigami.ScrollablePage {
-    id: appearancePage
-    property int kind: 1
-    readonly property int margins: Kirigami.Units.gridUnit
-    title: i18nc("@title", "Appearance")
-    topPadding: 0
-    leftPadding: margins
-    rightPadding: margins
-    bottomPadding: margins
-    ColumnLayout {
-        anchors.fill: parent
-        PlasmaExtras.Heading {
-            Layout.alignment: Qt.AlignCenter
-            text: i18n("\nAppearance Settings\n")
-            wrapMode: Text.WordWrap
-        }
-        PlasmaExtras.Heading {
-            Layout.alignment: Qt.AlignCenter
-            text: i18n("Indicator Position")
-            wrapMode: Text.WordWrap
-            level: 2
-        }
-        Item {
-            clip: false
-            Layout.alignment: Qt.AlignCenter
-            Layout.minimumWidth : 100
-            Layout.minimumHeight: 100
-            QQC2.RadioButton{
-                anchors.left: parent.right
-                anchors.top: parent.top
-                LayoutMirroring.enabled: true
-                text: i18n("Top-Left")
-                checked: plasmoid.configuration.badgePosition == 0
-                onCheckedChanged: {
-                    if( checked ) plasmoid.configuration.badgePosition = 0;
-                }
-            }
-            QQC2.RadioButton{
-                anchors.left: parent.right
-                anchors.top: parent.top
-                text: i18n("Top-Right")
-                checked: plasmoid.configuration.badgePosition == 1
-                onCheckedChanged: {
-                    if( checked ) plasmoid.configuration.badgePosition = 1;
-                }
-            }
-            Kirigami.Icon {
-                height: 100
-                width: 100
-                anchors.centerIn: parent
-                source: "update-none-symbolic"
-            }
-            QQC2.RadioButton{
-                anchors.left: parent.right
-                anchors.bottom: parent.bottom
-                LayoutMirroring.enabled: true
-                checked: plasmoid.configuration.badgePosition == 2
-                onCheckedChanged: {
-                    if( checked ) plasmoid.configuration.badgePosition = 2;
-                }
-                text: i18n("Bottom-Left")
-            }
-            QQC2.RadioButton{
-                anchors.left: parent.right
-                anchors.bottom: parent.bottom
-                checked: plasmoid.configuration.badgePosition == 3
-                onCheckedChanged: {
-                    if( checked ) plasmoid.configuration.badgePosition = 3;
-                }
-                text: i18n("Bottom-Right")
-            }
-        }
-        PlasmaExtras.Heading {
-            Layout.alignment: Qt.AlignCenter
-            text: i18n("\nVersion Seperator")
-            wrapMode: Text.WordWrap
-            level: 2
-        }
-        QQC2.TextField{
-            id: sprtrText
-            horizontalAlignment: TextInput.AlignHCenter
-            Layout.alignment: Qt.AlignCenter
-            text: plasmoid.configuration.packageSeparator
-            onTextChanged: plasmoid.configuration.packageSeparator = text
-        }
-        QQC2.Label{
-            Layout.alignment: Qt.AlignCenter
-            text: "v6.9"+sprtrText.text+"v9.6\n"
-        }
-        RowLayout{
-            Layout.alignment: Qt.AlignCenter
-            Common.CustomSwitch{
-                text:i18n("Custom Colors")
-                icon:"settings-configure"
-                checked: plasmoid.configuration.useCustomColors
-                onCheckedChanged: {
-                    plasmoid.configuration.useCustomColors = checked
-                }
-            }
-            KQuickControls.ColorButton {
-                id: dotColor
-                visible: plasmoid.configuration.useCustomColors
-                color: plasmoid.configuration.dotColor
-                onColorChanged: plasmoid.configuration.dotColor = color
-            }
-            KQuickControls.ColorButton {
-                id: textColor
-                visible: plasmoid.configuration.useCustomColors
-                color: plasmoid.configuration.textColor
-                onColorChanged: plasmoid.configuration.textColor = color
-            }
-        }
-    }
+Common.CustomPage {
+	id: appearancePage
+	kind: 1
+	title: i18nc("@title", "Appearance")
+	heading: "Appearance Settings"
+	subtitle: ""
+	anchors.fill: parent
+	PlasmaExtras.Heading {
+		Layout.alignment: Qt.AlignCenter
+		text: i18n("\nAppearance Settings\n")
+		wrapMode: Text.WordWrap
+	}
+	PlasmaExtras.Heading {
+		Layout.alignment: Qt.AlignCenter
+		text: i18n("Indicator Position")
+		wrapMode: Text.WordWrap
+		level: 2
+	}
+	Item {
+		clip: false
+		Layout.alignment: Qt.AlignCenter
+		Layout.minimumWidth : 100
+		Layout.minimumHeight: 100
+		QQC2.RadioButton{
+		anchors.left: parent.right
+		anchors.top: parent.top
+		LayoutMirroring.enabled: true
+		text: i18n("Top-Left")
+		checked: plasmoid.configuration.badgePosition == 0
+		onCheckedChanged: {
+			if( checked ) plasmoid.configuration.badgePosition = 0;
+		}
+	}
+	QQC2.RadioButton{
+		anchors.left: parent.right
+		anchors.top: parent.top
+		text: i18n("Top-Right")
+		checked: plasmoid.configuration.badgePosition == 1
+		onCheckedChanged: {
+			if( checked ) plasmoid.configuration.badgePosition = 1;
+		}
+	}
+	Kirigami.Icon {
+		height: 100
+		width: 100
+		anchors.centerIn: parent
+		source: "update-none-symbolic"
+	}
+	QQC2.RadioButton{
+		anchors.left: parent.right
+		anchors.bottom: parent.bottom
+		LayoutMirroring.enabled: true
+		checked: plasmoid.configuration.badgePosition == 2
+		onCheckedChanged: {
+			if( checked ) plasmoid.configuration.badgePosition = 2;
+		}
+		text: i18n("Bottom-Left")
+	}
+	QQC2.RadioButton{
+		anchors.left: parent.right
+		anchors.bottom: parent.bottom
+		checked: plasmoid.configuration.badgePosition == 3
+		onCheckedChanged: {
+			if( checked ) plasmoid.configuration.badgePosition = 3;
+		}
+		text: i18n("Bottom-Right")
+		}
+	}
+	PlasmaExtras.Heading {
+		Layout.alignment: Qt.AlignCenter
+		text: i18n("\nVersion Seperator")
+		wrapMode: Text.WordWrap
+		level: 2
+	}
+	QQC2.TextField{
+		id: sprtrText
+		horizontalAlignment: TextInput.AlignHCenter
+		Layout.alignment: Qt.AlignCenter
+		text: plasmoid.configuration.packageSeparator
+		onTextChanged: plasmoid.configuration.packageSeparator = text
+	}
+	QQC2.Label{
+		Layout.alignment: Qt.AlignCenter
+		text: "v6.9"+sprtrText.text+"v9.6\n"
+	}
+	RowLayout{
+		Layout.alignment: Qt.AlignCenter
+		Common.CustomSwitch{
+			text:i18n("Custom Colors")
+			icon:"settings-configure"
+			checked: plasmoid.configuration.useCustomColors
+			onCheckedChanged: {
+				plasmoid.configuration.useCustomColors = checked
+			}
+		}
+		KQuickControls.ColorButton {
+			id: dotColor
+			visible: plasmoid.configuration.useCustomColors
+			color: plasmoid.configuration.dotColor
+			onColorChanged: plasmoid.configuration.dotColor = color
+		}
+		KQuickControls.ColorButton {
+			id: textColor
+			visible: plasmoid.configuration.useCustomColors
+			color: plasmoid.configuration.textColor
+			onColorChanged: plasmoid.configuration.textColor = color
+		}
+	}
 }

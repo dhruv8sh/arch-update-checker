@@ -31,6 +31,7 @@ PlasmoidItem {
   property string sourceList : ""
   property string statusMessage: ""
   property string statusIcon: ""
+  property string downloadSize: "0 B"
   signal pop();
 
   toolTipMainText: i18n("Arch Update Checker")
@@ -40,7 +41,6 @@ PlasmoidItem {
     id: config
     property int interval: cfg.pollInterval * 1000 * 60
   }
-
   Timer {
     id: timer
     interval: config.interval

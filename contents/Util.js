@@ -15,7 +15,7 @@ function stopSearch(){
 		statusMessage = ""
 		statusIcon    = ""
 	} else {
-		statusMessage = packageModel.count + i18n(" updates available")
+		statusMessage = packageModel.count + i18n(" updates available")+" ("+downloadSize+")"
 		statusIcon    = "update-none"
 	}
 }
@@ -49,7 +49,12 @@ function fetchIcon(PackageName, Source, Group) {
 //Util functions
 function action_searchForUpdates() {
 	searching("Checking internet connection","speedometer")
-	const flatpakCmd = `flatpak remote-ls --updates | awk '{print $2}' | while read -r appref; do flatpak info "$appref"; echo "--------------"; done`;
+	const flatpakCmd = `flatpak remote-ls --updates --columns=application,download-size | while read -r updateline; do
+    		id=$(echo "$updateline" | awk '{print $1}')
+    		flatpak info "$id"
+    		size=$(echo "$updateline" | awk '{print $2}')
+    		echo "Download Size: $size"
+	done`;
 	packageManager.exec("ping -c 1 google.com > /dev/null",(_source, _stdout, stderr, _errcode) => {
 		if( stderr === "" ) {
 			packageModel.clear();
@@ -60,6 +65,7 @@ function action_searchForUpdates() {
 			error = "Problems connecting to the internet";
 		}
 	});
+	downloadSize = "0 B"
 	function fetchPacmanUpdates() {
 		let cmd = cfg.usePamacInstead ? "pamac checkupdates" : "checkupdates --nocolor";
 		searching("Checking Arch Repositories...","package");
@@ -69,11 +75,11 @@ function action_searchForUpdates() {
 				let names = stdout.trim().split('\n');
 				let details = stdout2.trim().split("\n\n");
 				if( details[0].trim().length > 3 && names.length > 3 )
-				for( let x = 0; x < names.length; x++ ){
-					let namedetails = names[x].split(/\s+/);
-					if( details[2*x+1] && namedetails.length > 3 )
-					pacmanFetchFromPacinfo(namedetails[0],namedetails[1],namedetails[3],details[2*x+1].split('\n'));
-				}
+					for( let x = 0; x < names.length; x++ ){
+						let namedetails = names[x].split(/\s+/);
+						if( details[2*x+1] && namedetails.length > 3 )
+							pacmanFetchFromPacinfo(namedetails[0],namedetails[1],namedetails[3],details[2*x+1].split('\n'));
+					}
 				fetchAURUpdates();
 			});
 		});
@@ -90,10 +96,10 @@ function action_searchForUpdates() {
 				let names = stdout.trim().split('\n');
 				let details = stdout2.trim().split("\n\n");
 				if( details[0].trim().length != 0 )
-				for( let x = 0; x < details.length; x++ ){
-					if( cfg.aurWrapper === "pacaur" ) aurFetchFromPacinfo(names[x].split(/\s+/)[5],details[x].split('\n'));
-					else aurFetchFromPacinfo(names[x].split(/\s+/)[3],details[x].split('\n'));
-				}
+					for( let x = 0; x < details.length; x++ ){
+						if( cfg.aurWrapper === "pacaur" ) aurFetchFromPacinfo(names[x].split(/\s+/)[5],details[x].split('\n'));
+						else aurFetchFromPacinfo(names[x].split(/\s+/)[3],details[x].split('\n'));
+					}
 				fetchFlatpakUpdates();
 			});
 		}); else fetchFlatpakUpdates();
@@ -102,41 +108,46 @@ function action_searchForUpdates() {
 		searching("Checking Flatpak for updates...","flatpak-discover");
 		if(cfg.useFlatpak) packageManager.exec(flatpakCmd,(_source, stdout, _stderr, _errcode) => {
 			let lines = stdout.split('--------------');
-			if( lines[0].trim().length != 0 )
-			lines.forEach(flatpakFetchFromInfo);
+			if( lines[0].trim().length != 0 ) lines.forEach(flatpakFetchFromInfo);
 			stopSearch();
 		}); else stopSearch();
 	}
 	function flatpakFetchFromInfo(infolines) {
 		if( infolines.trim().length === 0 ) return;
-		infolines = infolines.split('\n');
-		infolines.shift();
-		let name = infolines[0].substring(0,infolines[0].indexOf('-')).trim();
-		let desc = infolines[0].substring(infolines[0].indexOf('-')+1).trim();
 		let version, description = "", id;
-		infolines.shift();
+		let name, size;
+		infolines = infolines.split('\n');
+		let descAvailable = !infolines[0].trim().startsWith("ID:"); 
+		if( descAvailable ) {
+			infolines.shift();
+			name = infolines[0].substring(0,infolines[0].indexOf('-')).trim();
+			description = infolines[0].substring(infolines[0].indexOf('-')+1).trim();
+			infolines.shift();
+		}
 		infolines.forEach( line => {
 			if( line.trim().length > 0 ){
-			const tag = line.substring(0,line.indexOf(':')).trim();
-			const value = line.substring(line.indexOf(':')+1).trim();
-			switch( tag ) {
-				case "ID"      : id      = value; break;
-				case "Version" : version = value; break;
-				default: description += tag+":"+value+"\n"; break;
-			}}
+				const tag = line.substring(0,line.indexOf(': ')).trim();
+				const value = line.substring(line.indexOf(': ')+1).trim();
+				switch( tag ) {
+					case "ID"      : id      = value; break;
+					case "Version" : version = value; break;
+					case "Download Size" : size = resolveAddSize(value.replace('?',' '));
+					default: description += "\n"+tag+":"+value; break;
+				}}
 		});
 		packageModel.append({
-			"PackageName": name,
+			"PackageName": name?name:id.substring(id.lastIndexOf('.')+1),
 			"FromVersion": id,
-			"ToVersion"  : version,
-			"Source"     : "FLATPAK",
+			"ToVersion"  : version?version:"latest commit",
+			"Source"     : "FLATPAK"+(name?"":"(runtime)"),
 			"Group"      : "None",
-			"Desc"       : "Description:"+desc+"\n"+description,
-			"URL"        : "https://flathub.org/apps/"+id
+			"Desc"       : description,
+			"URL"        : "https://flathub.org/apps/"+id,
+			"Size"       : size?size:0
 		});
 	}
 	function aurFetchFromPacinfo(to, infolist) {
-		let name, from, group="None", description = "", url, licenses="", requires="", optionaldeps="", provides="";
+		let name, from, group="None", description = "", url, licenses="", requires="", optionaldeps="", provides="", size;
 		infolist.forEach(line=>{
 			const tag   = line.substring(0,line.indexOf(':')).trim();
 			const value = line.substring(line.indexOf(':')+1).trim();
@@ -144,9 +155,9 @@ function action_searchForUpdates() {
 				case "Name": name = value; break;
 				case "Version": from = value; break;
 				case "URL": url = value; break;
+				case "Download Size": size = resolveAddSize(value);
 				case "Description":
 				case "Packager":
-				case "Download Size":
 				case "Installed Size":
 				case "Architecture":description+= tag+":"+value+"\n"; break;
 				case "Licenses": licenses += value + " "; break;
@@ -164,11 +175,12 @@ function action_searchForUpdates() {
 			"Source"     : "AUR",
 			"Group"      : group,
 			"Desc"       : description,
-			"URL"        : url
+			"URL"        : url,
+			"Size"       : size?size:0
 		});
 	}
 	function pacmanFetchFromPacinfo(name, from, to, repo) {
-		let source, group, description = "", url, licenses="", requires="", optionaldeps="", provides="";
+		let source, group, description = "", url, licenses="", requires="", optionaldeps="", provides="", size="";
 		repo.forEach(line=>{
 			if( line.trim().length > 1 ){
 				const tag  = line.substring(0, line.indexOf(':'))
@@ -177,9 +189,9 @@ function action_searchForUpdates() {
 					case "Groups": group = value; break;
 					case "Repository": source = value; break;
 					case "URL": url = value; break;
+					case "Download Size": size = resolveAddSize(value);
 					case "Description":
 					case "Packager":
-					case "Download Size":
 					case "Installed Size":
 					case "Architecture":description+= tag+":"+value+"\n"; break;
 					case "Licenses": licenses += value + " "; break;
@@ -199,10 +211,41 @@ function action_searchForUpdates() {
 			"Source"     : source.toUpperCase(),
 			"Group"      : group?group:"None",
 			"Desc"       : description,
-			"URL"        : url
+			"URL"        : url,
+			"Size"       : size?size:0
 		});
 	}
 }
+function resolveAddSize(amount) {
+	const validUnits = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
+	const conversionFactor = {
+		"B": 1,
+		"K": 1024,
+		"M": 1024 * 1024,
+		"G": 1024 * 1024 * 1024,
+		"T": 1024 * 1024 * 1024 * 1024,
+		"P": 1024 * 1024 * 1024 * 1024 * 1024,
+		"E": 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+		"Z": 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+		"Y": 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+	};
+	const [value1Str, unit1] = amount.split(' ');
+	const value1 = parseFloat(value1Str);
+	const [value2Str, unit2] = downloadSize.split(' ');
+	const value2 = parseFloat(value2Str);
+	const bytes1 = value1 * conversionFactor[unit1.charAt(0)];
+	const bytes2 = value2 * conversionFactor[unit2.charAt(0)];
+	let totalBytes = bytes1 + bytes2;
+	let unit = "B";
+	for (const currUnit of validUnits)
+		if (totalBytes >= conversionFactor[currUnit]) {
+			unit = currUnit;
+		} else break;
+	const roundedValue = (totalBytes / conversionFactor[unit]).toFixed(2);
+	downloadSize = `${roundedValue} ${unit}`;
+	return bytes1;
+}
+
 function action_updateSystem() {
 	//change this
 	searching("Updating system","akonadiconsole")
@@ -282,3 +325,22 @@ function execInTerminal( cmd, hold, searchAfter ) {
 	})
 }
 
+/*
+function initialSetup() {
+	function exists(cmd, name){
+		packageManager.exec(cmd,(source,stdout,stderr,errcode)=>{
+			existsObject[name] = stderr !== "" && stdout === ""
+		});
+	}
+	exists("konsole --version","konsole");
+	exists("alacritty --version","alacritty");
+	exists("kitty --version","kitty");
+	exists("pamac --version","pamac");
+	exists("pacman --version","pacman");
+	exists("paru --version","paru");
+	exists("yay --version","yay");
+	exists("pacaur --version","pacaur");
+	exists("trizen --version","trizen");
+	exists("pikaur --version","pikaur");
+	exists("aura --version","aura");
+}*/

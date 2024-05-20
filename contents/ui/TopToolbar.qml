@@ -10,8 +10,9 @@ import "../Util.js" as Util
 
 StackLayout {
     property string headName: ""
-    property bool sortByName: false
+    property string sortBy: "PackageName"
     property alias searchTextField: searchTextField
+    property bool ascending: true
     Layout.fillWidth: true
     onCurrentIndexChanged: opacityAnimation.running = true
     onHeadNameChanged: opacityAnimation.running = true
@@ -70,11 +71,16 @@ StackLayout {
             id: sortButton
             icon.name: "view-sort-ascending-name"
             enabled: packageModel.count > 0
+	    property var sortable : ["PackageName", "Source", "Size", "Size"];
+	    property var names    : ["Package Name", "Source Name", "Download Size", "Download Size (Descending)"];
+	    property int curr: 0
             onClicked: {
-                sortByName = !sortByName
-                main.clearProperties();
+	   	if( curr == 3 ) curr = 0;
+		else curr ++;
+		ascending  = curr < 3;
+		sortBy = sortable[curr];
             }
-            PlasmaComponents.ToolTip { text: sortByName ? i18n("Currently sorted by: Package Name\nSort by Repository name") : i18n("Currently sorted by: Repository Name\nSort by Package name") }
+            PlasmaComponents.ToolTip { text: i18n("Sorted by: "+sortButton.names[sortButton.curr]) }
         }
     }
     PlasmaExtras.Heading {

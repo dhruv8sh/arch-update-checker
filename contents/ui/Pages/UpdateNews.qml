@@ -24,18 +24,13 @@ ColumnLayout {
     }
     PlasmaComponents.ScrollView {
         id: scrollView
-        Layout.fillWidth: true
         Layout.fillHeight: true
+	Layout.fillWidth : true
         visible: !main.isUpdating
-        contentWidth: availableWidth
         contentItem: ListView {
             id: content
             model: feedModel
             currentIndex: -1
-            // topMargin: Kirigami.Units.smallSpacing * 2
-            // bottomMargin: Kirigami.Units.smallSpacing * 2
-            // leftMargin: Kirigami.Units.smallSpacing * 2
-            // rightMargin: Kirigami.Units.smallSpacing * 2
             spacing: Kirigami.Units.smallSpacing
             boundsBehavior: Flickable.StopAtBounds
             highlight: PlasmaExtras.Highlight { }

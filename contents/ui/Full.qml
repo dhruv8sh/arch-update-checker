@@ -19,7 +19,8 @@ PlasmaExtras.Representation {
         id: filterModel
         sourceModel: packageModel
         filterRoleName: "PackageName"
-        sortRoleName: toolbar.sortByName?"PackageName":"Source"
+        sortRoleName: toolbar.sortBy
+	sortOrder   : toolbar.ascending ? Qt.AscendingOrder : Qt.DescendingOrder
         filterRowCallback: function(sourceRow, sourceParent) {
             let value = sourceModel.data(sourceModel.index(sourceRow, 0, sourceParent), filterRole);
             return value.toString().includes(toolbar.searchTextField.text);

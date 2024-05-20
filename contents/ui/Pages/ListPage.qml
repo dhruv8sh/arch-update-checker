@@ -14,6 +14,7 @@ ColumnLayout {
     property int kind: 0
     property string title: i18nc("@title", "Update View")
     Layout.fillWidth: true
+    Layout.minimumHeight: 200 
     Kirigami.InlineMessage {
         id: pausedMessage
         Layout.fillWidth: true
