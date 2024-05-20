@@ -21,7 +21,7 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 <p>
 
 ![Screenshot_20240508_143537](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/91ee7d25-54fd-4191-b65e-51533aa27f8e)<br/>
-<i>Setup screen</i>
+<i>Setup screen (Now hidden until out of Beta)</i>
 
 <br/><br/>
 </p>
