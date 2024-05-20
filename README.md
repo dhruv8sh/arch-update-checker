@@ -46,10 +46,15 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 - [ ] (1/2) Support for mirrorlist update
 - [x] Support for alacritty and kitty
 - [x] Support for pamac
+- [ ] Automatic setup
 - [ ] Snap support
 
 
 ## Installation
+
+#### !! Required
+You need to install ```pacutils``` and ```pacman-contrib``` packages for the applet to work correctly.
+Run ```sudo pacman -S pacutils pacman-contrib```.
 
 #### Recommended
 Install using ```Get New Widgets...``` functionality natively available in Plasma.
