@@ -53,18 +53,22 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 
 ## Installation
 
-#### !! Required
+
+#### Required :
 You need to install ```pacutils``` and ```pacman-contrib``` packages for the applet to work correctly.
 Run ```sudo pacman -S pacutils pacman-contrib```.
 
-#### Recommended
-Install using ```Get New Widgets...``` functionality natively available in Plasma.
+#### Recommended method :
+Use the `Download new widget` functionality to obtain the widget (currently there are no auto updates for widgets on plasma 6, and you can't update them via the update button, [relevant](https://bugs.kde.org/show_bug.cgi?id=483570) [issues](https://discuss.kde.org/t/kde-6-widgets-fail-to-update/14337))
 
-#### Currently Borked
+If the applet doesn't get automatically added to your system tray, run:
+`systemctl --user restart plasma-plasmashell` - this will restart your plasma shell
+or log out and back in.
+
+#### Alternatively,
+you can use `kpackagetool6` (currently broken) or `plasmapkg2` (not part of a clean plasma 6 install)
 ```
 git clone https://github.com/dhruv8sh/arch-update-checker/
 cd arch-update-checker
 kpackagetool6 -i .
 ```
-If ```kpackagetool6``` does not work use ```plasmapkg2``` instead if you still have Plasma Framework 5.
-
