@@ -39,7 +39,7 @@ ColumnLayout {
                 text: i18nc("@action:button", "Allow")
                 onTriggered: {
                     cfg.allowSingleModification = 2
-                    showAllowSingularModifications = false
+		    showAllowSingleModifications = false
                 }
             },
             Kirigami.Action {

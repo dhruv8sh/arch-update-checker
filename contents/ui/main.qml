@@ -12,7 +12,7 @@ PlasmoidItem {
   id: main
   property string subtext: i18n("Updates")
   property string title: title
-  property alias isNotPaused: timer.running
+  property bool isNotPaused: true
   compactRepresentation: Compact.CompactRepresentation { }
   fullRepresentation:  Full{}
 
@@ -44,7 +44,7 @@ PlasmoidItem {
   Timer {
     id: timer
     interval: config.interval
-    running: true
+    running: isNotPaused
     repeat: true
     onTriggered: {
       hasUserSeen = false

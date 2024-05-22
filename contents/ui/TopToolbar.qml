@@ -33,7 +33,7 @@ StackLayout {
             PlasmaComponents.Switch {
                 id: pauseButton
                 icon.name: "media-playback-pause"
-                checked: !main.isNotPaused && !isUpdating
+                checked: !isNotPaused 
                 onToggled: main.isNotPaused = !checked
                 PlasmaComponents.ToolTip { text: i18n("Pause Updates") }
             }
@@ -44,6 +44,7 @@ StackLayout {
                     Util.action_searchForUpdates()
                     main.hasUserSeen = true
                 }
+		enabled: !isUpdating
                 PlasmaComponents.ToolTip { text: i18n("Check for updates") }
             }
             PlasmaComponents.ToolButton {

@@ -15,7 +15,7 @@ function searching(message, icon) {
 	timer.stop()
 	error = ""
 	isUpdating = true
-	statusMessage = message
+	statusMessage = i18n(message)
 	statusIcon = icon
 	wasFlatpakDisabled = false
 	showAllowSingleModifications = false
@@ -105,7 +105,7 @@ function action_searchForUpdates() {
 				if( details[0].trim().length != 0 )
 					for( let x = 0; x < details.length; x++ )
 						aurFetchFromPacinfo(
-							names[x].split(/\s+/)[cfg.aurWrapper==="pacaur"?5:3],
+							names[x].split(/\s+/)[cfg.aurWrapper === "pacaur" ? 5:3],
 							details[x].split('\n')
 						);
 				fetchFlatpakUpdates();
@@ -268,8 +268,11 @@ function action_clearOrphans() {
 	execInTerminal(command, true, true)
 }
 function action_installOne(name, source) {
-	if( cfg.showAllowSingleModifications == 1 ){
+	console.log( cfg.allowSingleModification );
+	if( cfg.allowSingleModification == 1 ){
 		showAllowSingleModifications = true;
+		return;
+	} else if( cfg.allowSingleModification == 0 ){
 		return;
 	}
 	let command = ""
