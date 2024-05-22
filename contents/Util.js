@@ -1,3 +1,15 @@
+const validUnits = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
+const conversionFactor = {
+	"B": 0.0009765625,
+	"K": 1,
+	"M": 1024,
+	"G": 1024 * 1024,
+	"T": 1024 * 1024 * 1024,
+	"P": 1024 * 1024 * 1024 * 1024,
+	"E": 1024 * 1024 * 1024 * 1024 * 1024,
+	"Z": 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
+	"Y": 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+};
 //function for UI
 function searching(message, icon) {
 	timer.stop()
@@ -11,39 +23,33 @@ function searching(message, icon) {
 function stopSearch(){
 	timer.start()
 	isUpdating = false
-	if( packageModel.count == 0 ) {
-		statusMessage = ""
-		statusIcon    = ""
-	} else {
-		statusMessage = packageModel.count + i18n(" updates available")+" ("+downloadSize+")"
-		statusIcon    = "update-none"
-	}
+	statusMessage = packageModel.count === 0 ? "" : packageModel.count + i18n(" updates available")+" ("+humanize(downloadSize)+")"
+	statusIcon    = packageModel.count === 0 ? "" : "update-none"
+}
+function stopSearchWithError(stderror,code,message,icon){
+	timer.start();
+	isUpdating = false;
+	statusMessage = i18n(`${message}; Code:${code}`);
+	error = i18n(stderror);
+	statusIcon = icon?icon:"data-error";
 }
 function fetchIcon(PackageName, Source, Group) {
-	if( !plasmoid.configuration.useCustomIcons ) return "server-database"
-	let ans = "";
+	if( !cfg.useCustomIcons ) return "server-database"
 	let tempname = PackageName;
-	if( tempname.startsWith("lib32-") ) tempname = PackageName.substring(6);
-	else if( tempname.startsWith("lib") ) tempname = PackageName.substring(3);
-	let lines = plasmoid.configuration.customIcons.split('\n');
-	for (let line of lines) {
-		let info = line.split('>');
-		if (info.length < 3) continue; // Use continue instead of return
-		let type = info[0].trim();
-		let name = info[1].trim();
-		let tempans = info[2].trim();
-		if (type === "name" && (name === tempname || (name.endsWith('...') && tempname.startsWith(name.substring(0, name.length - 3))))) {
-			ans = tempans;
-			break;
-		} else if (type === "source" && name === Source.toLowerCase()) {
-			ans = tempans;
-			break;
-		} else if (type === "group" && name === Group.toLowerCase()) {
-			ans = tempans === "~" ? tempname : tempans;
-			break;
-		}
-	}
-	return ans;
+	if(      tempname.startsWith("lib32-") ) tempname = PackageName.substring(6);
+	else if( tempname.startsWith("lib"   ) ) tempname = PackageName.substring(3);
+	let ans = cfg.customIcons
+		.split('\n')
+		.map(line => line.split('>').map(word=>word.trim()))
+		.filter(line=>line.length === 3)
+		.find(([kind,id,_])=>{
+			switch (kind) {
+      				case "name":  if (id === tempname || (id.endsWith('...') && tempname.startsWith(id.substring(0, id.length - 3)))) return true;
+				case "group": if (id === Group.toLowerCase())  return true; break;
+      				case "source":if (id === Source.toLowerCase()) return true; break;
+    				default: return false;
+			}});
+	return ans[2] === "~" ? ans[1]:ans[2];
 }
 
 //Util functions
@@ -54,24 +60,23 @@ function action_searchForUpdates() {
     		flatpak info "$id"
     		size=$(echo "$updateline" | awk '{print $2}')
     		echo "Download Size: $size"
+			echo "--------------"
 	done`;
-	packageManager.exec("ping -c 1 google.com > /dev/null",(_source, _stdout, stderr, _errcode) => {
+	packageManager.exec("ping -c 1 google.com > /dev/null",(_,_,stderr,_) => {
 		if( stderr === "" ) {
 			packageModel.clear();
+			downloadSize = 0;
 			fetchPacmanUpdates();
-		}
-		else {
-			stopSearch();
-			error = "Problems connecting to the internet";
-		}
+		} else stopSearchWithError("Problems connecting to the internet",0,"Internet Error","network-offline");
 	});
-	downloadSize = "0 B"
 	function fetchPacmanUpdates() {
 		let cmd = cfg.usePamacInstead ? "pamac checkupdates" : "checkupdates --nocolor";
 		searching("Checking Arch Repositories...","package");
-		packageManager.exec(cmd+" | sort",(_source, stdout, _stderr, _errcode) => {
+		packageManager.exec(cmd+" | sort",(_, stdout, stderr, _) => {
 			cmd += " | awk '{print $1}' | pacinfo";
-			packageManager.exec(cmd,(_source2, stdout2, _stderr2, _errcode2) => {
+			if( stdout === "" && stderr !== "") stopSearchWithError(stderr,1,"Pacman Error","state-error");
+			else packageManager.exec(cmd,(_, stdout2, stderr2, _) => {
+				if( stdout2 === "" && stderr2 !== "") stopSearchWithError(stderr2,-1,"Pacinfo error");
 				let names = stdout.trim().split('\n');
 				let details = stdout2.trim().split("\n\n");
 				if( details[0].trim().length > 3 && names.length > 3 )
@@ -87,104 +92,108 @@ function action_searchForUpdates() {
 	function fetchAURUpdates() {
 		let cmd = ""
 		if( cfg.aurWrapper==="trizen"||cfg.aurWrapper==="pikaur") cmd = cfg.aurWrapper+" -Qua --color never | sort";
-		else cmd = cfg.aurWrapper+" -Qum --color never | sort "
+		else cmd = cfg.aurWrapper+" -Qum --color never | sort ";
 		searching("Checking Arch User Repositories...","package");
-		if( cfg.useAUR ) packageManager.exec(cmd,(_source, stdout, _stderr, _errcode) => {
+		if( cfg.useAUR ) packageManager.exec(cmd,(_, stdout, stderr, _) => {
 			if( cfg.aurWrapper === "pacaur" ) cmd += " | awk '{print $3}' | pacinfo";
 			else cmd += " | awk '{print $1}' | pacinfo";
-			packageManager.exec(cmd,(_source2, stdout2, _stderr2, _errcode2) => {
+			if( stdout === "" && stderr !== "") stopSearchWithError(stderr,2,"AUR Error","state-error");
+			else packageManager.exec(cmd,(_, stdout2, stderr2, _) => {
+				if( stdout2 === "" && stderr2 !== "") stopSearchWithError(stderr2,-1,"Pacinfo error");
 				let names = stdout.trim().split('\n');
 				let details = stdout2.trim().split("\n\n");
 				if( details[0].trim().length != 0 )
-					for( let x = 0; x < details.length; x++ ){
-						if( cfg.aurWrapper === "pacaur" ) aurFetchFromPacinfo(names[x].split(/\s+/)[5],details[x].split('\n'));
-						else aurFetchFromPacinfo(names[x].split(/\s+/)[3],details[x].split('\n'));
-					}
+					for( let x = 0; x < details.length; x++ )
+						aurFetchFromPacinfo(
+							names[x].split(/\s+/)[cfg.aurWrapper==="pacaur"?5:3],
+							details[x].split('\n')
+						);
 				fetchFlatpakUpdates();
 			});
 		}); else fetchFlatpakUpdates();
 	}
 	function fetchFlatpakUpdates() {
 		searching("Checking Flatpak for updates...","flatpak-discover");
-		if(cfg.useFlatpak) packageManager.exec(flatpakCmd,(_source, stdout, _stderr, _errcode) => {
+		if(cfg.useFlatpak) packageManager.exec(flatpakCmd,(_, stdout, stderr, _) => {
 			let lines = stdout.split('--------------');
-			if( lines[0].trim().length != 0 ) lines.forEach(flatpakFetchFromInfo);
+			if( stdout === "" && stderr !== "") stopSearchWithError(stderr,"Flatpak Error",3,"state-error");
+			else if( lines[0].trim().length > 0 )
+				lines
+					.map(line=>line.split('\n'))
+					.filter(lines=>lines.length > 3)
+					.forEach(flatpakFetchFromInfo);
 			stopSearch();
 		}); else stopSearch();
 	}
 	function flatpakFetchFromInfo(infolines) {
-		if( infolines.trim().length === 0 ) return;
-		let version, description = "", id;
-		let name, size;
-		infolines = infolines.split('\n');
-		let descAvailable = !infolines[0].trim().startsWith("ID:"); 
-		if( descAvailable ) {
+		let id, version, ref, size, name, description="", refAlt;
+		if( !infolines[0].trim().startsWith("ID") ) {
 			infolines.shift();
-			name = infolines[0].substring(0,infolines[0].indexOf('-')).trim();
-			description = infolines[0].substring(infolines[0].indexOf('-')+1).trim();
+			infolines.shift();
+			const [namePart, ...descPart] = infolines.shift().trim().split('-');
+			name = namePart.trim();
+			description = "Description:"+(descPart.join('-').trim());
 			infolines.shift();
 		}
-		infolines.forEach( line => {
-			if( line.trim().length > 0 ){
-				const tag = line.substring(0,line.indexOf(': ')).trim();
-				const value = line.substring(line.indexOf(': ')+1).trim();
-				switch( tag ) {
+		infolines
+			.filter(line=>line.trim().length>0)
+			.map(line=>{
+				const [rawTag, ...rest] = line.split(': ');
+				return [rawTag.trim(), rest.join(': ').trim()];
+			}).forEach(([tag,value])=>{ switch( tag ) {
 					case "ID"      : id      = value; break;
 					case "Version" : version = value; break;
-					case "Download Size" : size = resolveAddSize(value.replace('?',' '));
+					case "Ref"     : ref     = value; refAlt  = value.split('/')[0]; break;
+					case "Download Size" : value = value.replace('?',' ');
+						size = resolveAddSize(value.replace('?',' '));
 					default: description += "\n"+tag+":"+value; break;
-				}}
-		});
-		packageModel.append({
-			"PackageName": name?name:id.substring(id.lastIndexOf('.')+1),
-			"FromVersion": id,
-			"ToVersion"  : version?version:"latest commit",
-			"Source"     : "FLATPAK"+(name?"":"(runtime)"),
-			"Group"      : "None",
-			"Desc"       : description,
-			"URL"        : "https://flathub.org/apps/"+id,
-			"Size"       : size?size:0
-		});
+				}
+			});
+		addToModel(name?name:id,
+			ref,
+			version,
+			"FLATPAK ("+refAlt+")",
+			undefined,
+			description,
+			refAlt==="app"?"https://flathub.org/apps/"+id:"https://docs.flatpak.org/en/latest/available-runtimes.html",
+			size);
 	}
 	function aurFetchFromPacinfo(to, infolist) {
-		let name, from, group="None", description = "", url, licenses="", requires="", optionaldeps="", provides="", size;
-		infolist.forEach(line=>{
-			const tag   = line.substring(0,line.indexOf(':')).trim();
-			const value = line.substring(line.indexOf(':')+1).trim();
-			switch( tag ) {
-				case "Name": name = value; break;
-				case "Version": from = value; break;
-				case "URL": url = value; break;
-				case "Download Size": size = resolveAddSize(value);
-				case "Description":
-				case "Packager":
-				case "Installed Size":
-				case "Architecture":description+= tag+":"+value+"\n"; break;
-				case "Licenses": licenses += value + " "; break;
-				case "Requires": requires += value + " "; break;
-				case "Optional Deps": optionaldeps += value + " "; break;
-				case "Provides": provides += value + " "; break;
-				case "Groups" : group += value+ " "; break;
-			}
-		});
-		if( group === "" ) group = "None";
-		packageModel.append({
-			"PackageName": name,
-			"FromVersion": from,
-			"ToVersion"  : to,
-			"Source"     : "AUR",
-			"Group"      : group,
-			"Desc"       : description,
-			"URL"        : url,
-			"Size"       : size?size:0
-		});
+		let name, from, description = "", url, licenses="", requires="", optionaldeps="", provides="", size;
+		infolist
+			.map(line=>line.split(':').map(word=>word.trim()))
+			.forEach(([tag,...rest])=>{
+				const value = rest.join(':');
+				switch( tag ) {
+					case "Name": 		name = value; break;
+					case "Version": 	from = value; break;
+					case "URL": 		url = value; break;
+					case "Download Size": 	size = resolveAddSize(value);
+					case "Description":
+					case "Packager":
+					case "Installed Size":
+					case "Architecture":	description+= tag+":"+value+"\n"; break;
+					case "Licenses": 	licenses += value + " "; break;
+					case "Requires": 	requires += value + " "; break;
+					case "Optional Deps": 	optionaldeps += value + " "; break;
+					case "Provides": 	provides += value + " "; break;
+				}});
+		addToModel(name,
+			from,
+			to,
+			"AUR",
+			undefined,
+			description,
+			url,
+			size);
 	}
 	function pacmanFetchFromPacinfo(name, from, to, repo) {
 		let source, group, description = "", url, licenses="", requires="", optionaldeps="", provides="", size="";
-		repo.forEach(line=>{
-			if( line.trim().length > 1 ){
-				const tag  = line.substring(0, line.indexOf(':'))
-				const value= line.substring(line.indexOf(':')+1).trim()
+		repo
+			.filter(line => line.trim().length > 1)
+			.map( line => line.split(':').map(word=>word.trim()))
+			.forEach(([tag,...rest])=>{
+				const value = rest.join(':');
 				switch( tag ) {
 					case "Groups": group = value; break;
 					case "Repository": source = value; break;
@@ -198,59 +207,52 @@ function action_searchForUpdates() {
 					case "Requires": requires += value + " "; break;
 					case "Optional Deps": optionaldeps += value + " "; break;
 					case "Provides": provides += value + " "; break;
-				}
-			}
-		});
-		description += (licenses.length>0?"Licenses:" + licenses + '\n':"") + (requires.length>0?"Requires:" + requires + '\n':"")
-		description += (optionaldeps.length>0?"Optional Deps:" + optionaldeps + '\n':"") + (provides.length>0?"Provides:" + provides:"")
-		//console.log(description);
-		packageModel.append({
-			"PackageName": name,
-			"FromVersion": from,
-			"ToVersion"  : to,
-			"Source"     : source.toUpperCase(),
-			"Group"      : group?group:"None",
-			"Desc"       : description,
-			"URL"        : url,
-			"Size"       : size?size:0
-		});
+				}});
+		description += (licenses!==""?"Licenses:"+licenses+'\n':"");
+		description += (requires!==""?"Licenses:"+requires+'\n':"");
+		description += (provides!==""?"Licenses:"+provides+'\n':"");
+		description += (optionaldeps!==""?"Licenses:"+optionaldeps+'\n':"");
+		addToModel(name,
+			from,
+			to,
+			source.toUpperCase(),
+			group,
+			description,
+			url,
+			size);
 	}
 }
+function addToModel(...details) {
+	packageModel.append({
+		"PackageName": details[0],
+		"FromVersion": details[1],
+		"ToVersion"  : details[2]?details[2]:"latest commit",
+		"Source"     : details[3],
+		"Group"      : details[4]?details[4]:"None",
+		"Desc"       : details[5],
+		"URL"        : details[6],
+		"Size"       : details[7]?details[7]:0
+	});
+}
+function humanize(kbs) {
+	let unit = validUnits.reverse().find(u => kbs > conversionFactor[u]);
+	const roundedValue = (kbs / conversionFactor[unit]).toFixed(2);
+	return roundedValue+" "+unit;
+}
 function resolveAddSize(amount) {
-	const validUnits = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
-	const conversionFactor = {
-		"B": 1,
-		"K": 1024,
-		"M": 1024 * 1024,
-		"G": 1024 * 1024 * 1024,
-		"T": 1024 * 1024 * 1024 * 1024,
-		"P": 1024 * 1024 * 1024 * 1024 * 1024,
-		"E": 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
-		"Z": 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
-		"Y": 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
-	};
 	const [value1Str, unit1] = amount.split(' ');
 	const value1 = parseFloat(value1Str);
-	const [value2Str, unit2] = downloadSize.split(' ');
-	const value2 = parseFloat(value2Str);
-	const bytes1 = value1 * conversionFactor[unit1.charAt(0)];
-	const bytes2 = value2 * conversionFactor[unit2.charAt(0)];
-	let totalBytes = bytes1 + bytes2;
-	let unit = "B";
-	for (const currUnit of validUnits)
-		if (totalBytes >= conversionFactor[currUnit]) {
-			unit = currUnit;
-		} else break;
-	const roundedValue = (totalBytes / conversionFactor[unit]).toFixed(2);
-	downloadSize = `${roundedValue} ${unit}`;
-	return bytes1;
+	const kilobytes = value1 * conversionFactor[unit1.charAt(0).toUpperCase()];
+	downloadSize += kilobytes;
+	return kilobytes;
 }
-
 function action_updateSystem() {
-	//change this
 	searching("Updating system","akonadiconsole")
 	let command = ""
-	if( cfg.useCustomInstall ) execInTerminal(cfg.customScript, cfg.holdTerminal, true)
+	if( cfg.useCustomInstall ) {
+		execInTerminal(cfg.customScript, cfg.holdTerminal, true);
+		return;
+	}
 	if( cfg.useAUR ) command = cfg.aurWrapper == "pamac" ? "pamac upgrade ": cfg.aurWrapper + " -Syu "
 	else command = "sudo pacman -Syu "
 	command += cfg.aurFlags+"; "
@@ -304,8 +306,8 @@ function action_notificationInstall() {
 	Comment=Popup and Sound options enabled
 	Action=Popup|Sound
 	Sound=message-new-instant.ogg`
-	packageManager.exec("mkdir -p ~/.local/share/knotifications6/",(source,stdout,stderr,code)=>{})
-	packageManager.exec("echo \'"+notifycontent+"\' > "+notifypath,(source,stdout,stderr,code)=>{})
+	packageManager.exec("mkdir -p ~/.local/share/knotifications6/",(_,_,_,_)=>{})
+	packageManager.exec("echo \'"+notifycontent+"\' > "+notifypath,(_,_,_,_)=>{})
 }
 function execInTerminal( cmd, hold, searchAfter ) {
 	const startMessage = `
@@ -319,28 +321,8 @@ function execInTerminal( cmd, hold, searchAfter ) {
 	let termCmd  = cfg.terminal + ` -e bash -c 'trap "" SIGINT; echo "${startMessage}"; ${cmd} echo "${endMessage}";`
 	if( hold ) termCmd += `read -n 1 -p "Press Any Key to exit...";'`
 	else termCmd += `'`
-	packageManager.exec(termCmd,(source,stdout,stderr,errcode)=>{
+	packageManager.exec(termCmd,(_,_,stderr,_)=>{
 		console.log("errorlog:"+stderr);
 		if( searchAfter ) action_searchForUpdates();
 	})
 }
-
-/*
-function initialSetup() {
-	function exists(cmd, name){
-		packageManager.exec(cmd,(source,stdout,stderr,errcode)=>{
-			existsObject[name] = stderr !== "" && stdout === ""
-		});
-	}
-	exists("konsole --version","konsole");
-	exists("alacritty --version","alacritty");
-	exists("kitty --version","kitty");
-	exists("pamac --version","pamac");
-	exists("pacman --version","pacman");
-	exists("paru --version","paru");
-	exists("yay --version","yay");
-	exists("pacaur --version","pacaur");
-	exists("trizen --version","trizen");
-	exists("pikaur --version","pikaur");
-	exists("aura --version","aura");
-}*/

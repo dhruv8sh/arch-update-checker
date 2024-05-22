@@ -13,7 +13,7 @@ PlasmaExtras.ExpandableListItem {
     icon: Util.fetchIcon(PackageName, Source, Group)
     title: PackageName
     allowStyledText: true
-    subtitle: "<b>"+Source+"</b>   |   " + FromVersion + plasmoid.configuration.packageSeparator + ToVersion
+    subtitle: "<b>"+Source+"</b>   |   " + FromVersion + cfg.packageSeparator + ToVersion
     defaultActionButtonAction: Action {
             text: i18n("More Info")
             icon.name: "showinfo"
@@ -25,7 +25,7 @@ PlasmaExtras.ExpandableListItem {
             icon.name: "run-install"
             text: i18n("Update")
             onTriggered: Util.action_installOne(Source==="FLATPAK"?FromVersion:PackageName, Source)
-            enabled: Source === "FLATPAK"|| plasmoid.configuration.allowSingleModification != 0
+            enabled: Source === "FLATPAK"|| cfg.allowSingleModification != 0
         },
         Action {
             text: i18n("Uninstall")

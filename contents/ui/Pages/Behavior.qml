@@ -40,7 +40,7 @@ Kirigami.Page {
             }
             RowLayout{
                 id: time
-                property int value: plasmoid.configuration.pollInterval
+                property int value: cfg.pollInterval
                 Layout.alignment: Qt.AlignCenter
                 Kirigami.Icon {
                     source: "accept_time_event"
@@ -75,15 +75,15 @@ Kirigami.Page {
             }
             Common.CustomSwitch {
                 icon : "view-refresh"
-                checked: plasmoid.configuration.searchOnStart
-                onCheckedChanged: plasmoid.configuration.searchOnStart = checked
+                checked: cfg.searchOnStart
+                onCheckedChanged: cfg.searchOnStart = checked
                 text: i18n("Search on startup")
             }
             Common.CustomSwitch {
                 icon : "zoom-out-y-symbolic"
                 text: i18n("Search on expand")
-                checked: plasmoid.configuration.searchOnExpand
-                onCheckedChanged: plasmoid.configuration.searchOnExpand = checked
+                checked: cfg.searchOnExpand
+                onCheckedChanged: cfg.searchOnExpand = checked
             }
             QQC2.Label{}
             Common.CustomComboBox{
@@ -95,15 +95,15 @@ Kirigami.Page {
                     {text: "kitty"}
                 ];
                 function onIndexChanged(newindex){
-                    plasmoid.configuration.terminal = model[newindex].text
+                    cfg.terminal = model[newindex].text
                 }
-                index: model.findIndex(item => item.text === plasmoid.configuration.terminal)
+                index: model.findIndex(item => item.text === cfg.terminal)
             }
             Common.CustomSwitch {
                 icon : "project-development-close"
                 text: i18n("Close after update")
-                checked: plasmoid.configuration.holdTerminal
-                onCheckedChanged: plasmoid.configuration.holdTerminal = checked
+                checked: cfg.holdTerminal
+                onCheckedChanged: cfg.holdTerminal = checked
             }
         }
     }

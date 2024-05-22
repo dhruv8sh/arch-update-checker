@@ -16,9 +16,9 @@ MouseArea {
         if (mouse.button == Qt.MiddleButton) Util.action_updateSystem()
         else {
             expanded = !wasExpanded;
-            if( expanded && plasmoid.configuration.searchOnExpand && main.hasUserSeen )
+            if( expanded && cfg.searchOnExpand && main.hasUserSeen )
                 Util.action_searchForUpdates();
-            if( !plasmoid.configuration.rememberState )
+            if( !cfg.rememberState )
                 main.pop();
             main.hasUserSeen = true
         }
@@ -59,7 +59,7 @@ MouseArea {
             when: packageModel.count == 0
             PropertyChanges{
                 target: badge
-                visible: plasmoid.configuration.showBadgeAlways
+                visible: cfg.showBadgeAlways
             }PropertyChanges{
                 target: busyInd
                 visible: false

@@ -43,7 +43,7 @@ StackLayout {
                     pageNo --;
                     stack2.pop();
                 } else {
-                    plasmoid.configuration.showIntro = false;
+                    cfg.showIntro = false;
                     stack2.clear();
                     stack2.push("Pages/ListPage.qml");
 		    Util.action_searchForUpdates()
@@ -59,7 +59,7 @@ StackLayout {
                     pageNo ++;
                     stack2.push(getPage())
                 } else {
-                    plasmoid.configuration.showIntro = false;
+                    cfg.showIntro = false;
                     stack2.clear();
                     stack2.push("Pages/ListPage.qml");
                     Util.action_searchForUpdates();

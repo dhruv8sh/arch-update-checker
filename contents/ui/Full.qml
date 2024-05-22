@@ -41,7 +41,7 @@ PlasmaExtras.Representation {
         }
     }
     Component.onCompleted: {
-        if(plasmoid.configuration.showIntro) {
+        if(cfg.showIntro) {
 
         } else {
             stack2.clear();
@@ -55,7 +55,7 @@ PlasmaExtras.Representation {
         Layout.fillWidth: true
     }
     function getPage() {
-        if( plasmoid.configuration.debugNormal)
+        if( cfg.debugNormal)
             console.log("Switching to page no.:"+pageNo);
         switch( pageNo ) {
             case 0: return "Pages/Welcome.qml";

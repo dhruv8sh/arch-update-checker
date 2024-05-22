@@ -38,7 +38,7 @@ ColumnLayout {
             Kirigami.Action {
                 text: i18nc("@action:button", "Allow")
                 onTriggered: {
-                    plasmoid.configuration.allowSingleModification = 2
+                    cfg.allowSingleModification = 2
                     showAllowSingularModifications = false
                 }
             },
@@ -77,7 +77,7 @@ ColumnLayout {
             text: i18nc("@action:button", "Re-enable")
             onTriggered: {
                 main.wasFlatpakDisabled = false
-                plasmoid.configuration.useFlatpak = true
+                cfg.useFlatpak = true
             }
         }
     }

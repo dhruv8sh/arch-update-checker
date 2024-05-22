@@ -46,7 +46,7 @@ Kirigami.ScrollablePage {
                 {text: "aura"}
             ];
             currentIndex: {
-                switch(plasmoid.configuration.aurWrapper) {
+                switch(cfg.aurWrapper) {
                     case "yay"   : return 0;
                     case "paru"  : return 1;
                     case "trizen": return 2;

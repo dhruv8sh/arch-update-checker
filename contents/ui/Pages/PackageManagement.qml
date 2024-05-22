@@ -35,8 +35,8 @@ Kirigami.Page {
                 id: flatpakSwitch
                 icon: "flatpak-discover"
                 text: i18n("Flatpaks")
-                checked: plasmoid.configuration.useFlatpak
-                onCheckedChanged: plasmoid.configuration.useFlatpak = checked
+                checked: cfg.useFlatpak
+                onCheckedChanged: cfg.useFlatpak = checked
             }
             RowLayout {
                 enabled: flatpakSwitch.checked
@@ -46,8 +46,8 @@ Kirigami.Page {
                     wrapMode: Text.WordWrap
                 }
                 QQC2.TextField {
-                    text: plasmoid.configuration.flatpakFlags
-                    onTextChanged : plasmoid.configuration.flatpakFlags = text
+                    text: cfg.flatpakFlags
+                    onTextChanged : cfg.flatpakFlags = text
                 }
             }
             QQC2.Label{}
@@ -64,9 +64,9 @@ Kirigami.Page {
                     {"text": "aura"}
                 ];
                 function onIndexChanged(newindex){
-                    plasmoid.configuration.aurWrapper = model[newindex].text
+                    cfg.aurWrapper = model[newindex].text
                 }
-                index: model.findIndex(item => item.text === plasmoid.configuration.aurWrapper)
+                index: model.findIndex(item => item.text === cfg.aurWrapper)
             }
             RowLayout {
                 Layout.alignment: Qt.AlignCenter
@@ -75,8 +75,8 @@ Kirigami.Page {
                     wrapMode: Text.WordWrap
                 }
                 QQC2.TextField {
-                    text: plasmoid.configuration.aurFlags
-                    onTextChanged : plasmoid.configuration.aurFlags = text
+                    text: cfg.aurFlags
+                    onTextChanged : cfg.aurFlags = text
                 }
             }
         }

@@ -31,7 +31,7 @@ PlasmoidItem {
   property string sourceList : ""
   property string statusMessage: ""
   property string statusIcon: ""
-  property string downloadSize: "0 B"
+  property double downloadSize: 0
   signal pop();
 
   toolTipMainText: i18n("Arch Update Checker")

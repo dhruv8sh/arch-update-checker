@@ -37,18 +37,18 @@ Common.CustomPage {
 		anchors.top: parent.top
 		LayoutMirroring.enabled: true
 		text: i18n("Top-Left")
-		checked: plasmoid.configuration.badgePosition == 0
+		checked: cfg.badgePosition == 0
 		onCheckedChanged: {
-			if( checked ) plasmoid.configuration.badgePosition = 0;
+			if( checked ) cfg.badgePosition = 0;
 		}
 	}
 	QQC2.RadioButton{
 		anchors.left: parent.right
 		anchors.top: parent.top
 		text: i18n("Top-Right")
-		checked: plasmoid.configuration.badgePosition == 1
+		checked: cfg.badgePosition == 1
 		onCheckedChanged: {
-			if( checked ) plasmoid.configuration.badgePosition = 1;
+			if( checked ) cfg.badgePosition = 1;
 		}
 	}
 	Kirigami.Icon {
@@ -61,18 +61,18 @@ Common.CustomPage {
 		anchors.left: parent.right
 		anchors.bottom: parent.bottom
 		LayoutMirroring.enabled: true
-		checked: plasmoid.configuration.badgePosition == 2
+		checked: cfg.badgePosition == 2
 		onCheckedChanged: {
-			if( checked ) plasmoid.configuration.badgePosition = 2;
+			if( checked ) cfg.badgePosition = 2;
 		}
 		text: i18n("Bottom-Left")
 	}
 	QQC2.RadioButton{
 		anchors.left: parent.right
 		anchors.bottom: parent.bottom
-		checked: plasmoid.configuration.badgePosition == 3
+		checked: cfg.badgePosition == 3
 		onCheckedChanged: {
-			if( checked ) plasmoid.configuration.badgePosition = 3;
+			if( checked ) cfg.badgePosition = 3;
 		}
 		text: i18n("Bottom-Right")
 		}
@@ -87,8 +87,8 @@ Common.CustomPage {
 		id: sprtrText
 		horizontalAlignment: TextInput.AlignHCenter
 		Layout.alignment: Qt.AlignCenter
-		text: plasmoid.configuration.packageSeparator
-		onTextChanged: plasmoid.configuration.packageSeparator = text
+		text: cfg.packageSeparator
+		onTextChanged: cfg.packageSeparator = text
 	}
 	QQC2.Label{
 		Layout.alignment: Qt.AlignCenter
@@ -99,22 +99,22 @@ Common.CustomPage {
 		Common.CustomSwitch{
 			text:i18n("Custom Colors")
 			icon:"settings-configure"
-			checked: plasmoid.configuration.useCustomColors
+			checked: cfg.useCustomColors
 			onCheckedChanged: {
-				plasmoid.configuration.useCustomColors = checked
+				cfg.useCustomColors = checked
 			}
 		}
 		KQuickControls.ColorButton {
 			id: dotColor
-			visible: plasmoid.configuration.useCustomColors
-			color: plasmoid.configuration.dotColor
-			onColorChanged: plasmoid.configuration.dotColor = color
+			visible: cfg.useCustomColors
+			color: cfg.dotColor
+			onColorChanged: cfg.dotColor = color
 		}
 		KQuickControls.ColorButton {
 			id: textColor
-			visible: plasmoid.configuration.useCustomColors
-			color: plasmoid.configuration.textColor
-			onColorChanged: plasmoid.configuration.textColor = color
+			visible: cfg.useCustomColors
+			color: cfg.textColor
+			onColorChanged: cfg.textColor = color
 		}
 	}
 }
