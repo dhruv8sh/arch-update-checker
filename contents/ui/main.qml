@@ -70,10 +70,7 @@ PlasmoidItem {
   Timer {
     id: startupTimer
     interval: 5000
-    onTriggered: {
-      isUpdating = true
-      Util.action_searchForUpdates()
-    }
+    onTriggered: Util.action_searchForUpdates()
     running: false
     repeat: false
   }

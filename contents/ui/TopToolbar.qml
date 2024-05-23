@@ -74,7 +74,7 @@ StackLayout {
             enabled: packageModel.count > 0 && !isUpdating
 	    property var sortable : ["PackageName", "Source", "Size"];
 	    property var names    : ["Package Name", "Source Name", "Download Size"];
-	    property var icons    : ["view-sort-ascending-name","view-sort-descending-name","view-sort-ascending-name","view-sort-descending-name","view-sort-ascending","view-sort-descending"];
+	    property var icons    : ["view-sort-ascending-name","view-sort-descending-name","vcs-commit-cvs-cervisia","vcs-update-cvs-cervisia","view-sort-ascending","view-sort-descending"];
 	    property int curr: 0
             onClicked: {
 		curr ++;
@@ -83,7 +83,7 @@ StackLayout {
 		sortBy = sortable[parseInt(curr/2)];
 		icon.name = icons[curr];
             }
-            PlasmaComponents.ToolTip { text: i18n("Sorted by: "+sortButton.names[sortButton.curr]+(sortButton.curr%2==1?"(Descending)":"")) }
+            PlasmaComponents.ToolTip { text: i18n("Sorted by: "+sortButton.names[parseInt(sortButton.curr/2)]+(sortButton.curr%2==1?" (Descending)":"")) }
         }
     }
     PlasmaExtras.Heading {
