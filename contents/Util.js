@@ -23,7 +23,7 @@ function searching(message, icon) {
 function stopSearch(){
 	timer.start()
 	isUpdating = false
-	statusMessage = packageModel.count === 0 ? "" : packageModel.count + i18n(" updates available")+(downloadSize?" ("+humanize(downloadSize)+")":0)
+	statusMessage = packageModel.count === 0 ? "" : packageModel.count + i18n(" updates available")+(downloadSize?" ("+humanize(downloadSize)+")":"")
 	statusIcon    = packageModel.count === 0 ? "" : "update-none"
 }
 function stopSearchWithError(stderror,code,message,icon){
