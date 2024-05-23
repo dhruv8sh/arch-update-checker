@@ -54,6 +54,7 @@ function fetchIcon(PackageName, Source, Group) {
 
 //Util functions
 function action_searchForUpdates() {
+	if( isUpdating ) return;
 	searching("Checking internet connection","speedometer")
 	const flatpakCmd = `flatpak remote-ls --updates --columns=application,download-size | while read -r updateline; do
     		id=$(echo "$updateline" | awk '{print $1}')

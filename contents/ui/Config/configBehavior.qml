@@ -29,7 +29,7 @@ Kirigami.ScrollablePage {
             RowLayout{
                 id: time
                 Kirigami.FormData.label: i18n("Poll Interval:")
-                property int value: cfg.pollinterval
+                property int value: plasmoid.configuration.pollinterval
                 QQC2.SpinBox {
                     id: hrs
                     from: 0
@@ -102,7 +102,7 @@ Kirigami.ScrollablePage {
                     {text: "kitty"}
                 ];
                 currentIndex: {
-                    switch(cfg.terminal) {
+                    switch(plasmoid.configuration.terminal) {
                         case "konsole"   : return 0;
                         case "alacritty" : return 1;
                         case "kitty"     : return 2;

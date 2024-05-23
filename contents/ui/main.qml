@@ -35,7 +35,12 @@ PlasmoidItem {
   signal pop();
 
   toolTipMainText: i18n("Arch Update Checker")
-  toolTipSubText: i18n("Updates available: "+packageModel.count)
+  toolTipSubText: {
+  	if( error !== "" || isUpdating ) return statusMessage;
+  	else if( packageModel.count === 0 ) return i18n("No updates available");
+  	else if( packageModel.count > 999 ) return i18n("999+ updates available");
+	else return i18n(packageModel.count+" updates available");
+  }
   Plasmoid.status: (packageModel.count >= cfg.activeAmount || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
   Item{
     id: config
