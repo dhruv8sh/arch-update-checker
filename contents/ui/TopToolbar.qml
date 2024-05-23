@@ -71,17 +71,19 @@ StackLayout {
         PlasmaComponents.ToolButton {
             id: sortButton
             icon.name: "view-sort-ascending-name"
-            enabled: packageModel.count > 0
-	    property var sortable : ["PackageName", "Source", "Size", "Size"];
-	    property var names    : ["Package Name", "Source Name", "Download Size", "Download Size (Descending)"];
+            enabled: packageModel.count > 0 && !isUpdating
+	    property var sortable : ["PackageName", "Source", "Size"];
+	    property var names    : ["Package Name", "Source Name", "Download Size"];
+	    property var icons    : ["view-sort-ascending-name","view-sort-descending-name","view-sort-ascending-name","view-sort-descending-name","view-sort-ascending","view-sort-descending"];
 	    property int curr: 0
             onClicked: {
-	   	if( curr == 3 ) curr = 0;
-		else curr ++;
-		ascending  = curr < 3;
-		sortBy = sortable[curr];
+		curr ++;
+		if( curr > 5 ) curr = 0;
+		ascending  = curr % 2 == 0;
+		sortBy = sortable[parseInt(curr/2)];
+		icon.name = icons[curr];
             }
-            PlasmaComponents.ToolTip { text: i18n("Sorted by: "+sortButton.names[sortButton.curr]) }
+            PlasmaComponents.ToolTip { text: i18n("Sorted by: "+sortButton.names[sortButton.curr]+(sortButton.curr%2==1?"(Descending)":"")) }
         }
     }
     PlasmaExtras.Heading {
