@@ -86,13 +86,8 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
         visible: !main.isUpdating
-        contentWidth: availableWidth //- (contentItem.leftMargin + contentItem.rightMargin + 18)
         contentItem: ListView {
             id: packageView
-            // topMargin: Kirigami.Units.smallSpacing * 2
-            // bottomMargin: Kirigami.Units.smallSpacing * 2
-            // leftMargin: Kirigami.Units.smallSpacing * 2
-            // rightMargin: Kirigami.Units.smallSpacing * 2
             spacing: Kirigami.Units.smallSpacing
             model: filterModel
             currentIndex: -1
