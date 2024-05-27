@@ -1,14 +1,14 @@
 const validUnits = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
 const conversionFactor = {
-	"B": 0.0009765625,
-	"K": 1,
-	"M": 1024,
-	"G": 1024 * 1024,
-	"T": 1024 * 1024 * 1024,
-	"P": 1024 * 1024 * 1024 * 1024,
-	"E": 1024 * 1024 * 1024 * 1024 * 1024,
-	"Z": 1024 * 1024 * 1024 * 1024 * 1024 * 1024,
-	"Y": 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+	"B": 0.00000095367431640625,
+	"K": 0.0009765625,
+	"M": 1,
+	"G": 1024,
+	"T": 1024 * 1024,
+	"P": 1024 * 1024 * 1024,
+	"E": 1024 * 1024 * 1024 * 1024,
+	"Z": 1024 * 1024 * 1024 * 1024 * 1024,
+	"Y": 1024 * 1024 * 1024 * 1024 * 1024 * 1024
 };
 //function for UI
 function searching(message, icon) {
@@ -150,8 +150,8 @@ function action_searchForUpdates() {
 					default: description += "\n"+tag+":"+value; break;
 				}
 			});
-		addToModel(name?name:id,
-			ref,
+		addToModel(name?name:ref,
+			id,
 			version,
 			"FLATPAK ("+refAlt+")",
 			undefined,
@@ -235,17 +235,21 @@ function addToModel(...details) {
 		"Size"       : details[7]?details[7]:0
 	});
 }
-function humanize(kbs) {
-	let unit = validUnits.reverse().find(u => kbs > conversionFactor[u]);
-	const roundedValue = (kbs / conversionFactor[unit]).toFixed(2);
+function humanize(mbs) {
+	let unit = 'K';
+	for( let vu of validUnits )
+		if( conversionFactor[vu] < mbs ) unit = vu;
+		else break;
+	const roundedValue = (mbs / conversionFactor[unit]).toFixed(2);
+	if( unit !== 'B' ) unit += 'iB';
 	return roundedValue+" "+unit;
 }
 function resolveAddSize(amount) {
 	const [value1Str, unit1] = amount.split(' ');
 	const value1 = parseFloat(value1Str);
-	const kilobytes = value1 * conversionFactor[unit1.charAt(0).toUpperCase()];
-	downloadSize += kilobytes;
-	return kilobytes;
+	const megabytes = value1 * conversionFactor[unit1.charAt(0).toUpperCase()];
+	downloadSize += megabytes;
+	return megabytes;
 }
 function action_updateSystem() {
 	searching("Updating system","akonadiconsole")
@@ -266,7 +270,7 @@ function action_clearOrphans() {
 	else if( cfg.useAUR ) 			  command = `${cfg.aurWrapper} -Rns $(${cfg.aurWrapper} -Qtdq)`;
 	else 					  command = "sudo pacman -Rns $(pacman -Qtdq)";
 	command += ';'
-	execInTerminal(command, true, true)
+	execInTerminal(command, true)
 }
 function action_installOne(name, source) {
 	console.log( cfg.allowSingleModification );
@@ -281,7 +285,7 @@ function action_installOne(name, source) {
 	else if( source === "AUR") command = cfg.aurWrapper+" -S " + name
 	else                       command = "sudo pacman -S " + name
 	command += ';'
-	execInTerminal(command, true, true)
+	execInTerminal(command, true)
 }
 function action_showDetailedInfo(name, source) {
 	let command = ""
@@ -289,14 +293,14 @@ function action_showDetailedInfo(name, source) {
 	else if( source === "AUR" ) command = cfg.aurWrapper+" -Sii "+name
 	else 			    command = "pacman -Sii "+name
 	command += ';'
-	execInTerminal(command, true, false)
+	execInTerminal(command, true)
 }
 function action_uninstall(source, name) {
 	let command = ""
 	if( source === "FLATPAK" ) command = "sudo flatpak uninstall "+name;
 	else if( source === "AUR" )command = cfg.aurWrapper+" -R "+name
 	else command = "sudo pacman -R "+name
-	execInTerminal(command, true, false)
+	execInTerminal(command, true)
 }
 function action_notificationInstall() {
 	let notifypath= '~/.local/share/knotifications6/archupdatechecker.notifyrc'

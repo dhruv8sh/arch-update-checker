@@ -55,6 +55,7 @@ name > proton... > wine
 name > python... > pythonbackend
 name > firefox... > firefox
 name > lua... > luabackend
+name > libreoffice... > libreoffice-startcenter
 name > jre... > folder-java-symbolic
 name > jdk... > folder-java-symbolic
 name > openjdk... > folder-java-symbolic

@@ -21,34 +21,22 @@ PlasmoidItem {
 
   property bool isUpdating: false
   property bool hasUserSeen: false
-  property var details: []
   property string error: ""
   property bool wasFlatpakDisabled: false
   property bool showAllowSingleModifications: false
   property bool showNotification: false
-  property string outputText: ''
   property var cfg: plasmoid.configuration
-  property string sourceList : ""
   property string statusMessage: ""
   property string statusIcon: ""
   property double downloadSize: 0
   signal pop();
 
   toolTipMainText: i18n("Arch Update Checker")
-  toolTipSubText: {
-  	if( error !== "" || isUpdating ) return statusMessage;
-  	else if( packageModel.count === 0 ) return i18n("No updates available");
-  	else if( packageModel.count > 999 ) return i18n("999+ updates available");
-	else return i18n(packageModel.count+" updates available");
-  }
+  toolTipSubText: statusMessage
   Plasmoid.status: (packageModel.count >= cfg.activeAmount || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
-  Item{
-    id: config
-    property int interval: cfg.pollInterval * 1000 * 60
-  }
   Timer {
     id: timer
-    interval: config.interval
+    interval: cfg.pollInterval * 1000 * 60
     running: isNotPaused
     repeat: true
     onTriggered: {

@@ -99,16 +99,12 @@ ColumnLayout {
                 showSeparator: index !== 0
                 width: packageView.width //- Kirigami.Units.smallSpacing * 4
             }
-            Loader {
+            Kirigami.PlaceholderMessage {
                 anchors.centerIn: parent
                 width: parent.width - (Kirigami.Units.largeSpacing * 4)
-                active: packageModel.count === 0
-                asynchronous: true
-                visible: status === Loader.Ready
-                sourceComponent: PlasmaExtras.PlaceholderMessage {
-                    text: "You are up-to date!"
-                    iconName: "checkmark"
-                }
+                visible: packageView.count === 0
+                text: error===""?"You are up-to date!":"Error!"
+                icon.name: error===""?"checkmark":"data-error"
             }
         }
     }
