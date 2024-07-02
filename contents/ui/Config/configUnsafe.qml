@@ -18,6 +18,12 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
             visible: true
         }
+        Kirigami.InlineMessage {
+            text: i18n("Features below are currently under maintainance and might not work due to recent major code refactors.")
+            type: Kirigami.MessageType.Warning
+            Layout.fillWidth: true
+            visible: true
+        }
         Kirigami.FormLayout {
             QQC2.CheckBox {
                 id: debugNormal

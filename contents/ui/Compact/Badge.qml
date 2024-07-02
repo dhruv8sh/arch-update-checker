@@ -63,8 +63,9 @@ Rectangle {
         id: label
         color              : cfg.useCustomColors ? cfg.textColor : Kirigami.Theme.backgroundColor;
         visible            : cfg.useBadgeNumber
-        font.pixelSize     : 8
+        font.pixelSize     : 10
         antialiasing       : true
+        font.bold          : true
         anchors.fill       : parent
         anchors.margins    : parent.anchors.margins
         verticalAlignment  : Text.AlignVCenter

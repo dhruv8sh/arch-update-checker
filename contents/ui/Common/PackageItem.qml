@@ -15,41 +15,40 @@ PlasmaExtras.ExpandableListItem {
     allowStyledText: true
     subtitle: "<b>"+Source+"</b>   |   " + FromVersion + cfg.packageSeparator + ToVersion
     defaultActionButtonAction: Action {
-            text: i18n("More Info")
-            icon.name: "showinfo"
-            onTriggered: Util.action_showDetailedInfo(Source==="FLATPAK"?FromVersion:PackageName,Source)
+        icon.name: "showinfo"
+        onTriggered: {
+            if(Source.startsWith("FLATPAK")) Util.commands["showFlatpakInfo"].run(FromVersion)
+            else if( Source==="AUR" ) Util.commands["showAURInfo"].run(PackageName)
+            else Util.commands["showPacmanInfo"].run(PackageName)
         }
+    }
     contextualActions: [
         Action {
             id: singleInstallButton
             icon.name: "run-install"
             text: i18n("Update")
-            onTriggered: Util.action_installOne(Source==="FLATPAK"?FromVersion:PackageName, Source)
+            onTriggered: {
+                if(Source.startsWith("FLATPAK")) Util.commands["installFlatpak"].run(FromVersion)
+                else if( Source==="AUR" ) Util.commands["installAUR"].run(PackageName)
+                else Util.commands["installPacman"].run(PackageName)
+            }
             enabled: Source === "FLATPAK"|| cfg.allowSingleModification != 0
         },
         Action {
             text: i18n("Uninstall")
             icon.name: "uninstall"
-            onTriggered: Util.action_uninstall(Source==="FLATPAK"?FromVersion:PackageName,Source)
+            onTriggered: {
+                if(Source.startsWith("FLATPAK")) Util.commands["uninstallFlatpak"].run(FromVersion)
+                else if( Source==="AUR" ) Util.commands["uninstallAUR"].run(PackageName)
+                else Util.commands["uninstallPacman"].run(PackageName)
+            }
         },
-	Action {
-	    text: i18n("Open URL")
-	    icon.name: "edit-link"
-	    onTriggered: Qt.openUrlExternally(URL)
-	}
-    ]
-
-    KSvg.SvgItem {
-        id: separatorLine
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
+        Action {
+            text: i18n("Open URL")
+            icon.name: "edit-link"
+            onTriggered: Qt.openUrlExternally(URL)
         }
-        imagePath: "widgets/line"
-        elementId: "horizontal-line"
-        width: parent.width - Kirigami.Units.gridUnit
-        visible: showSeparator
-    }
+    ]
     customExpandedViewContent: DetailsText{
         id: detailsText
         details: Desc.trim().split('\n')

@@ -28,7 +28,12 @@ Plasma5Support.DataSource {
 	if(cfg.debugCommands)console.log("running command:"+cmd)
         connectSource(cmd)
     }
-
+    function endAll(){
+        for( var proc in listeners ){
+            delete listeners[proc]
+            disconnectSource(proc)
+        }
+    }
     function execCallback(callback, cmd, out, err, code) {
         delete listeners[cmd]
         if (callback) callback(cmd, out, err, code)

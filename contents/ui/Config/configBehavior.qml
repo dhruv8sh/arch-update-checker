@@ -10,8 +10,7 @@ Kirigami.ScrollablePage {
     property alias cfg_pollInterval    : time.value
     property alias cfg_searchOnExpand  : updateOnExpand.checked
     property alias cfg_searchOnStart   : updateOnStartup.checked
-    property alias cfg_terminal        : terminal.value
-    property alias cfg_holdTerminal    : holdTerminal.checked
+    property alias cfg_terminal        : terminal.text
     property alias cfg_useNotifications: notificationsToggle.checked
     property alias cfg_customScript    : customScript.text
     property alias cfg_useCustomInstall: useCustomScript.checked
@@ -91,30 +90,10 @@ Kirigami.ScrollablePage {
             Item {
                 Kirigami.FormData.isSection: true
             }
-            QQC2.ComboBox {
+            QQC2.TextField {
                 id: terminal
-                property string value: model[currentIndex].text
-                Kirigami.FormData.label: i18n("Terminal:")
-                textRole: "text"
-                model: [
-                    {text: "konsole"},
-                    {text: "alacritty"},
-                    {text: "kitty"}
-                ];
-                currentIndex: {
-                    switch(plasmoid.configuration.terminal) {
-                        case "konsole"   : return 0;
-                        case "alacritty" : return 1;
-                        case "kitty"     : return 2;
-                        default          : return 0;
-                    }
-                }
-                onCurrentIndexChanged: value = model[currentIndex].text
-            }
-            QQC2.CheckBox {
-                id: holdTerminal
-                Kirigami.FormData.label: i18n("Do not close terminal:")
-                text: i18n("After update")
+                Kirigami.FormData.label: i18n("Terminal Command:")
+                placeholderText: "konsole -e"
             }
             RowLayout {
                 Kirigami.FormData.label: i18n("Custom `update system` command:")

@@ -19,12 +19,12 @@ PlasmoidItem {
   ListModel { id: packageModel }
   PackageManager{ id: packageManager }
 
-  property bool isUpdating: false
+  property bool isBusy: false
   property bool hasUserSeen: false
   property string error: ""
-  property bool wasFlatpakDisabled: false
   property bool showAllowSingleModifications: false
   property bool showNotification: false
+  property bool missingDependency: false
   property var cfg: plasmoid.configuration
   property string statusMessage: ""
   property string statusIcon: ""
@@ -33,7 +33,7 @@ PlasmoidItem {
 
   toolTipMainText: i18n("Arch Update Checker")
   toolTipSubText: statusMessage
-  Plasmoid.status: (packageModel.count >= cfg.activeAmount || isUpdating || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
+  Plasmoid.status: (packageModel.count >= cfg.activeAmount || isBusy || error !== "") ? PlasmaCore.Types.ActiveStatus : PlasmaCore.Types.PassiveStatus
   Timer {
     id: timer
     interval: cfg.pollInterval * 1000 * 60
@@ -42,7 +42,7 @@ PlasmoidItem {
     onTriggered: {
       hasUserSeen = false
       showNotification = true
-      Util.action_searchForUpdates()
+      Util.commands["checkUpdates"].run()
     }
   }
   Notification {
@@ -58,25 +58,27 @@ PlasmoidItem {
   Timer {
     id: startupTimer
     interval: 5000
-    onTriggered: Util.action_searchForUpdates()
+    onTriggered: if(!missingDependency) Util.commands["checkUpdates"].run()
     running: false
     repeat: false
   }
   Component.onCompleted : () => {
     hasUserSeen = false;
-    Util.action_notificationInstall()
+    Util.notificationInstall()
+    Util.checkDependency("pacinfo")
+    Util.checkDependency("checkupdates")
     if( cfg.searchOnStart ) startupTimer.start()
   }
   Plasmoid.contextualActions: [
       PlasmaCore.Action {
           text: i18n("Update System")
           icon.name: "install-symbolic"
-          onTriggered: Util.action_updateSystem()
+          onTriggered: Util.updateSystem()
       },
       PlasmaCore.Action {
           text: i18n("Check for Updates")
           icon.name: "view-refresh"
-          onTriggered: Util.action_searchForUpdates()
+          onTriggered: Util.commands["checkUpdates"].run()
       }
     ]
 }

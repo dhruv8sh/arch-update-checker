@@ -7,7 +7,6 @@ import "../Pages/" as Pages
 
 Kirigami.ScrollablePage {
     id: root
-    property alias cfg_usePamacInstead : usePamac.checked
     property alias cfg_useAUR          : useAUR.checked
     property alias cfg_useFlatpak      : useFlatpak.checked
     property alias cfg_aurWrapper      : aurWrapper.value
@@ -16,13 +15,6 @@ Kirigami.ScrollablePage {
 
     Kirigami.FormLayout {
         anchors.fill: parent
-        QQC2.CheckBox {
-            id: usePamac
-            Kirigami.FormData.label: i18n("Use `pamac`:")
-            text: "pacman "+i18n("will not be used")
-            visible: true
-        }
-
         Item {
             Kirigami.FormData.isSection: true
         }

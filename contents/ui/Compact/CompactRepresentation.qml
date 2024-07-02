@@ -13,11 +13,11 @@ MouseArea {
     hoverEnabled: true
     onPressed: wasExpanded = expanded
     onClicked: mouse => {
-        if (mouse.button == Qt.MiddleButton) Util.action_updateSystem()
+        if (mouse.button == Qt.MiddleButton) Util.updateSystem()
         else {
             expanded = !wasExpanded;
             if( expanded && cfg.searchOnExpand && main.hasUserSeen )
-                Util.action_searchForUpdates();
+                Util.searchForUpdates();
             if( !cfg.rememberState )
                 main.pop();
             main.hasUserSeen = true
@@ -45,7 +45,7 @@ MouseArea {
     states:[
         State {
             name: "updating"
-            when: isUpdating
+            when: isBusy
             PropertyChanges{
                 target: badge
                 visible: false
