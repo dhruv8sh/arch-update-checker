@@ -326,11 +326,19 @@ function execInTerminal( cmd, hold, searchAfter ) {
 ###############################################################################
 #############################    Process Ended    #############################
 ###############################################################################`
+
 	let termCmd  = cfg.terminal + ` -e bash -c 'trap "" SIGINT; echo "${startMessage}"; ${cmd} echo "${endMessage}";`
 	if( hold ) termCmd += `read -n 1 -p "Press Any Key to exit...";'`
 	else termCmd += `'`
+
 	packageManager.exec(termCmd,(_,_,stderr,_)=>{
 		console.log("errorlog:"+stderr);
-		if( searchAfter ) action_searchForUpdates();
+    if( searchAfter ) {
+      // seraching() was called in action_updateSystem which set isUpdating if
+      // stopSearch() is not called action_searchForUpdates() will early
+      // return and not perform a serach.
+      stopSearch()
+      action_searchForUpdates();
+    }
 	})
 }
