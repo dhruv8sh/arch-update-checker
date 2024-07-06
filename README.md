@@ -1,27 +1,35 @@
 # Arch Update Checker
-A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
+A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates, along with official Arch Linux Update News feed.
+
+## Supported Wrappers
+- [Paru](https://github.com/Morganamilo/paru)
+- [Yay](https://github.com/Jguer/yay)
+- [Trizen](https://github.com/trizen/trizen)
+- [Pikaur](https://github.com/actionless/pikaur)
+- [Aura](https://github.com/fosskers/aura)
+- [Pacaur](https://github.com/rmarquis/pacaur) [Unmaintained]
 
 ## Screenshots
 
 <div align="center">
 <p>
   
-![Screenshot_20240508_142812](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/aebae6ed-d075-4a8c-b5ee-57de7fe6c1c7)<br/>
-<i>Available updates view</i>
+![image](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/d475d25e-9636-40ce-871c-6e7f1b1f376c)<br/>
+<i>Available updates list view</i>
 <br/><br/>
 </p>
 
 <p>
   
-![Screenshot_20240508_143330](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/5edb0542-12f2-40e2-8cb8-1faa348b96ff)<br/>
-<i>Arch Linux Update News</i>
+![image](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/0dac6eaa-0ad9-482d-b58e-b1569cf6f071)<br/>
+<i>Expanded details in list view</i>
 <br/><br/>
 </p>
 
 <p>
 
-![Screenshot_20240508_143537](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/91ee7d25-54fd-4191-b65e-51533aa27f8e)<br/>
-<i>Setup screen (Now hidden until out of Beta)</i>
+![image](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/ba1a59a7-f8bd-417e-853b-d3754b4bad1e)<br/>
+<i>Official Arch Linux News</i>
 
 <br/><br/>
 </p>
@@ -29,46 +37,28 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates.
 </div>
 
 ## Todo
-- [x] Support for YAY, Trizen, Paru and Pikaur
-- [x] Flatpak Support
-- [x] Complete support for AURA and PACAUR
-- [x] Orphan Removal
-- [x] Rewrite to look native
-  - [x] Details on item expand
-  - [x] Flatpak details on expand
-  - [x] Ask for modifying singular updates
-  - [x] Better error handling
-  - [x] Extensive logging support
-- [x] Notification on update
-  - [x] Basic Support
-  - [x] Native Support
-  - [ ] Support for update diff
-- [x] Support for Arch Linux Update News
-- [ ] (1/2) Support for mirrorlist update
-- [x] Support for alacritty and kitty
-- [x] Support for pamac
-- [ ] Automatic setup
-- [ ] Snap support
-
+- [ ] Add more pages to install/uninstall/manage packages
+- [ ] Integration with pacman-offline
+- [ ] Snap support(Unplanned)
 
 ## Installation
 
 
 #### Required :
-You need to install ```pacutils``` and ```pacman-contrib``` packages for the applet to work correctly.
-Run ```sudo pacman -S pacutils pacman-contrib```.
+```pacman-contrib``` and ```pacutils``` are required.
+The applet will automatically ask you to install them if not installed.
+
+```sudo pacman -S pacman-contrib pacutils``` to install manually.
 
 #### Recommended method :
-Use the `Download new widget` functionality to obtain the widget (currently there are no auto updates for widgets on plasma 6, and you can't update them via the update button, [relevant](https://bugs.kde.org/show_bug.cgi?id=483570) [issues](https://discuss.kde.org/t/kde-6-widgets-fail-to-update/14337))
+Use the 'Download New Plasma Widgets' functionality in the edit mode and look for "Arch Update Checker".
 
-If the applet doesn't get automatically added to your system tray, run:
-`systemctl --user restart plasma-plasmashell` - this will restart your plasma shell
-or log out and back in.
-
-#### Alternatively,
-you can use `kpackagetool6` (currently broken) or `plasmapkg2` (not part of a clean plasma 6 install)
+#### Alternatively :
+You can run:
 ```
-git clone https://github.com/dhruv8sh/arch-update-checker/
-cd arch-update-checker
-kpackagetool6 -i .
+git clone https://github.com/dhruv8sh/arch-update-checker
+rm -rf ~/.local/share/plasma/plasmoids/org.kde.archupdatechecker/
+cp -r arch-update-checker/ ~/.local/share/plasma/plasmoids/org.kde.archupdatechecker
+systemctl --user restart plasma-plasmashell
 ```
+This will restart your plasmashell
