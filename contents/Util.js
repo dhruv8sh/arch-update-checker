@@ -146,18 +146,21 @@ class Command {
             read -n 1 -p "Press Any Key to exit...";'`
         packageManager.exec(termCmd,(_,_2,stderr,_3)=>{
             stopSearch()
+            if(cfg.debugCommands) console.log("Command: "+newCmd+"\nOutput:"+stdout+"\nstderr:"+stderr)
         })
     }
     exec(newCmd){
         packageManager.exec(newCmd,(_,stdout,stderr,_2)=>{
             this.callback(stdout)
             if(stderr!==""&&stdout.trim()==="") errorRaised(stderr,this.err)
+            if(cfg.debugCommands) console.log("Command: "+newCmd+"\nOutput:"+stdout+"\nstderr:"+stderr)
         })
     }
     run(name){
         startSearch(this.txt,this.icn, this.showsBusy)
         let newCmd = this.cmd.replace(/{\$aur}/g,cfg.aurWrapper)
         .replace("{}",name);
+        if(cfg.debugCommands) console.log("running "+newCmd)
         if(this.runsInTerm) this.execInTerminal(newCmd)
         else this.exec(newCmd)
     }
@@ -165,7 +168,7 @@ class Command {
 let commands = {
     checkUpdates:new Command("ping -c 1 google.com > /dev/null",
         "No internet Connection","Checking Internet Connection",
-        "speedometer",true,false,()=>{packageModel.clear();commands["getPacman"].run()}),
+        "speedometer",true,false,internetAvailable),
     getPacman:new Command("checkupdates --nocolor|sort; echo \"--------\"; checkupdates --nocolor|sort|awk '{print $1}'|pacinfo",
         "checkupdates/pacinfo command error", "Checking Arch Repositories...",
         "package",true,false,gotPacman),
@@ -218,18 +221,31 @@ done`,
         "Pacman Error","Cleaning up orphans",
         "edit-clear-all",true,true)
 }
+function internetAvailable(){
+    packageModel.clear()
+    commands["getPacman"].run()
+}
 function gotPacman(output){
     let [versions,...rest] = output.split("--------")
     let details = rest.join("--------").trim().split('\n\n')
     versions = versions.trim().split('\n')
-    for(let i=0,j=1; i<versions.length; i++,j+=2)
-    parsePacinfo(versions[i],details[j])
+    let i = 0;
+    versions.forEach(version=>{
+        let vername = details[i].slice(0,details[i].indexOf('\n'))
+        parsePacinfo(version, details[i+1])
+        i+=2
+        while(i<details.length && details[i].slice(0,details[i].indexOf('\n')===vername)) i++;
+    });
+
     if(cfg.useAUR) {
         if(cfg.aurWrapper==="trizen"||cfg.aurWrapper==="pikaur") commands["getAURAlt1"].run()
         else if(cfg.aurWrapper==="pacaur") commands["getAURAlt2"].run()
         else commands["getAUR"].run()
     } else if(cfg.useFlatpak) commands["getFlatpak"].run()
-    else stopSearch()
+    else {
+        stopSearch()
+        notifBuild()
+    }
 }
 function gotAUR(output){
     let [versions,...rest] = output.split("--------")
@@ -238,7 +254,10 @@ function gotAUR(output){
     for(let i=0; i<versions.length; i++)
         parsePacinfo(versions[i].trim(),details[i],"AUR")
     if(cfg.useFlatpak) commands["getFlatpak"].run()
-    else stopSearch()
+    else {
+        stopSearch()
+        notifBuild()
+    }
 }
 function gotFlatpak(output){
     let lines = output.split('--------------');
@@ -248,7 +267,7 @@ function gotFlatpak(output){
         .filter(lines=>lines.length > 3)
         .forEach(parseFlatpakInfo);
     stopSearch()
-    if(showNotification) notif.sendEvent()
+    notifBuild()
 }
 function parsePacinfo(ver,deets,source){
     let [name, prev_ver, arrow, next_ver] = ver.split(/\s+/)
@@ -319,4 +338,26 @@ function updateSystem() {
     new Command(command,
         "Error updating packages","Updating System",
         "akonadiconsole",true,true).run()
+}
+function notifBuild() {
+    let arr=[]
+    for(let i=0; i<packageModel.count; i++){
+        let pkg = packageModel.get(i)
+        arr.push({
+            "Name":pkg["PackageName"],
+            "Ver":pkg["ToVersion"],
+            "Source":pkg["Source"]
+        })
+    }
+    let prev_list = cfg.lastList.split('\n')
+    let list = prev_list===""?[]:arr.map(ob=>ob.Name+" > "+ob.Ver)
+    let diff = list.filter(line=>!prev_list.includes(line))
+    if(diff.length>0 && showNotification){
+        notifText = diff.join('\n')
+        notifDiff = diff.length
+        notif.sendEvent()
+    }
+    cfg.lastList = list.join('\n')
+    console.log(diff)
+    showNotification = false
 }

@@ -10,7 +10,6 @@ Kirigami.ScrollablePage {
     property alias cfg_debugNormal      : debugNormal.checked
     property alias cfg_debugCommands    : debugCommands.checked
     property alias cfg_showBadgeAlways  : showBadgeAlways.checked
-    property alias cfg_showIntro        : showIntroAgain.checked
     property alias cfg_allowSingleModification : singleChange.checkState
     ColumnLayout {
         Kirigami.InlineMessage {
@@ -40,11 +39,6 @@ Kirigami.ScrollablePage {
             QQC2.CheckBox {
                 Kirigami.FormData.label: i18n("Always Show Badge:")
                 id: showBadgeAlways
-            }
-            QQC2.CheckBox {
-                Kirigami.FormData.label: i18n("Show Intro Pages:")
-                text: i18n("On next startup")
-                id: showIntroAgain
             }
             Item {
                 Kirigami.FormData.isSection: true

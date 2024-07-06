@@ -41,6 +41,7 @@ Kirigami.Page {
                     if( isBusy ) Util.endAll();
                     else Util.commands["checkUpdates"].run()
                 }
+                PlasmaComponents.ToolTip{ text: parent.text }
                 display:QQC2.AbstractButton.IconOnly
             }
             QQC2.ToolButton {
@@ -49,9 +50,7 @@ Kirigami.Page {
                 onClicked: Util.updateSystem()
                 enabled: !isBusy
                 display:QQC2.AbstractButton.IconOnly
-            }
-            QQC2.Label{
-                Layout.fillWidth: true
+                PlasmaComponents.ToolTip{ text: parent.text }
             }
             Kirigami.SearchField {
                 id: searchTextField
@@ -112,6 +111,7 @@ Kirigami.Page {
                     checkable: true
                     checked: !isNotPaused
                     onCheckedChanged: main.isNotPaused = !checked
+                    PlasmaComponents.ToolTip { text: i18n(isNotPaused?"Automatically searching for updates":"Automatic updates paused") }
                 }
             }
         }

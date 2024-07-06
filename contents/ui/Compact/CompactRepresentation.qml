@@ -16,11 +16,10 @@ MouseArea {
         if (mouse.button == Qt.MiddleButton) Util.updateSystem()
         else {
             expanded = !wasExpanded;
-            if( expanded && cfg.searchOnExpand && main.hasUserSeen )
+            if( expanded && cfg.searchOnExpand )
                 Util.searchForUpdates();
             if( !cfg.rememberState )
                 main.pop();
-            main.hasUserSeen = true
         }
     }
     Keys.onPressed: event => {
