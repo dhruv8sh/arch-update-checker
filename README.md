@@ -8,13 +8,14 @@ A KDE Plamsa Applet (Plasmoid) to check for Arch, AUR and Flatpak Updates, along
 - [Pikaur](https://github.com/actionless/pikaur)
 - [Aura](https://github.com/fosskers/aura)
 - [Pacaur](https://github.com/rmarquis/pacaur) [Unmaintained]
+- ~~[Pamac](https://wiki.manjaro.org/index.php/Pamac)~~ : will be added back in the next version
 
 ## Screenshots
 
 <div align="center">
 <p>
-  
-![image](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/d475d25e-9636-40ce-871c-6e7f1b1f376c)<br/>
+
+![Screenshot_20240707_161427](https://github.com/dhruv8sh/arch-update-checker/assets/67322047/2e2bb3cd-fad9-481a-b9f7-c634ba3143bd)<br/>
 <i>Available updates list view</i>
 <br/><br/>
 </p>
