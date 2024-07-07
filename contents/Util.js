@@ -358,6 +358,5 @@ function notifBuild() {
         notif.sendEvent()
     }
     cfg.lastList = list.join('\n')
-    console.log(diff)
     showNotification = false
 }

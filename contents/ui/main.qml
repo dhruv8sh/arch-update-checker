@@ -15,8 +15,8 @@ PlasmoidItem {
     property bool isNotPaused: true
     compactRepresentation: Compact.CompactRepresentation { }
     fullRepresentation:  Full{}
-    switchWidth: 500
-    switchHeight: 500
+    switchWidth: 300
+    switchHeight: 300
 
     ListModel { id: packageModel }
     PackageManager{ id: packageManager }

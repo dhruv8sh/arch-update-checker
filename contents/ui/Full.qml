@@ -7,8 +7,11 @@ import "./Pages/" as Pages
 PlasmaExtras.Representation {
     id: full
     collapseMarginsHint: true
-    Layout.minimumHeight: 400
-    Layout.minimumWidth:  400
+    Layout.minimumHeight: 290
+    Layout.minimumWidth:  290
+    Layout.preferredWidth: 500
+    Layout.preferredHeight: 550
+    anchors.fill: parent
     QQC2.StackView {
         id: stack
         initialItem: Pages.ListPage{}

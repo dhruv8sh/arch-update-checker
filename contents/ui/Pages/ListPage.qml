@@ -91,6 +91,7 @@ Kirigami.Page {
                 QQC2.Label {
                     Layout.alignment: Qt.AlignLeft
                     Layout.fillWidth: true
+                    elide: Text.ElideRight
                     text: statusMessage
                     opacity: 0.7
                 }
