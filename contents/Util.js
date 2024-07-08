@@ -231,10 +231,14 @@ function gotPacman(output){
     versions = versions.trim().split('\n')
     let i = 0;
     versions.forEach(version=>{
-        let vername = details[i].slice(0,details[i].indexOf('\n'))
+        let vername = details[i].slice(16,details[i].indexOf('\n'))
         parsePacinfo(version, details[i+1])
         i+=2
-        while(i<details.length && details[i].slice(0,details[i].indexOf('\n')===vername)) i++;
+        while(i<details.length) {
+            let name = details[i].slice(16,details[i].indexOf('\n'))
+            if( name === vername ) i ++
+            else break
+        }
     });
 
     if(cfg.useAUR) {
