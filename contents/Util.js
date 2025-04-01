@@ -230,6 +230,7 @@ function gotPacman(output){
     let details = rest.join("--------").trim().split('\n\n')
     versions = versions.trim().split('\n')
     let i = 0;
+    downloadSize = 0;
     versions.forEach(version=>{
         let vername = details[i].slice(16,details[i].indexOf('\n'))
         parsePacinfo(version, details[i+1])
