@@ -62,9 +62,12 @@ Kirigami.Page {
                     id: content
                     model: feedModel
                     currentIndex: -1
+                    bottomMargin: Kirigami.Units.smallSpacing
                     spacing: Kirigami.Units.smallSpacing
                     boundsBehavior: Flickable.StopAtBounds
                     highlight: PlasmaExtras.Highlight { }
+                    highlightMoveDuration: 80
+                    highlightResizeDuration: 80
                     delegate: Common.NewsItem {
                         title: head
                         link: hyperlink
