@@ -62,6 +62,7 @@ Kirigami.Page {
                     id: content
                     model: feedModel
                     currentIndex: -1
+                    bottomMargin: Kirigami.Units.smallSpacing
                     spacing: Kirigami.Units.smallSpacing
                     boundsBehavior: Flickable.StopAtBounds
                     highlight: PlasmaExtras.Highlight { }

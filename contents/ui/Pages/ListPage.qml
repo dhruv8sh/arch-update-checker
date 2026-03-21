@@ -195,6 +195,7 @@ Kirigami.Page {
                     contentItem: ListView {
                         id: packageView
                         spacing: Kirigami.Units.smallSpacing
+                        bottomMargin: Kirigami.Units.smallSpacing
                         model: filterModel
                         currentIndex: -1
                         boundsBehavior: Flickable.StopAtBounds
