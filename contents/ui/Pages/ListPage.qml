@@ -199,6 +199,8 @@ Kirigami.Page {
                         currentIndex: -1
                         boundsBehavior: Flickable.StopAtBounds
                         highlight: PlasmaExtras.Highlight { }
+                        highlightMoveDuration: 80
+                        highlightResizeDuration: 80
                         delegate: Common.PackageItem {
                             showSeparator: index !== 0
                             width: packageView.width //- Kirigami.Units.smallSpacing * 4

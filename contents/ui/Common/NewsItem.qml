@@ -9,6 +9,7 @@ import QtQuick.Controls as QQC2
 
 PlasmaExtras.ExpandableListItem {
     id: packageItem
+    required index
     property string link
     property string desc
     property bool showSeparator

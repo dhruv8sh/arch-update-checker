@@ -65,6 +65,8 @@ Kirigami.Page {
                     spacing: Kirigami.Units.smallSpacing
                     boundsBehavior: Flickable.StopAtBounds
                     highlight: PlasmaExtras.Highlight { }
+                    highlightMoveDuration: 80
+                    highlightResizeDuration: 80
                     delegate: Common.NewsItem {
                         title: head
                         link: hyperlink

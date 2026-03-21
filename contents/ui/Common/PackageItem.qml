@@ -9,17 +9,19 @@ import "../../Util.js" as Util
 
 PlasmaExtras.ExpandableListItem {
     id: packageItem
+    required index
+    required property var model
     property bool showSeparator
-    icon: Util.fetchIcon(PackageName, Source, Group)
-    title: PackageName
+    icon: Util.fetchIcon(model.PackageName, model.Source, model.Group)
+    title: model.PackageName
     allowStyledText: true
-    subtitle: "<b>"+Source+"</b>   |   " + FromVersion + cfg.packageSeparator + ToVersion
+    subtitle: "<b>" + model.Source + "</b>   |   " + model.FromVersion + cfg.packageSeparator + model.ToVersion
     defaultActionButtonAction: Action {
         icon.name: "showinfo"
         onTriggered: {
-            if(Source.startsWith("FLATPAK")) Util.commands["showFlatpakInfo"].run(FromVersion)
-            else if( Source==="AUR" ) Util.commands["showAURInfo"].run(PackageName)
-            else Util.commands["showPacmanInfo"].run(PackageName)
+            if (model.Source.startsWith("FLATPAK")) Util.commands["showFlatpakInfo"].run(model.FromVersion)
+            else if (model.Source === "AUR") Util.commands["showAURInfo"].run(model.PackageName)
+            else Util.commands["showPacmanInfo"].run(model.PackageName)
         }
     }
     contextualActions: [
@@ -28,29 +30,29 @@ PlasmaExtras.ExpandableListItem {
             icon.name: "run-install"
             text: i18n("Update")
             onTriggered: {
-                if(Source.startsWith("FLATPAK")) Util.commands["installFlatpak"].run(FromVersion)
-                else if( Source==="AUR" ) Util.commands["installAUR"].run(PackageName)
-                else Util.commands["installPacman"].run(PackageName)
+                if (model.Source.startsWith("FLATPAK")) Util.commands["installFlatpak"].run(model.FromVersion)
+                else if (model.Source === "AUR") Util.commands["installAUR"].run(model.PackageName)
+                else Util.commands["installPacman"].run(model.PackageName)
             }
-            enabled: Source === "FLATPAK"|| cfg.allowSingleModification != 0
+            enabled: model.Source === "FLATPAK" || cfg.allowSingleModification != 0
         },
         Action {
             text: i18n("Uninstall")
             icon.name: "uninstall"
             onTriggered: {
-                if(Source.startsWith("FLATPAK")) Util.commands["uninstallFlatpak"].run(FromVersion)
-                else if( Source==="AUR" ) Util.commands["uninstallAUR"].run(PackageName)
-                else Util.commands["uninstallPacman"].run(PackageName)
+                if (model.Source.startsWith("FLATPAK")) Util.commands["uninstallFlatpak"].run(model.FromVersion)
+                else if (model.Source === "AUR") Util.commands["uninstallAUR"].run(model.PackageName)
+                else Util.commands["uninstallPacman"].run(model.PackageName)
             }
         },
         Action {
             text: i18n("Open URL")
             icon.name: "edit-link"
-            onTriggered: Qt.openUrlExternally(URL)
+            onTriggered: Qt.openUrlExternally(model.URL)
         }
     ]
     customExpandedViewContent: DetailsText{
         id: detailsText
-        details: Desc.trim().split('\n')
+        details: model.Desc.trim().split('\n')
     }
 }
